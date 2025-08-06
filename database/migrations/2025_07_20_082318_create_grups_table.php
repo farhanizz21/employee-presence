@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pegawais', function (Blueprint $table) {
+        Schema::create('grups', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('nama', 100);
-            $table->string('telepon');
-            $table->uuid('grup_uuid');
-            $table->uuid('jabatan_uuid');
-            $table->string('alamat', 255)->nullable();
-            $table->string('keterangan', 255)->nullable();
+            $table->string('grup', 100);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pegawais');
+        Schema::dropIfExists('grups');
     }
 };

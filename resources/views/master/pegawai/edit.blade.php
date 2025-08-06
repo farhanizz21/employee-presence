@@ -40,30 +40,36 @@
                 </div>
                 <!--end::Header-->
                 <!--begin::Form-->
-                <form class="pegawai" method="post" action="{{ route('pegawai.update',$Pegawai->uuid) }}">
+                <form class="pegawai" method="post" action="{{ route('pegawai.update',$pegawai->uuid) }}">
                     @csrf
                     @method('PUT')
                     <!--begin::Body-->
                     <div class="card-body">
                         <div class="form-group row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Nama <span class="text-danger">
                                         *</span></label>
                                 <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror"
-                                    value="{{ $Pegawai->nama }}" required>
+                                    value="{{ $pegawai->nama }}" required>
                                 @error('nama')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
                                 </div>
                                 @enderror
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Golongan <span class="text-danger">
-                                        *</span></label>
-                                <input type="text" name="golongan"
-                                    class="form-control @error('golongan') is-invalid @enderror"
-                                    value="{{ old('golongan', $Pegawai->golongan_uuid) }}" required>
-                                @error('golongan')
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Grup <span class="text-danger">*</span></label>
+                                <select name="grup_uuid" class="form-select @error('grup_uuid') is-invalid @enderror"
+                                    required>
+                                    <option disabled {{ !$pegawai->grup_uuid ? 'selected' : '' }}>Pilih Grup</option>
+                                    @foreach ($grups as $grup)
+                                    <option value="{{ $grup->uuid }}"
+                                        {{ (old('grup', $pegawai->grup->uuid ?? '') == $grup->uuid) ? 'selected' : '' }}>
+                                        {{ $grup->grup }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('grup')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
                                 </div>
@@ -71,24 +77,31 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="col-md-6">
-                                <label class="form-label">Jabatan <span class="text-danger">
-                                        *</span></label>
-                                <input type="text" name="jabatan"
-                                    class="form-control @error('jabatan') is-invalid @enderror"
-                                    value="{{ $Pegawai->jabatan_uuid }}" required>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Jabatan <span class="text-danger">*</span></label>
+                                <select name="jabatan_uuid"
+                                    class="form-select @error('jabatan_uuid') is-invalid @enderror" required>
+                                    <option disabled {{ !$pegawai->jabatan ? 'selected' : '' }}>Pilih Jabatan</option>
+                                    @foreach ($jabatans as $jabatan)
+                                    <option value="{{ $jabatan->uuid }}"
+                                        {{ (old('jabatan', $pegawai->jabatan->uuid ?? '') == $jabatan->uuid) ? 'selected' : '' }}>
+                                        {{ $jabatan->jabatan }}
+                                    </option>
+                                    @endforeach
+                                </select>
                                 @error('jabatan')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
                                 </div>
                                 @enderror
                             </div>
-                            <div class="col-md-6">
+
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Telepon <span class="text-danger">
                                         *</span></label>
                                 <input type="number" name="telepon"
                                     class="form-control @error('telepon') is-invalid @enderror"
-                                    value="{{ $Pegawai->telepon }}" required>
+                                    value="{{ $pegawai->telepon }}" required>
                                 @error('telepon')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
@@ -99,8 +112,8 @@
                         <div class="form-group row">
                             <div class="col-md-12">
                                 <label class="form-label">Alamat</label>
-                                <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror"
-                                    value="{{ $Pegawai->alamat }}"></textarea>
+                                <textarea name="alamat"
+                                    class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat', $pegawai->alamat) }}</textarea>
                                 @error('alamat')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
@@ -112,8 +125,7 @@
                             <div class="col-md-12">
                                 <label class="form-label">Keterangan</label>
                                 <textarea name="keterangan"
-                                    class="form-control @error('keterangan') is-invalid @enderror"
-                                    value="{{ $Pegawai->keterangan }}"></textarea>
+                                    class="form-control @error('keterangan') is-invalid @enderror">{{ old('keterangan', $pegawai->keterangan) }}</textarea>
                             </div>
                             <div class="form-text">
                                 Kolom isian untuk keterangan tambahan, jika ada.
@@ -128,7 +140,9 @@
                     <!--end::Body-->
                     <!--begin::Footer-->
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
                         <a href="{{ route('pegawai.index') }}" class="btn btn-md btn-danger">
                             <i class="fa fa-times"></i> Batal
                         </a>

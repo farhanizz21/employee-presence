@@ -49,7 +49,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $pegawais = \App\Models\Master\Pegawai::all();
+        $pegawais = Pegawai::all();
         return view('master.user.create', compact('pegawais'));
     }
 
@@ -103,7 +103,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:100',
-            'golongan' => 'required|string',
+            'grup' => 'required|string',
             'telepon' => 'required|string|max:20',
             'jabatan' => 'required|string',
             'alamat' => 'nullable|string|max:255',

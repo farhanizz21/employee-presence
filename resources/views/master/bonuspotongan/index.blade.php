@@ -9,13 +9,13 @@
         <!--begin::Row-->
         <div class="row">
             <div class="col-sm-6">
-                <h3 class="mb-0">Master Pegawai</h3>
+                <h3 class="mb-0">Master Bonus & Potongan</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        Master Pegawai
+                        Master Bonus & Potongan
                     </li>
                 </ol>
             </div>
@@ -43,21 +43,21 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col text-start">
-                                    <h3 class="card-title mb-0">Data Master Pegawai</h3>
+                                    <h3 class="card-title mb-0">Data Master Bonus & Potongan</h3>
                                 </div>
                                 <div class="col-auto text-end">
-                                    <a href="{{ route('pegawai.create')}}" class="btn btn-primary shadow-sm">
+                                    <a href="{{ route('bonuspotongan.create')}}" class="btn btn-primary shadow-sm">
                                         <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Data
                                     </a>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body">
-                            <form method="GET" action="{{ route('pegawai.index') }}"
+                            <form method="GET" action="{{ route('bonuspotongan.index') }}"
                                 class="row gy-2 gx-3 mb-3 align-items-center">
                                 <div class="col-md-6 col-lg-4">
-                                    <input type="text" name="search" class="form-control" placeholder="Cari pegawai…"
-                                        value="{{ request('search') }}">
+                                    <input type="text" name="search" class="form-control"
+                                        placeholder="Cari Bonus & Potongan…" value="{{ request('search') }}">
                                 </div>
                                 <div class="col-auto">
                                     <button type="submit" class="btn btn-primary">
@@ -65,7 +65,7 @@
                                     </button>
                                 </div>
                                 <div class="col-auto">
-                                    <a href="{{ route('pegawai.index') }}" class="btn btn-warning">
+                                    <a href="{{ route('bonuspotongan.index') }}" class="btn btn-warning">
                                         <i class="fas fa-redo"></i> Reset
                                     </a>
                                 </div>
@@ -80,12 +80,15 @@
                                         <tr>
                                             <th style="width: 10px">#</th>
                                             <th>
-                                                <a href="{{ route('pegawai.index', ['sort_by' => 'nama', 'sort_order' => $currentOrder] + request()->all()) }}"
+                                                <a href="{{ route('bonuspotongan.index', ['sort_by' => 'nama', 'sort_order' => $currentOrder] + request()->all()) }}"
                                                     class="text-secondary fw-bold">
                                                     Nama
-                                                    @if(request('sort_by') == 'nama' && request('sort_order') == 'asc')
+                                                    @if(request('sort_by') == 'nama' && request('sort_order')
+                                                    ==
+                                                    'asc')
                                                     <i class="fas fa-sort-up"></i>
-                                                    @elseif(request('sort_by') == 'nama' && request('sort_order') ==
+                                                    @elseif(request('sort_by') == 'nama' &&
+                                                    request('sort_order') ==
                                                     'desc')
                                                     <i class="fas fa-sort-down"></i>
                                                     @else
@@ -94,65 +97,73 @@
                                                 </a>
                                             </th>
                                             <th>
-                                                <form method="GET" action="{{ route('pegawai.index') }}">
-                                                    <select name="filter_jabatan" class="form-select form-select-sm"
+                                                <form method="GET" action="{{ route('bonuspotongan.index') }}">
+                                                    <select name="jenis" class="form-select form-select-sm mt-1"
                                                         onchange="this.form.submit()">
-                                                        <option value="">Semua Jabatan</option>
-                                                        @foreach ($jabatans as $jabatan)
-                                                        <option value="{{ $jabatan->uuid }}"
-                                                            {{ request('filter_jabatan') == $jabatan->uuid ? 'selected' : '' }}>
-                                                            {{ $jabatan->jabatan }}
-                                                        </option>
-                                                        @endforeach
+                                                        <option value="">Semua Jenis</option>
+                                                        <option value="1" {{ request('jenis') == 1 ? 'selected' : '' }}>
+                                                            Bonus</option>
+                                                        <option value="2" {{ request('jenis') == 2 ? 'selected' : '' }}>
+                                                            Potongan</option>
                                                     </select>
-                                                    <input type="hidden" name="search" value="{{ request('search') }}">
-                                                    <input type="hidden" name="sort_by"
-                                                        value="{{ request('sort_by') }}">
-                                                    <input type="hidden" name="sort_order"
-                                                        value="{{ request('sort_order') }}">
                                                 </form>
                                             </th>
                                             <th>
-                                                <form method="GET" action="{{ route('pegawai.index') }}">
-                                                    <select name="filter_grup" class="form-select form-select-sm"
-                                                        onchange="this.form.submit()">
-                                                        <option value="">Semua Grup</option>
-                                                        @foreach ($grups as $grup)
-                                                        <option value="{{ $grup->uuid }}"
-                                                            {{ request('filter_grup') == $grup->uuid ? 'selected' : '' }}>
-                                                            {{ $grup->grup }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                    <input type="hidden" name="search" value="{{ request('search') }}">
-                                                    <input type="hidden" name="sort_by"
-                                                        value="{{ request('sort_by') }}">
-                                                    <input type="hidden" name="sort_order"
-                                                        value="{{ request('sort_order') }}">
-                                                </form>
+                                                Nominal
                                             </th>
-                                            <th>Telepon</th>
-                                            <th>Ket</th>
+                                            <th>
+                                                Keterangan
+                                            </th>
+                                            <th style="width: 5%">
+                                                Status
+                                            </th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($pegawais as $pegawai)
+                                        @forelse($bonuspotongans as $bonuspotongan)
                                         <tr class="align-middle">
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="text-truncate" style="max-width: 200px;">
-                                                {{ $pegawai->nama }}
+                                                {{ $bonuspotongan->nama }}
                                             </td>
-                                            <td class="text-truncate">{{ $pegawai->jabatan->jabatan }}</td>
-                                            <td class="text-truncate">{{ $pegawai->grup->grup }}</td>
-                                            <td class="text-truncate">{{ $pegawai->telepon }}</td>
-                                            <td class="text-truncate">{{ $pegawai->keterangan }}</td>
+                                            <td class="text-truncate" style="max-width: 200px;">
+                                                {{ $bonuspotongan->jenis_label }}
+                                            </td>
+                                            <td class="text-truncate" style="max-width: 200px;">
+                                                Rp {{ number_format($bonuspotongan->nominal, 0, ',', '.') }}
+                                            </td>
+                                            <td class="text-truncate" style="max-width: 200px;">
+                                                {{ $bonuspotongan->keterangan }}
+                                            </td>
                                             <td>
-                                                <a href="{{route ('pegawai.edit', $pegawai->uuid) }}"
-                                                    class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
-                                                    title="Edit Data"><i class="fas fa-edit text-white"></i>
+                                                @if($bonuspotongan->is_system)
+                                                <span class="badge bg-secondary">Sistem</span>
+                                                @else
+                                                <span class="badge bg-{{ $bonuspotongan->status_class }}">
+                                                    {{ $bonuspotongan->status_label }}
+                                                </span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{-- Tombol Edit --}}
+                                                @if($bonuspotongan->is_system)
+                                                <a href="{{ route('bonuspotongan.edit_system', $bonuspotongan->uuid) }}"
+                                                    class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Edit">
+                                                    <i class="fas fa-coins text-white"></i>
                                                 </a>
-                                                <form action="{{ route('pegawai.destroy', $pegawai->uuid) }}"
+                                                @else
+                                                <a href="{{ route('bonuspotongan.edit_non_system', $bonuspotongan->uuid) }}"
+                                                    class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
+                                                    title="Edit">
+                                                    <i class="fas fa-edit text-white"></i>
+                                                </a>
+                                                @endif
+
+                                                {{-- Tombol Hapus hanya untuk data bukan sistem --}}
+                                                @if(!$bonuspotongan->is_system)
+                                                <form
+                                                    action="{{ route('bonuspotongan.destroy', $bonuspotongan->uuid) }}"
                                                     method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
@@ -161,7 +172,9 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
+                                                @endif
                                             </td>
+
                                         </tr>
                                         @empty
                                         <tr>
@@ -176,7 +189,7 @@
                         <div class="card-footer clearfix">
 
                             <div class="float-end">
-                                {{ $pegawais->withQueryString()->links('pagination::bootstrap-4') }}
+                                {{ $bonuspotongans->withQueryString()->links('pagination::bootstrap-4') }}
                             </div>
                         </div>
                     </div> <!-- /.card -->

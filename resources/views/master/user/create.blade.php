@@ -44,7 +44,7 @@
                     <!--begin::Body-->
                     <div class="card-body">
                         <div class="form-group row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Nama Pegawai (Opsional)</label>
                                 <select name="pegawai_uuid" id="pegawai-select"
                                     class="form-control @error('pegawai_uuid') is-invalid @enderror">
@@ -63,7 +63,7 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">username <span class="text-danger">
                                         *</span></label>
                                 <input type="text" id="username" name="username"
@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">e-mail </label>
                                 <input type="text" name="email"
                                     class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}"
@@ -84,7 +84,7 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Role <span class="text-danger">
                                         *</span></label>
                                 <select name="role" class="form-control @error('role') is-invalid @enderror">

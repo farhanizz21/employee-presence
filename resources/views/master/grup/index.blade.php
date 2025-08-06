@@ -9,13 +9,13 @@
         <!--begin::Row-->
         <div class="row">
             <div class="col-sm-6">
-                <h3 class="mb-0">Master Pegawai</h3>
+                <h3 class="mb-0">Master Grup</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        Master Pegawai
+                        Master Grup
                     </li>
                 </ol>
             </div>
@@ -43,20 +43,20 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col text-start">
-                                    <h3 class="card-title mb-0">Data Master Pegawai</h3>
+                                    <h3 class="card-title mb-0">Data Master Grup</h3>
                                 </div>
                                 <div class="col-auto text-end">
-                                    <a href="{{ route('pegawai.create')}}" class="btn btn-primary shadow-sm">
+                                    <a href="{{ route('grup.create')}}" class="btn btn-primary shadow-sm">
                                         <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Data
                                     </a>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body">
-                            <form method="GET" action="{{ route('pegawai.index') }}"
+                            <form method="GET" action="{{ route('grup.index') }}"
                                 class="row gy-2 gx-3 mb-3 align-items-center">
                                 <div class="col-md-6 col-lg-4">
-                                    <input type="text" name="search" class="form-control" placeholder="Cari pegawai…"
+                                    <input type="text" name="search" class="form-control" placeholder="Cari Grup…"
                                         value="{{ request('search') }}">
                                 </div>
                                 <div class="col-auto">
@@ -65,7 +65,7 @@
                                     </button>
                                 </div>
                                 <div class="col-auto">
-                                    <a href="{{ route('pegawai.index') }}" class="btn btn-warning">
+                                    <a href="{{ route('grup.index') }}" class="btn btn-warning">
                                         <i class="fas fa-redo"></i> Reset
                                     </a>
                                 </div>
@@ -80,12 +80,13 @@
                                         <tr>
                                             <th style="width: 10px">#</th>
                                             <th>
-                                                <a href="{{ route('pegawai.index', ['sort_by' => 'nama', 'sort_order' => $currentOrder] + request()->all()) }}"
+                                                <a href="{{ route('grup.index', ['sort_by' => 'grup', 'sort_order' => $currentOrder] + request()->all()) }}"
                                                     class="text-secondary fw-bold">
-                                                    Nama
-                                                    @if(request('sort_by') == 'nama' && request('sort_order') == 'asc')
+                                                    Grup
+                                                    @if(request('sort_by') == 'grup' && request('sort_order') ==
+                                                    'asc')
                                                     <i class="fas fa-sort-up"></i>
-                                                    @elseif(request('sort_by') == 'nama' && request('sort_order') ==
+                                                    @elseif(request('sort_by') == 'grup' && request('sort_order') ==
                                                     'desc')
                                                     <i class="fas fa-sort-down"></i>
                                                     @else
@@ -93,67 +94,23 @@
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th>
-                                                <form method="GET" action="{{ route('pegawai.index') }}">
-                                                    <select name="filter_jabatan" class="form-select form-select-sm"
-                                                        onchange="this.form.submit()">
-                                                        <option value="">Semua Jabatan</option>
-                                                        @foreach ($jabatans as $jabatan)
-                                                        <option value="{{ $jabatan->uuid }}"
-                                                            {{ request('filter_jabatan') == $jabatan->uuid ? 'selected' : '' }}>
-                                                            {{ $jabatan->jabatan }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                    <input type="hidden" name="search" value="{{ request('search') }}">
-                                                    <input type="hidden" name="sort_by"
-                                                        value="{{ request('sort_by') }}">
-                                                    <input type="hidden" name="sort_order"
-                                                        value="{{ request('sort_order') }}">
-                                                </form>
-                                            </th>
-                                            <th>
-                                                <form method="GET" action="{{ route('pegawai.index') }}">
-                                                    <select name="filter_grup" class="form-select form-select-sm"
-                                                        onchange="this.form.submit()">
-                                                        <option value="">Semua Grup</option>
-                                                        @foreach ($grups as $grup)
-                                                        <option value="{{ $grup->uuid }}"
-                                                            {{ request('filter_grup') == $grup->uuid ? 'selected' : '' }}>
-                                                            {{ $grup->grup }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                    <input type="hidden" name="search" value="{{ request('search') }}">
-                                                    <input type="hidden" name="sort_by"
-                                                        value="{{ request('sort_by') }}">
-                                                    <input type="hidden" name="sort_order"
-                                                        value="{{ request('sort_order') }}">
-                                                </form>
-                                            </th>
-                                            <th>Telepon</th>
-                                            <th>Ket</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($pegawais as $pegawai)
+                                        @forelse($grups as $grup)
                                         <tr class="align-middle">
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="text-truncate" style="max-width: 200px;">
-                                                {{ $pegawai->nama }}
+                                                {{ $grup->grup }}
                                             </td>
-                                            <td class="text-truncate">{{ $pegawai->jabatan->jabatan }}</td>
-                                            <td class="text-truncate">{{ $pegawai->grup->grup }}</td>
-                                            <td class="text-truncate">{{ $pegawai->telepon }}</td>
-                                            <td class="text-truncate">{{ $pegawai->keterangan }}</td>
                                             <td>
-                                                <a href="{{route ('pegawai.edit', $pegawai->uuid) }}"
+                                                <a href="{{route ('grup.edit', $grup->uuid) }}"
                                                     class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
                                                     title="Edit Data"><i class="fas fa-edit text-white"></i>
                                                 </a>
-                                                <form action="{{ route('pegawai.destroy', $pegawai->uuid) }}"
-                                                    method="POST" style="display:inline;">
+                                                <form action="{{ route('grup.destroy', $grup->uuid) }}" method="POST"
+                                                    style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger delete-btn"
@@ -176,7 +133,7 @@
                         <div class="card-footer clearfix">
 
                             <div class="float-end">
-                                {{ $pegawais->withQueryString()->links('pagination::bootstrap-4') }}
+                                {{ $grups->withQueryString()->links('pagination::bootstrap-4') }}
                             </div>
                         </div>
                     </div> <!-- /.card -->
