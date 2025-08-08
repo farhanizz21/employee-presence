@@ -69,7 +69,7 @@ class GrupController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(grup $grup)
+    public function edit(String $uuid)
     {
         $grup = Grup::where('uuid', $uuid)->firstOrFail();
         // dd($grup);
@@ -79,7 +79,7 @@ class GrupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, grup $grup)
+    public function update(Request $request, string $uuid)
     {
         $validated = $request->validate([
             'grup' => 'required|string'
@@ -94,7 +94,7 @@ class GrupController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(grup $grup)
+    public function destroy(String $uuid)
     {
         $grup = Grup::where('uuid', $uuid)->firstOrFail();
         $grup->delete();

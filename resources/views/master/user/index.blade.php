@@ -32,11 +32,7 @@
         <!--begin::Row-->
         <div class="row">
             <div class="col-12">
-                @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show text-center text-dark" role="alert">
-                    {{ session('success') }}
-                </div>
-                @endif
+
                 <!--begin::Col-->
                 <div class="col-md-6 col-lg-12">
                     <div class="card mb-4">
@@ -80,18 +76,7 @@
                                         <tr>
                                             <th style="width: 10px">#</th>
                                             <th>
-                                                <a href="{{ route('user.index', ['sort_by' => 'nama', 'sort_order' => $currentOrder] + request()->all()) }}"
-                                                    class="text-secondary fw-bold">
-                                                    Nama
-                                                    @if(request('sort_by') == 'nama' && request('sort_order') == 'asc')
-                                                    <i class="fas fa-sort-up"></i>
-                                                    @elseif(request('sort_by') == 'nama' && request('sort_order') ==
-                                                    'desc')
-                                                    <i class="fas fa-sort-down"></i>
-                                                    @else
-                                                    <i class="fas fa-sort"></i>
-                                                    @endif
-                                                </a>
+                                                Nama
                                             </th>
                                             <th>
                                                 <a href="{{ route('user.index', ['sort_by' => 'username', 'sort_order' => $currentOrder] + request()->all()) }}"
@@ -115,11 +100,11 @@
                                                     <select name="role" class="form-select form-select-sm"
                                                         onchange="document.getElementById('roleFilterForm').submit()">
                                                         <option value="">Filter Role</option>
-                                                        <option value="1"
-                                                            {{ request('role') == '1' ? 'selected' : '' }}>Admin
+                                                        <option value="1" {{ request('role')=='1' ? 'selected' : '' }}>
+                                                            Admin
                                                         </option>
-                                                        <option value="2"
-                                                            {{ request('role') == '2' ? 'selected' : '' }}>User</option>
+                                                        <option value="2" {{ request('role')=='2' ? 'selected' : '' }}>
+                                                            User</option>
                                                     </select>
 
                                                     {{-- Kirim juga parameter lain biar tidak hilang --}}
@@ -130,6 +115,7 @@
                                                         value="{{ request('sort_order') }}">
                                                 </form>
                                             </th>
+                                            <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -144,10 +130,13 @@
                                             <td class="text-truncate">{{ $user->email }}</td>
                                             <td class="text-truncate">{{ $user->role_label }}</td>
                                             <td>
-                                                <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
+                                                <a href="{{route ('user.edit', $user->uuid) }}"
+                                                    class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
                                                     title="Edit Data"><i class="fas fa-edit text-white"></i>
                                                 </a>
-                                                <form action="" method="POST" style="display:inline;">
+                                                @unless($user->username === 'admin')
+                                                <form action="{{ route('user.destroy', $user->uuid) }}" method="POST"
+                                                    style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-danger delete-btn"
@@ -155,6 +144,7 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
+                                                @endunless
                                             </td>
                                         </tr>
                                         @empty

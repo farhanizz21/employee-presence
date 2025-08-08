@@ -30,23 +30,21 @@
                     <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none;"></i>
                 </a>
             </li>
-            <!--end::Fullscreen Toggle-->
+            <!--begin::User Info and Logout-->
+            <span class="nav-link d-flex align-items-center">
+                <i class="fas fa-user me-1 text-muted"></i>
+                {{ Auth::user()->pegawai->nama ?? Auth::user()->username }}
+            </span>
 
-            <!--begin::User Menu Dropdown-->
-            <li class="nav-item dropdown user-menu">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                    <span class="d-none d-md-inline">Admin</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                    <li class="user-header text-bg-primary">
-                        <p>Admin - Administrator</p>
-                    </li>
-                    <li class="user-footer">
-                        <a href="#" class="btn btn-default btn-flat">Profile</a>
-                        <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
-                    </li>
-                </ul>
-            </li>
+            <!-- Logout -->
+            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </button>
+            </form>
+            <!--end::User Info and Logout-->
+
             <!--end::User Menu Dropdown-->
         </ul>
     </div>
@@ -57,7 +55,7 @@
 
 @push('scripts')
 <script>
-function updateClock() {
+    function updateClock() {
     const now = new Date();
     const clock = now.toLocaleTimeString();
     const date = now.toLocaleDateString('id-ID', {

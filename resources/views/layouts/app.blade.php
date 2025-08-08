@@ -4,7 +4,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>employee-presence</title>
+    <title>Employee Presence</title>
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="color-scheme" content="light dark">
@@ -67,8 +67,42 @@
         @include('partials.sidebar')
         <!--begin::App Main-->
         <main class="app-main">
+            <div class="container mt-3">
+
+                {{-- Flash Message --}}
+                @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
+                @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
+                {{-- Validation Errors --}}
+                @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Terjadi kesalahan:</strong>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @endif
+
+            </div>
+
+            {{-- Konten utama halaman --}}
             @yield('content')
         </main>
+
         <!--end::App Main-->
         <!--begin::Footer-->
         <footer class="app-footer">
@@ -106,7 +140,7 @@
     <!--end::Required Plugin(AdminLTE)-->
     <!--begin::OverlayScrollbars Configure-->
     <script>
-    const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper"
+        const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper"
     const Default = {
         scrollbarTheme: "os-theme-light",
         scrollbarAutoHide: "leave",
@@ -130,7 +164,7 @@
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -140,7 +174,7 @@
     <!--end::OverlayScrollbars Configure-->
     <!-- Image path runtime fix -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
         // Find the link tag for the main AdminLTE CSS file.
         const cssLink = document.querySelector('link[href*="css/adminlte.min.css"]');
         if (!cssLink) {

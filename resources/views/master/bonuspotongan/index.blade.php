@@ -32,11 +32,7 @@
         <!--begin::Row-->
         <div class="row">
             <div class="col-12">
-                @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show text-center text-dark" role="alert">
-                    {{ session('success') }}
-                </div>
-                @endif
+
                 <!--begin::Col-->
                 <div class="col-md-6 col-lg-12">
                     <div class="card mb-4">
@@ -101,9 +97,9 @@
                                                     <select name="jenis" class="form-select form-select-sm mt-1"
                                                         onchange="this.form.submit()">
                                                         <option value="">Semua Jenis</option>
-                                                        <option value="1" {{ request('jenis') == 1 ? 'selected' : '' }}>
+                                                        <option value="1" {{ request('jenis')==1 ? 'selected' : '' }}>
                                                             Bonus</option>
-                                                        <option value="2" {{ request('jenis') == 2 ? 'selected' : '' }}>
+                                                        <option value="2" {{ request('jenis')==2 ? 'selected' : '' }}>
                                                             Potongan</option>
                                                     </select>
                                                 </form>

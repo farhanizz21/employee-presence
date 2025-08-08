@@ -72,7 +72,7 @@ class JabatanController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Jabatan $jabatan)
+    public function edit(String $uuid)
     {
         $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();
         // dd($jabatan);
@@ -82,7 +82,7 @@ class JabatanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Jabatan $jabatan)
+    public function update(Request $request, String $uuid)
     {
         $validated = $request->validate([
             'jabatan' => 'required|string',
@@ -98,7 +98,7 @@ class JabatanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Jabatan $jabatan)
+    public function destroy(String $uuid)
     {
         $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();
         $jabatan->delete();

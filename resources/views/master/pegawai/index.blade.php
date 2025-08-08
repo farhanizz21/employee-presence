@@ -32,11 +32,7 @@
         <!--begin::Row-->
         <div class="row">
             <div class="col-12">
-                @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show text-center text-dark" role="alert">
-                    {{ session('success') }}
-                </div>
-                @endif
+
                 <!--begin::Col-->
                 <div class="col-md-6 col-lg-12">
                     <div class="card mb-4">
@@ -99,8 +95,9 @@
                                                         onchange="this.form.submit()">
                                                         <option value="">Semua Jabatan</option>
                                                         @foreach ($jabatans as $jabatan)
-                                                        <option value="{{ $jabatan->uuid }}"
-                                                            {{ request('filter_jabatan') == $jabatan->uuid ? 'selected' : '' }}>
+                                                        <option value="{{ $jabatan->uuid }}" {{
+                                                            request('filter_jabatan')==$jabatan->uuid ? 'selected' : ''
+                                                            }}>
                                                             {{ $jabatan->jabatan }}
                                                         </option>
                                                         @endforeach
@@ -118,8 +115,8 @@
                                                         onchange="this.form.submit()">
                                                         <option value="">Semua Grup</option>
                                                         @foreach ($grups as $grup)
-                                                        <option value="{{ $grup->uuid }}"
-                                                            {{ request('filter_grup') == $grup->uuid ? 'selected' : '' }}>
+                                                        <option value="{{ $grup->uuid }}" {{
+                                                            request('filter_grup')==$grup->uuid ? 'selected' : '' }}>
                                                             {{ $grup->grup }}
                                                         </option>
                                                         @endforeach

@@ -144,8 +144,12 @@ class BonusPotonganController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(BonusPotongan $bonusPotongan)
+
+    public function destroy(String $uuid)
     {
-        //
+        $bonuspotongan = BonusPotongan::where('uuid', $uuid)->firstOrFail();
+        $bonuspotongan->delete();
+
+        return redirect()->route('bonuspotongan.index')->with('success', 'Data berhasil dihapus!');
     }
 }

@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
                 'uuid' => Str::uuid(), // Generate UUID otomatis
                 'username' => 'admin',
                 'email' => 'admin@example.com',
-                'password' => bcrypt('name'),
+                'password' => bcrypt('admin'),
                 'pegawai_uuid' => null, // Admin tidak terkait dengan pegawai
                 'role' => '1', // 1= Admin, 2=User
                 ]

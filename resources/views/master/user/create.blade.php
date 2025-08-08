@@ -50,8 +50,8 @@
                                     class="form-control @error('pegawai_uuid') is-invalid @enderror">
                                     <option selected disabled>Pilih Pegawai</option>
                                     @foreach ($pegawais as $pegawai)
-                                    <option value="{{ $pegawai->uuid }}"
-                                        {{ old('pegawai_uuid') == $pegawai->uuid ? 'selected' : '' }}>
+                                    <option value="{{ $pegawai->uuid }}" {{ old('pegawai_uuid')==$pegawai->uuid ?
+                                        'selected' : '' }}>
                                         {{ $pegawai->nama }}
                                     </option>
                                     @endforeach
@@ -78,8 +78,8 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">e-mail </label>
                                 <input type="text" name="email"
-                                    class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}"
-                                    required>
+                                    class="form-control @error('email') is-invalid @enderror"
+                                    value="{{ old('email') }}">
                                 @error('email')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -121,7 +121,7 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
 
     $('#pegawai-select').select2({
         placeholder: "Cari atau pilih pegawai",

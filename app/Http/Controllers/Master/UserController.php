@@ -15,7 +15,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::with('pegawai');
 
         if ($request->filled('search')) {
                 $search = $request->search;
@@ -69,8 +69,8 @@ class UserController extends Controller
         User::create([
             'uuid' => \Illuminate\Support\Str::uuid(), // Generate UUID otomatis
             'username' => $validated['username'],
-            'email' => $validated['email'],
-            'pegawai_uuid' => $validated['pegawai_uuid'],
+            'email' => $validated['email']?? null,
+            'pegawai_uuid' => $validated['pegawai_uuid']?? null,
             'role' => $validated['role'],
             'password' => bcrypt($validated['username']),
             // 'created_by' => Auth::user()->uuid
@@ -92,8 +92,9 @@ class UserController extends Controller
     public function edit(string $uuid)
     {
         $user = User::where('uuid', $uuid)->firstOrFail();
+        $pegawais = Pegawai::all();
         // dd($user);
-        return view('master.user.edit', compact('user'));
+        return view('master.user.edit', compact('user','pegawais'));
     }
 
     /**
@@ -101,16 +102,15 @@ class UserController extends Controller
      */
     public function update(Request $request, string $uuid)
     {
+        $user = User::where('uuid', $uuid)->firstOrFail();
+        
         $validated = $request->validate([
-            'nama' => 'required|string|max:100',
-            'grup' => 'required|string',
-            'telepon' => 'required|string|max:20',
-            'jabatan' => 'required|string',
-            'alamat' => 'nullable|string|max:255',
-            'keterangan' => 'nullable|string|max:255',
+            'unique:users,username,' . $user->uuid . ',uuid',
+            'email' => 'nullable|email',
+            'pegawai_uuid' => 'nullable|exists:pegawais,uuid',
+            'role' => 'required|integer|in:1,2', // 1= Admin, 2=User
         ]);
 
-        $user = User::where('uuid', $uuid)->firstOrFail();
         $user->update($validated);
 
         return redirect()->route('user.index')->with('success', 'Data berhasil diupdate!');
@@ -122,6 +122,9 @@ class UserController extends Controller
     public function destroy(string $uuid)
     {
         $user = User::where('uuid', $uuid)->firstOrFail();
+        if ($user->username === 'admin') {
+            return redirect()->route('user.index')->with('error', 'User admin tidak dapat dihapus.');
+        }
         $user->delete();
 
         return redirect()->route('user.index')->with('success', 'Data berhasil dihapus!');

@@ -1,16 +1,16 @@
 <style>
-#pegawai-search.loading {
-    background-image: url('/spinner.gif');
-    background-repeat: no-repeat;
-    background-position: right center;
-    background-size: 20px 20px;
-}
+    #pegawai-search.loading {
+        background-image: url('/spinner.gif');
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: 20px 20px;
+    }
 
-.select2-container--bootstrap-5 .select2-selection--single {
-    height: calc(1.5em + .75rem + 2px);
-    padding: .375rem .75rem;
-    font-size: .875rem;
-}
+    .select2-container--bootstrap-5 .select2-selection--single {
+        height: calc(1.5em + .75rem + 2px);
+        padding: .375rem .75rem;
+        font-size: .875rem;
+    }
 </style>
 
 @extends('layouts.app')
@@ -21,11 +21,6 @@
     <div class="container-fluid">
         <!--begin::Row-->
         <div class="row">
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show text-center text-dark" role="alert">
-                {{ session('success') }}
-            </div>
-            @endif
             <div class="col-sm-6">
                 <h3 class="mb-0 fw-bold">Absensi Pegawai</h3>
             </div>
@@ -366,7 +361,7 @@
 
 @push('scripts')
 <script>
-function clearSearch() {
+    function clearSearch() {
     // console.log("Resetting search input");
     const searchInput = document.getElementById("search-by-grup");
     searchInput.value = "";
