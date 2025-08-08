@@ -114,7 +114,7 @@
                         </form>
                         <div class="table-responsive">
                             <div class="alert alert-info mb-3">
-                                <form method="GET" action="{{ route('absensi.index') }}"
+                                <form method="GET" action="{{ route('gajian.index') }}"
                                     class="d-flex align-items-center flex-wrap gap-2 mb-0">
                                     <label for="tgl_absen" class="fw-semibold mb-0">Periode Gajian:</label>
                                     <input type="date" name="tgl_absen" id="tgl_absen"
@@ -136,7 +136,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($dataGaji as $index => $gaji)
+                                    @forelse($semua_gajian as $index => $gaji)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $gaji['pegawai']->nama}}</td>
@@ -146,12 +146,18 @@
                                                 {{ number_format($gaji['total_gaji'], 0, ',', '.') }}</strong>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-warning">Belum Dibayar</span>
+                                            @if($gaji['status_gajian'] == '1')
+                                            <span class="badge bg-success">Sudah Gajian</span>
+                                            @else
+                                            <span class="badge bg-warning text-dark">Belum Gajian</span>
+                                            @endif
                                         </td>
                                         <td class="text-center">
                                             <button class="btn btn-sm btn-success btn-detail" data-bs-toggle="modal"
                                                 data-bs-target="#detailGaji" data-nama="{{ $gaji['pegawai']->nama }}"
+                                                data-pegawai_uuid="{{ $gaji['pegawai']->uuid }}"
                                                 data-jabatan="{{ $gaji['jabatan']->jabatan }}"
+                                                data-jabatan_uuid="{{ $gaji['jabatan']->uuid }}"
                                                 data-pokok="{{ number_format($gaji['gaji_pokok'], 0, ',', '.')  }}"
                                                 data-bonus_lembur="{{ number_format($gaji['bonus_lembur'], 0, ',', '.')  }}"
                                                 data-bonus_kehadiran="{{ number_format($gaji['bonus_kehadiran'], 0, ',', '.')  }}"
@@ -160,31 +166,34 @@
                                                 data-hadir="{{ $gaji['jumlah_hadir'] }}"
                                                 data-telat="{{ $gaji['jumlah_telat'] }}"
                                                 data-alpha="{{ $gaji['jumlah_alpha'] }}"
-                                                data-lembur="{{ $gaji['jumlah_lembur'] }}"> <i
-                                                    class="fas fa-info-circle me-2"></i>
+                                                data-lembur="{{ $gaji['jumlah_lembur'] }}"
+                                                data-status="{{ $gaji['status_gajian'] }}"
+                                                data-periode_mulai="{{ $gaji['periode_mulai'] }}">
+                                                <i class="fas fa-info-circle me-2"></i>
                                                 Detail
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-primary" disabled>
+                                            <button type="button" class="btn btn-sm btn-primary"
+                                                {{ $gaji['status_gajian'] != '1' ? 'disabled' : '' }}>
                                                 <i class="fas fa-print me-1"></i> Cetak Slip Gaji
                                             </button>
                                         </td>
-                                    </tr>
 
+                                        </td>
+                                    </tr>
                                     @empty
                                     <tr>
                                         <td colspan="8" class="text-center">Belum ada data gajian</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
-                                <tfoot class="table-light">
+                                <!-- <tfoot class="table-light">
                                     <tr>
                                         <th colspan="4" class="text-end">Total Keseluruhan</th>
                                         <th class="text-end fw-bold">Rp
-                                            {{ number_format($totalKeseluruhan, 0, ',', '.') }}
                                         </th>
                                         <th colspan="4"></th>
                                     </tr>
-                                </tfoot>
+                                </tfoot> -->
                             </table>
                         </div>
                     </div> <!-- /.card-body -->
@@ -233,8 +242,6 @@
                             <input type="hidden" name="pegawai_uuid" id="pegawaiUuidInput">
                             <p class="mb-0"><strong>Jabatan : </strong> <span id="modalJabatan"></span></p>
                             <input type="hidden" name="jabatan_uuid" id="jabatanUuidInput">
-                            <p class="mb-0"><strong>Periode:</strong> Januari 2025
-                            </p>
                         </div>
                     </div>
                     <hr>
@@ -307,31 +314,24 @@
                             </tr>
                         </tbody>
                     </table>
-                    <h6 class="fw-bold mb-2">Keterangan</h6>
-                    <div class="mb-3">
-                        <input type="text" name="keterangan" class="form-control"
-                            placeholder="Tambahkan keterangan (opsional)" value="{{ old('keterangan') }}">
-                        @error('keterangan')
-                        <div class="invalid-feedback d-block">
-                            {{ $message }}
-                        </div>
-                        @enderror
-                        <div class="form-text">
-                            Kolom isian untuk keterangan tambahan, jika ada.
+                    <div id="periodeInfo"
+                        class="alert alert-warning py-2 px-3 small d-flex align-items-center mt-2 mb-0" role="alert">
+                        <i class="fas fa-exclamation-circle me-2 text-warning"></i>
+                        <div>
+                            Perhitungan dilakukan sejak gajian terakhir :
+                            <span id="modalPeriodeMulai" class="fw-semibold text-dark"></span>
+                            <br>
+                            <strong>Pastikan nominal telah sesuai</strong>
                         </div>
                     </div>
-                    <!-- Catatan Opsional -->
-                    <div class="alert alert-warning py-2">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Cek kembali dan pastikan nominal telah sesuai
-                    </div>
+
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-1"></i> Tutup
                     </button>
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-success" id="btnBayar">
                         <i class="fas fa-check-circle me-1"></i> Bayar
                     </button>
                 </div>
@@ -358,6 +358,8 @@
     const modalBonusKehadiran = document.getElementById('modalBonusKehadiran');
     const modalPotongan = document.getElementById('modalPotongan');
     const modalTotal = document.getElementById('modalTotal');
+    const btnBayar = document.getElementById('btnBayar');
+    const modalPeriodeMulai = document.getElementById('modalPeriodeMulai');
 
     // Hidden inputs
     const pegawaiUuidInput = document.getElementById('pegawaiUuidInput');
@@ -392,6 +394,19 @@
             modalPotongan.textContent = this.dataset.potongan;
             modalTotal.textContent = this.dataset.total;
 
+            const rawPeriodeMulai = this.dataset.periode_mulai;
+            const tanggal = new Date(rawPeriodeMulai +
+                'T00:00:00'); // Tambahkan waktu agar valid di semua browser
+            const options = {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            };
+            const formatter = new Intl.DateTimeFormat('id-ID', options);
+
+            modalPeriodeMulai.textContent = formatter.format(tanggal);
+            // modalPeriodeMulai.textContent = this.dataset.periode_mulai;
+
             // hidden input
             pegawaiUuidInput.value = this.dataset.pegawai_uuid;
             jabatanUuidInput.value = this.dataset.jabatan_uuid;
@@ -404,6 +419,9 @@
             bonusKehadiranInput.value = this.dataset.bonus_kehadiran;
             totalPotonganInput.value = this.dataset.potongan;
             totalGajiInput.value = this.dataset.total;
+
+            const statusGajian = this.dataset.status;
+            btnBayar.style.display = (statusGajian == '1') ? 'none' : 'inline-block';
         });
     });
 
