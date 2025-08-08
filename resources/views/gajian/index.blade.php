@@ -1,55 +1,55 @@
 <style>
-    #calendarGajian {
-        max-width: 100%;
-        font-size: 9px;
-    }
+#calendarGajian {
+    max-width: 100%;
+    font-size: 9px;
+}
 
-    .fc .fc-daygrid-day-top {
-        display: flex;
-        justify-content: space-evenly;
-    }
+.fc .fc-daygrid-day-top {
+    display: flex;
+    justify-content: space-evenly;
+}
 
-    /* Tinggi hari lebih pendek */
-    .fc .fc-daygrid-day-frame {
-        min-height: 10px;
-    }
+/* Tinggi hari lebih pendek */
+.fc .fc-daygrid-day-frame {
+    min-height: 10px;
+}
 
-    /* Ukuran angka tanggal */
-    .fc .fc-daygrid-day-number {
-        font-size: 15px;
-        padding: 2px;
-    }
+/* Ukuran angka tanggal */
+.fc .fc-daygrid-day-number {
+    font-size: 15px;
+    padding: 2px;
+}
 
-    /* Hanya bulatan kecil untuk event */
-    .fc-event-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        display: inline-block;
-    }
+/* Hanya bulatan kecil untuk event */
+.fc-event-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
 
-    /* Warna sesuai status */
-    .gajian-sudah {
-        background-color: #28a745;
-    }
+/* Warna sesuai status */
+.gajian-sudah {
+    background-color: #28a745;
+}
 
-    .gajian-belum {
-        background-color: #ffc107;
-    }
+.gajian-belum {
+    background-color: #ffc107;
+}
 
-    /* Legend kotak kecil */
-    .legend-box {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        margin-left: 10px;
-        margin-right: 5px;
-        border-radius: 50%;
-    }
+/* Legend kotak kecil */
+.legend-box {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 10px;
+    margin-right: 5px;
+    border-radius: 50%;
+}
 
-    .legend-box.gajian-sudah {
-        background-color: #28a745;
-    }
+.legend-box.gajian-sudah {
+    background-color: #28a745;
+}
 </style>
 
 @extends('layouts.app')
@@ -172,10 +172,16 @@
                                                 <i class="fas fa-info-circle me-2"></i>
                                                 Detail
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-primary"
+                                            <!-- <button type="button" class="btn btn-sm btn-primary"
                                                 {{ $gaji['status_gajian'] != '1' ? 'disabled' : '' }}>
                                                 <i class="fas fa-print me-1"></i> Cetak Slip Gaji
-                                            </button>
+                                            </button> -->
+                                            @unless($gaji['status_gajian'] != '1')
+                                            <a href="{{ route('gajian.cetak', $gaji['uuid']) }}" target="_blank"
+                                                class="btn btn-sm btn-primary">
+                                                <i class="fas fa-print me-1"></i> Cetak Slip Gaji
+                                            </a>
+                                            @endunless
                                         </td>
 
                                         </td>
@@ -345,7 +351,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const detailButtons = document.querySelectorAll('.btn-detail');
     const modalNama = document.getElementById('modalNama');
     const modalJabatan = document.getElementById('modalJabatan');

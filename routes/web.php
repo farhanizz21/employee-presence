@@ -44,7 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
     Route::post('/absensi/ganti', [AbsensiController::class, 'ganti'])->name('absensi.ganti');
 
-    
+    Route::get('/gajian/cetak/{uuid}', [GajianController::class, 'cetakSlip'])->name('gajian.cetak');
     Route::resource('gajian', GajianController::class);
 
     // Resource routes (user, pegawai, jabatan, grup)

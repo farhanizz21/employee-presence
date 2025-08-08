@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Models\Gajian;
 use App\Models\Master\Pegawai;
@@ -96,6 +97,7 @@ class GajianController extends Controller
             ->get()
             ->map(function ($gajian) {
                 return [
+                    'uuid'            => $gajian->uuid,
                     'pegawai'         => $gajian->pegawai,
                     'grup'            => $gajian->pegawai->grup,
                     'jabatan'         => $gajian->pegawai->jabatan,
@@ -201,11 +203,11 @@ class GajianController extends Controller
             })
             ->values();
             
-            // dd($belum_gajian);
-        $semua_gajian = collect($belum_gajian)->merge($sudah_gajian);
-        return view('gajian.index', [
-            'semua_gajian' => $semua_gajian,
-        ]);
+            $semua_gajian = collect($belum_gajian)->merge($sudah_gajian);
+            // dd($semua_gajian);
+            return view('gajian.index', [
+                'semua_gajian' => $semua_gajian,
+            ]);
     }
 
 
@@ -297,5 +299,20 @@ class GajianController extends Controller
     public function destroy(Gajian $gajian)
     {
         //
+    }
+
+    public function cetakSlip($uuid)
+    {
+        $gaji = Gajian::with(['pegawai', 'jabatan'])
+            ->where('uuid', $uuid)
+            ->firstOrFail();
+
+        $pdf = Pdf::loadView('gajian.slip', compact('gaji'))
+                ->setPaper('A4', 'portrait');
+        $nama = strtolower(trim($gaji->pegawai->nama));
+        $tanggal = $gaji->created_at->translatedFormat('dmy');
+
+        // Download langsung
+        return $pdf->stream('slip-gaji_' . $nama . '_' . $tanggal . '.pdf');
     }
 }
