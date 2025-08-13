@@ -47,6 +47,10 @@ class JabatanController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
+        $request->merge([
+            'gaji' => str_replace('.', '', $request->gaji),
+        ]);
+
         $validated = $request->validate([
             'jabatan' => 'required|string',
             'gaji' => 'required|numeric',
