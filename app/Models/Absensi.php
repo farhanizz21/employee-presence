@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\Master\Pegawai;
+use App\Models\Master\Jabatan;
 
 class Absensi extends Model
 {
@@ -15,6 +16,7 @@ class Absensi extends Model
         'uuid',
         'pegawai_uuid',
         'grup_uuid',
+        'jabatan_uuid',
         'status', // 1=Hadir, 2=lembur, 3=telat, 4=Alfa
         'tgl_absen',
         'created_at',
@@ -31,4 +33,10 @@ class Absensi extends Model
     {
         return $this->belongsTo(Pegawai::class, 'pegawai_uuid', 'uuid');
     }
+
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class, 'jabatan_uuid', 'uuid');
+    }
+
 }

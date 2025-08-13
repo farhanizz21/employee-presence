@@ -42,7 +42,10 @@ Route::middleware('auth')->group(function () {
     // Absensi
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
     Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
-    Route::post('/absensi/ganti', [AbsensiController::class, 'ganti'])->name('absensi.ganti');
+    Route::post('/absensi/ganti-pegawai', [AbsensiController::class, 'gantiPegawai'])->name('absensi.gantiPegawai');
+    Route::post('/absensi/ganti-jabatan', [AbsensiController::class, 'gantiJabatan'])->name('absensi.gantiJabatan');
+
+
 
     
     Route::resource('gajian', GajianController::class);

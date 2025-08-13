@@ -119,7 +119,7 @@
                                                             <table class="table table-sm table-bordered mb-0">
                                                                 <thead class="table-light">
                                                                     <tr>
-                                                                        <th style="width: 10%;">Aksi</th>
+                                                                        <th style="width: 10%;">Check</th>
                                                                         <th style="width: 5%;">#</th>
                                                                         <th>Nama Pegawai</th>
                                                                         <th style="width: 20%;">Jabatan</th>
@@ -132,6 +132,9 @@
                                                                     <input type="hidden" name="tgl_absen"
                                                                         class="tgl_absen_hidden">
                                                                     @forelse ($grup->pegawai as $pegawai)
+                                                                    <input type="hidden" name="jabatan_uuid"
+                                                                        class="jabatan_uuid_hidden"
+                                                                        value="{{ $pegawai->jabatan->uuid }}">
                                                                     <tr>
                                                                         <td>
                                                                             <input class="form-check-input"
@@ -143,6 +146,9 @@
                                                                         <td class="td-nama"> {{ $pegawai->nama }}</td>
                                                                         <td class="td-jabatan">
                                                                             {{ $pegawai->jabatan->jabatan }}</td>
+                                                                        <input type="hidden" name="jabatan_uuid[]"
+                                                                            class="jabatan-hidden"
+                                                                            value="{{ $pegawai->jabatan->uuid }}">
                                                                         <td>
                                                                             <button type="button"
                                                                                 class="btn btn-sm btn-warning btn-ganti-pegawai"
@@ -154,6 +160,17 @@
                                                                                 title="Ganti Pegawai">
                                                                                 <i class="fas fa-sync-alt"></i>
                                                                             </button>
+                                                                            <button type="button"
+                                                                                class="btn btn-sm btn-info btn-ganti-jabatan"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#modalGantiJabatan"
+                                                                                data-pegawai="{{ $pegawai->uuid }}"
+                                                                                data-grup="{{ $grup->uuid }}"
+                                                                                data-tgl="{{ $tanggal }}"
+                                                                                title="Ganti Jabatan">
+                                                                                <i class="fas fa-briefcase"></i>
+                                                                            </button>
+
                                                                         </td>
 
                                                                     </tr>
@@ -284,7 +301,7 @@
                                             @forelse($riwayats as $index => $riwayat)
                                             <td>{{ $riwayat->pegawai->grup->grup}}</td>
                                             <td>{{ $riwayat->pegawai->nama}}</td>
-                                            <td>{{ $riwayat->pegawai->jabatan->jabatan}}</td>
+                                            <td>{{ $riwayat->jabatan->jabatan}}</td>
                                             <td>
                                                 @php
                                                 $statusList = [
@@ -344,18 +361,43 @@
                         <select class="form-control" data-role="pegawai-select" id="pegawai_pengganti"></select>
                     </div>
                 </div>
-                <!-- <div class="modal-footer">
-                    <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
-                        <i class="fas fa-times"></i> Batal
-                    </button>
-                    <button type="button" class="btn btn-primary btn-sm">
-                        <i class="fas fa-save"></i> Simpan
-                    </button>
-                </div> -->
             </form>
         </div>
     </div>
 </div>
+
+<!-- Modal Ganti Jabatan -->
+<div class="modal fade" id="modalGantiJabatan" tabindex="-1" aria-labelledby="modalGantiJabatanLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="formGantiJabatan" class="text-center">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalGantiJabatanLabel">Ganti Jabatan Sementara</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 text-start">
+                        <label class="form-label fw-bold">Pilih Jabatan</label>
+                        <input type="hidden" id="jab_pegawai_uuid">
+                        <input type="hidden" id="jab_grup_uuid">
+                        <input type="hidden" id="jab_tgl_absen">
+                        <select class="form-control" id="jabatan_pengganti">
+                            @foreach($jabatans as $jabatan)
+                            <option value="{{ $jabatan->uuid }}">{{ $jabatan->jabatan }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 @endsection
 
@@ -397,7 +439,8 @@ $(document).ready(function() {
                             text: item.label,
                             grup: item.grup,
                             grup_uuid: item.grup_uuid,
-                            jabatan: item.jabatan
+                            jabatan: item.jabatan,
+                            jabatan_uuid: item.jabatan_uuid
                         }))
                     };
                 },
@@ -434,6 +477,7 @@ $(document).ready(function() {
     $('[data-role="pegawai-select"]').on('select2:select', function(e) {
         const data = e.params.data;
         $(this).closest('form').find('.grup_uuid_hidden').val(data.grup_uuid || '');
+        $(this).closest('form').find('.jabatan_uuid_hidden').val(data.jabatan_uuid || '');
     });
 
     // Fokus slelect2
@@ -448,7 +492,6 @@ $(document).ready(function() {
     $('.modal').on('shown.bs.modal', function() {
         $(this).find('[data-role="pegawai-select"]').select2('open');
     });
-
 
     // collapse
     $('.toggle-arrow').on('click', function() {
@@ -539,7 +582,7 @@ $(document).ready(function() {
         const penggantiUuid = e.params.data.id;
 
         $.ajax({
-            url: "{{ route('absensi.ganti') }}",
+            url: "{{ route('absensi.gantiPegawai') }}",
             type: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
@@ -565,6 +608,49 @@ $(document).ready(function() {
         });
     });
 
+    // Event select jabatan
+        let jabpegawaiUuid, jabgrupUuid, jabtglAbsen;
+
+    // Event click button ganti jabatan
+    $(document).on('click', '.btn-ganti-jabatan', function() {
+        jabpegawaiUuid = $(this).data('pegawai');
+        jabgrupUuid = $(this).data('grup');
+        jabtglAbsen = $(this).data('tgl');
+
+        $('#jab_pegawai_uuid').val(jabpegawaiUuid);
+        $('#jab_grup_uuid').val(jabgrupUuid);
+        $('#jab_tgl_absen').val(jabtglAbsen);
+    });
+
+    // Submit form ganti jabatan
+    $('#formGantiJabatan').on('submit', function(e) {
+        e.preventDefault();
+        const jabatanBaru = $('#jabatan_pengganti').val();
+
+        $.ajax({
+            url: "{{ route('absensi.gantiJabatan') }}",
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                pegawai_uuid: jabpegawaiUuid,
+                grup_uuid: jabgrupUuid,
+                tgl_absen: jabtglAbsen,
+                jabatan_uuid: jabatanBaru
+            },
+            success: function(response) {
+                $('#modalGantiJabatan').modal('hide');
+
+                const row = $(`button[data-pegawai="${jabpegawaiUuid}"]`).closest('tr');
+                row.find('td:nth-child(4)').text(response.jabatan_baru);
+
+                alert('Jabatan sementara berhasil diganti!');
+            },
+            error: function(xhr) {
+                console.error('Error Ajax:', xhr.status, xhr.responseText);
+                alert('Gagal mengganti jabatan!');
+            }
+        });
+    });
 
 });
 </script>
