@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
 
 
 
-    
+    Route::get('/gajian/cetak/{uuid}', [GajianController::class, 'cetakSlip'])->name('gajian.cetak');
     Route::resource('gajian', GajianController::class);
 
     // Resource routes (user, pegawai, jabatan, grup)
