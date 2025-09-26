@@ -22,43 +22,36 @@
     <!--begin::Accessibility Features-->
     <!-- Skip links will be dynamically added by accessibility.js -->
     <meta name="supported-color-schemes" content="light dark">
-    <link rel="preload" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}" as="style">
+    
     <!--end::Accessibility Features-->
-    <!--begin::Fonts-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
-        integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q=" crossorigin="anonymous" media="print"
-        onload="this.media='all'">
-    <!--end::Fonts-->
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/styles/overlayscrollbars.min.css"
-        crossorigin="anonymous">
-    <!--end::Third Party Plugin(OverlayScrollbars)-->
-    <!--begin::Third Party Plugin(Bootstrap Icons)-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-        crossorigin="anonymous">
-    <!--end::Third Party Plugin(Bootstrap Icons)-->
+
+
+    
     <!--begin::Required Plugin(AdminLTE)-->
     <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
     <!--end::Required Plugin(AdminLTE)-->
-    <!-- jsvectormap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
-        integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4=" crossorigin="anonymous">
-
+    
     <!-- Custom fonts for this template-->
-    <!-- <link href="{{ asset('adminlte/dist/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css"> -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <!-- FullCalendar CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    
+   
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
 
-    <!-- Optional: untuk tema bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/bootstrap5.min.css" rel="stylesheet">
+<!-- Select2 -->
+<link rel="stylesheet" href="{{ asset('adminlte/plugins/select2/css/select2.min.css') }}">
+
+<!-- FullCalendar -->
+<link rel="stylesheet" href="{{ asset('adminlte/plugins/fullcalendar/main.min.css') }}">
 
 
 
 </head>
 <!--end::Head-->
 <!--begin::Body-->
+<script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
 
+<!-- Bootstrap 4 bundle (sudah ada Popper.js di dalamnya) -->
+<script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
@@ -121,95 +114,53 @@
 
     <!--begin::Script-->
 
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-
-    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
-        crossorigin="anonymous"></script>
-    <!--end::Third Party Plugin(OverlayScrollbars)-->
-    <!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous">
-    </script>
-    <!--end::Required Plugin(popperjs for Bootstrap 5)-->
-    <!--begin::Required Plugin(Bootstrap 5)-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous">
-    </script>
-    <!--end::Required Plugin(Bootstrap 5)-->
+    
+    
+    
     <!--begin::Required Plugin(AdminLTE)-->
     <!-- <script src="{{ asset('adminlte/dist/js/adminlte.js') }}"></script> -->
-    <script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
+    
     <!--end::Required Plugin(AdminLTE)-->
-    <!--begin::OverlayScrollbars Configure-->
-    <script>
-        const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper"
-    const Default = {
-        scrollbarTheme: "os-theme-light",
-        scrollbarAutoHide: "leave",
-        scrollbarClickScroll: true
-    }
-    document.addEventListener("DOMContentLoaded", function() {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER)
-        if (
-            sidebarWrapper &&
-            OverlayScrollbarsGlobal?.OverlayScrollbars !== undefined
-        ) {
-            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-                scrollbars: {
-                    theme: Default.scrollbarTheme,
-                    autoHide: Default.scrollbarAutoHide,
-                    clickScroll: Default.scrollbarClickScroll
-                }
-            })
-        }
-    })
-    </script>
+<!-- jQuery -->
+<!-- <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script> -->
+<!-- Bootstrap Bundle -->
+<!-- <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script> -->
+<!-- OverlayScrollbars JS -->
+<script src="{{ asset('adminlte/plugins/overlayScrollbars/js/OverlayScrollbars.min.js') }}"></script>
+<!-- AdminLTE App -->
+<script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    })
-    </script>
-    <!--end::OverlayScrollbars Configure-->
-    <!-- Image path runtime fix -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        // Find the link tag for the main AdminLTE CSS file.
-        const cssLink = document.querySelector('link[href*="css/adminlte.min.css"]');
-        if (!cssLink) {
-            return; // Exit if the link isn't found
-        }
-
-        // Extract the base path from the CSS href.
-        // e.g., from ".{{ asset('adminlte/dist/css/adminlte.min.css') }}", we get "../"
-        // e.g., from "{{ asset('adminlte/dist/css/adminlte.min.css') }}", we get "./"
-        const cssHref = cssLink.getAttribute('href');
-        const deploymentPath = cssHref.slice(0, cssHref.indexOf('css/adminlte.min.css'));
-
-        // Find all images with absolute paths and fix them.
-        document.querySelectorAll('img[src^="/assets/"]').forEach(img => {
-            const originalSrc = img.getAttribute('src');
-            if (originalSrc) {
-                const relativeSrc = originalSrc.slice(1); // Remove leading '/'
-                img.src = deploymentPath + relativeSrc;
-            }
+<!-- OverlayScrollbars & Tooltip Init -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // OverlayScrollbars init
+    const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+    if (sidebarWrapper && typeof OverlayScrollbarsGlobal !== "undefined" && OverlayScrollbarsGlobal.OverlayScrollbars) {
+        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+            scrollbars: {
+                theme: "os-theme-light",
+                autoHide: "leave",
+                clickScroll: true,
+            },
         });
+    }
+
+    // Bootstrap tooltip init
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-    </script>
-    <!-- OPTIONAL SCRIPTS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
-        rel="stylesheet" />
+});
+</script>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- OverlayScrollbars CSS -->
+<link rel="stylesheet" href="{{ asset('adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
 
-    <!-- Select2 CSS -->
 
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{{ asset('adminlte/plugins/select2/js/select2.full.min.js') }}"></script>
+<script src="{{ asset('adminlte/plugins/fullcalendar/main.min.js') }}"></script>
+
 
 
 

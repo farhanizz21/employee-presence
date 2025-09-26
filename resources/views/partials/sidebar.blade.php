@@ -22,9 +22,18 @@
                 {{-- Absensi --}}
                 <li class="nav-item">
                     <a href="{{ route('absensi.index') }}"
-                        class="nav-link {{ request()->routeIs('absensi.*') ? 'active' : '' }}">
+                        class="nav-link {{ request()->routeIs('absensi.index') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-clipboard-check"></i>
                         <p>Absensi</p>
+                    </a>
+                </li>
+
+                {{-- Rekap absensi --}}
+                <li class="nav-item">
+                    <a href="{{ route('absensi.rekap') }}"
+                        class="nav-link {{ request()->routeIs('absensi.rekap') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-clipboard-check"></i>
+                        <p>Rekap</p>
                     </a>
                 </li>
 

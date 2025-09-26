@@ -28,9 +28,11 @@ class Gajian extends Model
         'keterangan',
     ];
 
-    public function pegawai()
-    {
+    public function pegawai() {
         return $this->belongsTo(Pegawai::class, 'pegawai_uuid', 'uuid');
+    }
+    public function details() {
+        return $this->hasMany(GajianDetail::class, 'gajian_uuid', 'uuid');
     }
 
     public function jabatan()

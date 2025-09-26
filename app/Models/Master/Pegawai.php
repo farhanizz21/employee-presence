@@ -34,18 +34,16 @@ class Pegawai extends Model
         return $this->hasOne(User::class);
     }
 
-    public function grup()
-    {
-        return $this->belongsTo(Grup::class, 'grup_uuid', 'uuid');
+    public function absensi() {
+        return $this->hasMany(Absensi::class, 'pegawai_uuid', 'uuid');
     }
-
-    public function jabatan()
-    {
+    public function gajians() {
+        return $this->hasMany(Gajian::class, 'pegawai_uuid', 'uuid');
+    }
+    public function jabatan() {
         return $this->belongsTo(Jabatan::class, 'jabatan_uuid', 'uuid');
     }
-    
-    public function absensi()
-    {
-        return $this->hasMany(Absensi::class, 'pegawai_uuid', 'uuid');
+    public function grup() {
+        return $this->belongsTo(Grup::class, 'grup_uuid', 'uuid');
     }
 }

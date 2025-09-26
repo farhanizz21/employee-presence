@@ -25,7 +25,9 @@ return new class extends Migration
             $table->integer('jumlah_lembur');
             $table->integer('jumlah_telat');
             $table->integer('jumlah_alpha');
-            $table->text('keterangan')->nullable();          
+            $table->text('keterangan')->nullable();
+            $table->date('periode_mulai')->nullable();
+            $table->date('periode_selesai')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

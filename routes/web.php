@@ -13,7 +13,7 @@ use App\Http\Controllers\Master\BonusPotonganController;
 
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\GajianController;
-
+use App\Http\Controllers\PayrollController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -26,8 +26,8 @@ use App\Http\Controllers\GajianController;
 */
 Route::get('/', function () {
     return auth()->check()
-        ? redirect()->route('absensi.index')
-        : redirect()->route('login');
+    ? redirect()->route('absensi.index')
+    : redirect()->route('login');
 });
 
 Route::middleware('guest')->group(function () {
@@ -59,12 +59,25 @@ Route::middleware('auth')->group(function () {
 
     // Bonus Potongan Custom Routes
     Route::get ('bonuspotongan/{uuid}/edit-system', [BonusPotonganController::class, 'edit_system'])
-        ->name('bonuspotongan.edit_system');
+    ->name('bonuspotongan.edit_system');
     Route::put('bonuspotongan/{uuid}/update-system', [BonusPotonganController::class, 'update_system'])
-        ->name('bonuspotongan.update_system');
+    ->name('bonuspotongan.update_system');
     Route::get('bonuspotongan/{uuid}/edit-non-system', [BonusPotonganController::class, 'edit_non_system'])
-        ->name('bonuspotongan.edit_non_system');
+    ->name('bonuspotongan.edit_non_system');
     Route::put('bonuspotongan/{uuid}/update-non-system', [BonusPotonganController::class, 'update_non_system'])
-        ->name('bonuspotongan.update_non_system');
+    ->name('bonuspotongan.update_non_system');
     Route::resource('bonuspotongan', BonusPotonganController::class);
+
+    Route::get('/payroll/slip/{uuid}', [PayrollController::class, 'showSlip'])->name('payroll.slip');
+    Route::get('/payroll/slip/{uuid}/export', [PayrollController::class, 'exportSlip'])->name('payroll.slip.export');
+    Route::get('/payroll/report', [PayrollController::class, 'report'])->name('payroll.report');
+    Route::post('/absensi/{uuid}/update-status', [AbsensiController::class, 'updateStatus'])->name('absensi.updateStatus');
+    Route::get('/absensi/rekap', [AbsensiController::class, 'formRekap'])->name('absensi.rekap');
+Route::post('/absensi/rekap', [AbsensiController::class, 'simpanRekap'])->name('absensi.simpanRekap');
+Route::post('/absensi/ganti-shift-jobdesk', [AbsensiController::class, 'gantiShiftJobdesk'])
+    ->name('absensi.gantiShiftJobdesk');
+Route::post('/pegawai/update', [AbsensiController::class, 'update'])->name('pegawai.update');
+Route::post('/absensi/update-cell', [AbsensiController::class, 'updateCell'])->name('absensi.updateCell');
+
+
 });
