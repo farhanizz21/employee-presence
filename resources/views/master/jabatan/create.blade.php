@@ -44,7 +44,7 @@
                     <!--begin::Body-->
                     <div class="card-body">
                         <div class="form-group row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Nama Jabatan <span class="text-danger">
                                         *</span></label>
                                 <input type="text" name="jabatan" class="form-control" value="{{ old('jabatan') }}"
@@ -55,8 +55,24 @@
                                 </div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Gaji <span class="text-danger">*</span></label>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Sistem Gaji <span class="text-danger">
+                                        *</span></label>
+                                <select name="harian" class="form-select @error('harian') is-invalid @enderror"
+                                    required>
+                                    <option disabled selected>Pilih Sistem Gajian</option>
+                                    <option value="1">Harian</option>
+                                    <option value="2">Borongan</option>
+                                    </option>
+                                </select>
+                                @error('harian')
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Gaji (min) <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" name="gaji" id="gaji" class="form-control"

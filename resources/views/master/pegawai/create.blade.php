@@ -91,23 +91,22 @@
                                 </div>
                                 @enderror
                             </div>
+                            
+                        </div>
+                        <div class="form-group row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Telepon <span class="text-danger">
-                                        *</span></label>
-                                <input type="number" name="telepon" class="form-control" value="{{ old('telepon') }}"
-                                    required>
-                                @error('telepon')
+                                <label class="form-label">Alamat</label>
+                                <textarea name="alamat" class="form-control" value="{{ old('alamat') }}"></textarea>
+                                @error('alamat')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
                                 </div>
                                 @enderror
                             </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <label class="form-label">Alamat</label>
-                                <textarea name="alamat" class="form-control" value="{{ old('alamat') }}"></textarea>
-                                @error('alamat')
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">telepon</label>
+                                <textarea name="telepon" class="form-control" value="{{ old('telepon') }}"></textarea>
+                                @error('telepon')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
                                 </div>

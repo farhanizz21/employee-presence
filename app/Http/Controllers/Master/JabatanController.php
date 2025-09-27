@@ -54,12 +54,14 @@ class JabatanController extends Controller
         $validated = $request->validate([
             'jabatan' => 'required|string',
             'gaji' => 'required|numeric',
+            'harian' => 'required|numeric',
         ]);
         // dd($validated);
         Jabatan::create([
             'uuid' => \Illuminate\Support\Str::uuid(), // Generate UUID otomatis
             'jabatan' => $validated['jabatan'],
             'gaji' => $validated['gaji'],
+            'harian' => $validated['harian'],
             // 'created_by' => Auth::jabatan()->uuid
         ]);
         return redirect()->route('jabatan.index')->with('success', 'Data berhasil ditambahkan!');
@@ -88,9 +90,13 @@ class JabatanController extends Controller
      */
     public function update(Request $request, String $uuid)
     {
+        $request->merge([
+        'gaji' => str_replace('.', '', $request->gaji), // ubah "85.000" jadi "85000"
+    ]);
         $validated = $request->validate([
             'jabatan' => 'required|string',
-            'gaji' => 'required|numeric'
+            'gaji' => 'required|numeric',
+            'harian' => 'required|numeric'
         ]);
 
         $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();

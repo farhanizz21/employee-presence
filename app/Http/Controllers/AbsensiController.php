@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Absensi;
-
+use App\Models\Hasil_produksi;
 use App\Models\Master\Pegawai;
 use App\Models\Master\Grup;
 use App\Models\Master\Jabatan;
@@ -266,8 +266,9 @@ public function gantiJabatan(Request $request)
         $tanggalMulai = $request->input('tanggal_mulai', date('Y-m-d'));
         $tanggalSelesai = $request->input('tanggal_selesai', date('Y-m-d'));
 
-    $pegawais = Pegawai::with('grup')->get(); // ambil juga default grup/jobdesk
+    $pegawais = Pegawai::with('grup', 'jabatan')->get(); // ambil juga default grup/jobdesk
     $grups = Grup::all();
+    $jabatans = Jabatan::all();
 
     // generate range tanggal
     $dates = [];
@@ -279,7 +280,7 @@ public function gantiJabatan(Request $request)
     }
 
     return view('absensi.rekap', compact(
-        'pegawais','grups','dates',
+        'pegawais','grups', 'jabatans','dates',
         'tanggalMulai','tanggalSelesai'
     ));
 }
@@ -313,18 +314,28 @@ public function simpanRekap(Request $request)
                 [
                     'uuid'      => Str::uuid()->toString(),
                     'status'    => $data['status'] ?? 'Alpha',
-                    'shift'     => $data['shift'] ?? ($pegawai->default_shift ?? 'Pagi'),
-                    'grup_uuid' => $data['grup_uuid'] ?? $pegawai->grup_uuid,
-                    'pencapaian'=> $data['pencapaian_kg'] ?? null,
+                    'grup_uuid'     => $data['shift'],
+                    'jabatan_uuid' => $data['jabatan_uuid'],
+                    'pencapaian'=> $data['pencapaian'] ?? null,
                     'periode_uuid' => $periode->uuid,
                 ]
             );
         }
     }
 
+    foreach ($request->input('produksi', []) as $tanggal => $data) {
+        Hasil_produksi::updateOrCreate(
+            ['tanggal' => $tanggal],
+            [
+                'hasil_pagi'  => $data['hasil_pagi'] ?? 0,
+                'hasil_malam' => $data['hasil_malam'] ?? 0,
+            ]
+        );
+    }
+
     return redirect()
-    ->route('absensi.index', ['periode_uuid' => $periode->uuid])
-    ->with('success','Rekap absensi berhasil disimpan!');
+        ->route('absensi.index', ['periode_uuid' => $periode->uuid])
+        ->with('success','Rekap absensi + produksi berhasil disimpan!');
 }
 
 public function gantiShiftJobdesk(Request $request)

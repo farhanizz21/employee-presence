@@ -90,6 +90,7 @@
                                                     @endif
                                                 </a>
                                             </th>
+                                            <th>Sistem Gaji</th>
                                             <th>Gaji</th>
                                             <th>Aksi</th>
                                         </tr>
@@ -100,6 +101,9 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="text-truncate" style="max-width: 200px;">
                                                 {{ $jabatan->jabatan }}
+                                            </td>
+                                            <td class="text-truncate" style="max-width: 200px;">
+                                                {{ $jabatan->harian_text }}
                                             </td>
                                             <td class="text-truncate" style="max-width: 200px;">
                                                 Rp {{ number_format($jabatan->gaji, 0, ',', '.') }}

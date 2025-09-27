@@ -35,7 +35,7 @@
                     @method('PUT')
                     <div class="card-body">
                         <div class="form-group row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Nama Jabatan <span class="text-danger">*</span></label>
                                 <input type="text" name="jabatan"
                                     class="form-control @error('jabatan') is-invalid @enderror"
@@ -46,7 +46,20 @@
                                 </div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Sistem Gaji <span class="text-danger">*</span></label>
+                                <select name="harian" class="form-select @error('harian') is-invalid @enderror" required>
+                                    <option value="1" {{ old('harian', $jabatan->harian ?? 1) == 1 ? 'selected' : '' }}>Harian</option>
+                                    <option value="2" {{ old('harian', $jabatan->harian ?? 2) == 2 ? 'selected' : '' }}>Borongan</option>
+                                </select>
+                                @error('harian')
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label">Gaji <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
@@ -78,17 +91,18 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
+    // Format input gaji as currency
     const gajiInput = document.getElementById('gaji');
-    
-    gajiInput.addEventListener('input', function (e) {
-        let value = e.target.value.replace(/\D/g, '');
-        e.target.value = new Intl.NumberFormat('id-ID').format(value);
+    gajiInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+        e.target.value = new Intl.NumberFormat('id-ID').format(value); // Format as currency
     });
-
-    document.querySelector('form').addEventListener('submit', function () {
+    document.querySelector('form').addEventListener('submit', function() {
+        const gajiInput = document.getElementById('gaji');
         gajiInput.value = gajiInput.value.replace(/\D/g, '');
     });
+
 });
 </script>
 @endpush

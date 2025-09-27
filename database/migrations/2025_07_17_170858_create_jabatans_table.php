@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('jabatans', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
+            $table->integer('gaji');
+            $table->integer('harian');
             $table->string('jabatan', 100);
             $table->timestamps();
             $table->softDeletes();

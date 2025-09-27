@@ -49,44 +49,6 @@ class PegawaiController extends Controller
     return view('master.pegawai.index', compact('pegawais', 'jabatans', 'grups'));
 }
 
-    // public function index(Request $request)
-    // {
-    //     $query = Pegawai::query();
-
-    //     // Pencarian
-    //     if ($request->has('search') && $request->search != '') {
-    //         $query->where('nama', 'like', '%' . $request->search . '%');
-    //     }
-        
-    //     // Urutan
-    //     if ($request->has('sort_by') && $request->has('sort_order')) {
-    //         $query->orderBy($request->sort_by, $request->sort_order);
-    //     } else {
-    //         $query->orderBy('created_at', 'desc'); // default sort
-    //     }
-        
-    //     $pegawais = $query->paginate(10)->appends($request->all());
-
-    //     //filter jabatan
-    //     if ($request->filled('filter_jabatan')) {
-    //         $query->where('uuid', $request->filter_jabatan);
-    //     }
-
-    //     //filter grup
-    //     if ($request->filled('filter_grup')) {
-    //         $query->where('uuid', $request->filter_grup);
-    //     }
-        
-
-    //     $jabatans = Jabatan::all();
-    //     $grups = Grup::all();
-
-    //     return view('master.pegawai.index', compact('pegawais', 'jabatans','grups'));
-    // }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $grups = Grup::all();

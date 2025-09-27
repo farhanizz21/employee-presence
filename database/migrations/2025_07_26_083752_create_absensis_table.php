@@ -16,9 +16,9 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->uuid('pegawai_uuid');
             $table->uuid('periode_uuid');
-            $table->uuid('grup_uuid')->nullable(); // Optional foreign key to Grup
+            $table->uuid('grup_uuid'); // Optional foreign key to Grup
+            $table->uuid('jabatan_uuid', 20);
             $table->string('status', 20);
-            $table->string('shift', 20)->nullable(); 
             $table->integer('pencapaian')->nullable();
             $table->date('tgl_absen'); // Date of attendance
             $table->timestamps();

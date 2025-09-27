@@ -13,6 +13,7 @@ class Jabatan extends Model
         'uuid',
         'jabatan',
         'gaji',
+        'harian',
         'created_at',
         'updated_at',
         'deleted_at'
@@ -21,5 +22,19 @@ class Jabatan extends Model
     public function getRouteKeyName()
     {
         return 'uuid';
+    }
+
+    public function getHarianTextAttribute()
+    {
+        return match ($this->harian) {
+            1 => 'Harian',
+            2 => 'Borongan',
+            default => 'Tidak Diketahui'
+        };
+    }
+
+    public function absensi()
+    {
+        return $this->hasMany(Absensi::class, 'grup_uuid', 'uuid');
     }
 }
