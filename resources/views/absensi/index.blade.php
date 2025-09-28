@@ -17,41 +17,51 @@
   </select>
 </form>
 
-
-
-
   <div class="table-responsive">
     <table class="table table-bordered table-sm">
         <thead class="table-dark">
-            <tr>
-                <th>No.</th>
-                <th>Nama Karyawan</th>
-                <th>Ket.</th>
-                @foreach ($dates as $tgl)
-                <th>{{ \Carbon\Carbon::parse($tgl)->format('d M Y') }}</th>
-                @endforeach
-            </tr>
-        </thead>
+    <tr>
+        <th>No.</th>
+        <th>Nama Karyawan</th>
+        <th>Ket.</th>
+        @foreach ($dates as $tgl)
+            <th colspan="2">
+                {{ \Carbon\Carbon::parse($tgl)->format('d M Y') }}
+            </th>
+        @endforeach
+    </tr>
+    <tr>
+        <th
+    colspan="3">Hasil Produksi</th>
+    @foreach ($dates as $tgl)
+        <th>P : {{ $hasilProduksi[$tgl]->hasil_pagi ?? '-' }}</th>
+        <th>M : {{ $hasilProduksi[$tgl]->hasil_malam ?? '-' }}</th>
+    @endforeach
+    </tr>
+</thead>
         <tbody>
             @foreach($pegawais as $i => $pegawai)
             <tr>
                 <td>{{ $i+1 }}</td>
-                <td>{{ $pegawai->nama }}</td>
-                <td>
-                    <div><strong>Status</strong></div>
-                    <div><strong>Shift</strong></div>
-                    <div><strong>Jobdesk</strong></div>
-                    <div><strong>Aksi</strong></div>
-                </td>
+                    <td>{{ $pegawai->nama }}</td>
+                    <td>
+                        <div><strong>Status</strong></div>
+                        <div><strong>Shift</strong></div>
+                        <div><strong>Jobdesk</strong></div>
+                        <div><strong>Hasil Produksi</strong></div>
+                        <div><strong>Aksi</strong></div>
+                    </td>
                 @foreach($dates as $tgl)
                 @php
                 $absensi = $absensis[$pegawai->uuid.'_'.$tgl] ?? null;
                 @endphp
-                <td>
-                    <div><span class="cell-status">{{ $absensi->status ?? '-' }}</span></div>
-                    <div><span class="cell-shift">{{ $absensi->shift ?? '-' }}</span></div>
-                    <div><span class="cell-grup">{{ $absensi->grup->grup ?? '-' }}</span></div>
-                    <div><button class="btn btn-sm btn-primary edit-btn"
+                    <td colspan="2">
+                            <div class="cell-status">{{ $absensi->status ?? '-' }}</div>
+                            <div class="cell-shift">{{ $absensi->grup->grup ?? '-' }}</div>
+                            <div class="cell-grup">{{ $absensi->jabatan->jabatan ?? '-' }}</div>
+                            <div class="cell-grup">{{ $absensi->pencapaian ?? '-' }}</div>
+                            <div>
+                                <button class="btn btn-sm btn-primary edit-btn"
                         data-pegawai="{{ $pegawai->uuid }}"
                         data-tanggal="{{ $tgl }}"
                         data-nama="{{ $pegawai->nama }}"

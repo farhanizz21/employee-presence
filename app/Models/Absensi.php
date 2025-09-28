@@ -56,4 +56,15 @@ class Absensi extends Model
         return $this->belongsTo(AbsensiPeriode::class, 'periode_uuid', 'uuid');
     }
 
+    public function hasil()
+    {
+        return $this->belongsTo(Hasil_produksi::class, 'tgl_absen', 'tanggal');
+    }
+
+    public function hasilProduksi()
+{
+    return $this->hasOne(Hasil_produksi::class, 'tanggal', 'tanggal');
+}
+
+
 }

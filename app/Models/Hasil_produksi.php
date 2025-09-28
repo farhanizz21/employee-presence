@@ -13,4 +13,9 @@ class Hasil_produksi extends Model
 
     public $incrementing = false;
     protected $keyType = 'string';
+
+    public function absensis()
+    {
+        return $this->hasMany(Absensi::class, 'tgl_absen', 'tanggal');
+    }
 }

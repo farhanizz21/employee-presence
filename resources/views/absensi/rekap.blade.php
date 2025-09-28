@@ -2,7 +2,9 @@
 
 @section('content')
 <div class="container">
+
   <h3>Rekap Absensi Pegawai</h3>
+
 
   {{-- Filter Tanggal --}}
   <form method="GET" action="{{ route('absensi.rekap') }}" class="mb-3">
