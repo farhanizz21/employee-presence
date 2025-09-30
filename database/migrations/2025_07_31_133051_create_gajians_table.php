@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('jumlah_telat');
             $table->integer('jumlah_alpha');
             $table->text('keterangan')->nullable();
+            $table->uuid('periode_uuid');
             $table->date('periode_mulai')->nullable();
             $table->date('periode_selesai')->nullable();
             $table->timestamps();

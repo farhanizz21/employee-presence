@@ -12,177 +12,80 @@ use App\Models\Master\Pegawai;
 use App\Models\Master\Jabatan;
 use App\Models\Master\BonusPotongan;
 use App\Models\Absensi;
+use App\Models\AbsensiPeriode;
 
 class GajianController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $periodeMulai = '2025-07-28';
-    //     $periodeSelesai = '2025-08-03';
-        
-    //     $pegawais = Pegawai::with('jabatan','grup')->get();
-    //     $absensi = Absensi::whereBetween('tgl_absen', [$periodeMulai, $periodeSelesai])->get();
-        
-    //     // Ambil bonus & potongan per kategori
-    //     $bonusKehadiran = BonusPotongan::where('kode', 'bonus_keehadiran')->first();
-    //     $bonusLembur = BonusPotongan::where('kode', 'bonus_lembur')->first();
-    //     $potonganTelat = BonusPotongan::where('kode', 'potongan_terlambat')->first();
-        
-    //     $dataGajiDB = Gajian::with(['pegawai', 'jabatan'])->get(); 
-        
-    //     //data gaji belum dibayar
-    //     $totalKeseluruhan = 0;
-    //     $dataGaji = [];
-    //     foreach ($pegawais as $pegawai) {
-    //         $jabatan = $pegawai->jabatan;
-    //         $grup = $pegawai->grup;
-
-    //         $absensiPegawai = $absensi->where('pegawai_uuid', $pegawai->uuid);
-    //         $jumlahHadir = $absensiPegawai->where('status', '1')->count();
-    //         $jumlahLembur = $absensiPegawai->where('status','2' )->count();
-    //         $jumlahTelat = $absensiPegawai->where('status', '3')->count();
-    //         $jumlahAlpha = $absensiPegawai->where('status', '4')->count();
-
-    //         // Hitung bonus kehadiran
-    //         $totalBonusKehadiran = 0;
-    //         if ($jumlahAlpha == 0 && $bonusKehadiran) {
-    //             $totalBonusKehadiran += $bonusKehadiran->nominal;
-    //         }
-            
-    //         //Hitung bonus lembur
-    //         $totalBonusLembur = 0;
-    //         if ($jumlahLembur > 0 && $bonusLembur) {
-    //             $totalBonusLembur += ($jumlahLembur * $bonusLembur->nominal);
-    //         }
-
-    //         // Hitung potongan
-    //         $totalPotongan = 0;
-    //         if ($jumlahTelat > 0 && $potonganTelat) {
-    //             $totalPotongan += ($jumlahTelat * $potonganTelat->nominal);
-    //         }
-
-    //         $gajiPokok = $jabatan->gaji;
-    //         $totalGaji = $gajiPokok + $totalBonusLembur + $totalBonusKehadiran - $totalPotongan;
-            
-    //         $totalKeseluruhan += $totalGaji;
-
-    //         $dataGaji[] = [
-    //             'pegawai' => $pegawai,
-    //             'grup' => $grup,
-    //             'jabatan' => $jabatan,
-    //             'gaji_pokok' => $gajiPokok,
-    //             'bonus_lembur' => $totalBonusLembur,
-    //             'bonus_kehadiran' => $totalBonusKehadiran,
-    //             'total_potongan' => $totalPotongan,
-    //             'total_gaji' => $totalGaji,
-    //             'jumlah_hadir' => $jumlahHadir,
-    //             'jumlah_telat' => $jumlahTelat,
-    //             'jumlah_alpha' => $jumlahAlpha,
-    //             'jumlah_lembur' => $jumlahLembur,
-    //         ];
-    //     }
-    //     // dd($dataGaji);
-
-    //     return view('gajian.index', compact('dataGaji', 'periodeMulai', 'periodeSelesai','totalKeseluruhan'));
-    
-    // }
-
-    public function index()
+    public function index(Request $request)
     {
-        $today = now();
+        // 🔽 Ambil semua periode
+        $periodes = AbsensiPeriode::orderBy('tanggal_mulai', 'desc')->get();
 
-        // 1️⃣ Ambil data gajian yang sudah dibayar
-        $sudah_gajian = Gajian::with('pegawai', 'pegawai.jabatan')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($gajian) {
-                return [
-                    'uuid'            => $gajian->uuid,
-                    'pegawai'         => $gajian->pegawai,
-                    'grup'            => $gajian->pegawai->grup,
-                    'jabatan'         => $gajian->pegawai->jabatan,
-                    'periode_mulai'   => $gajian->created_at->copy()->startOfDay()->toDateString(),
-                    'periode_selesai' => $gajian->created_at->copy()->endOfDay()->toDateString(),
-                    'jumlah_hadir'    => $gajian->jumlah_hadir,
-                    'jumlah_telat'    => $gajian->jumlah_telat,
-                    'jumlah_alpha'    => $gajian->jumlah_alpha,
-                    'jumlah_lembur'   => $gajian->jumlah_lembur,
-                    'gaji_pokok'      => $gajian->gaji_pokok,
-                    'bonus_lembur'    => $gajian->bonus_lembur,
-                    'bonus_kehadiran' => $gajian->bonus_kehadiran,
-                    'total_potongan'  => $gajian->total_potongan,
-                    'total_gaji'      => $gajian->total_gaji,
-                    'status_gajian'   => '1'
-                ];
-            });
-            // dd($sudah_gajian);
+        // 🔽 Periode dipilih (uuid)
+        $periodeUuid = $request->get('periode_uuid');
+        $periodeAktif = $periodeUuid
+            ? AbsensiPeriode::where('uuid', $periodeUuid)->first()
+            : null;
 
-        // 2️⃣ Ambil gajian terakhir per pegawai
-        $lastGajian = Gajian::select(
-                'pegawai_uuid', 
-                DB::raw('MAX(created_at) as last_gajian')
-            )
-            ->groupBy('pegawai_uuid')
-            ->get()
-            ->keyBy('pegawai_uuid');
+        $semua_gajian = collect();
 
-        // 3️⃣ Ambil data absensi untuk periode aktif (gajian terakhir → hari ini)
-        $absensi = Absensi::whereDate('tgl_absen', '<=', $today)->get();
+        if ($periodeAktif) {
+            $tgl_mulai   = $periodeAktif->tanggal_mulai;
+            $tgl_selesai = $periodeAktif->tanggal_selesai;
 
-        // 4️⃣ Ambil semua pegawai
-        $pegawais = Pegawai::with('jabatan','grup')->get();
+            // Ambil absensi sesuai periode
+            $absensi = Absensi::whereBetween('tgl_absen', [$tgl_mulai, $tgl_selesai])->get();
 
-        // 5️⃣ Hitung pegawai yang belum gajian
-        $belum_gajian = $pegawais->filter(function ($pegawai) use ($sudah_gajian) {
-                return !$sudah_gajian->contains('pegawai.uuid', $pegawai->uuid);
-            })
-            ->map(function ($pegawai) use ($lastGajian, $absensi, $today) {
+            // Ambil semua pegawai
+            $pegawais = Pegawai::with('jabatan', 'grup')->get();
 
-                // Periode aktif
-                $lastDate = $lastGajian[$pegawai->uuid]->last_gajian ?? null;
-                $tgl_mulai = $lastDate 
-                    ? Carbon::parse($lastDate)->addDay()->toDateString()
-                    : $absensi->where('pegawai_uuid', $pegawai->uuid)->min('tgl_absen'); // awal absensi
-                $tgl_selesai = $today->toDateString();
-
-                // Filter absensi sesuai periode
+            // Hitung gajian
+            $semua_gajian = $pegawais->map(function ($pegawai) use ($absensi, $tgl_mulai, $tgl_selesai) {
+                // Filter absensi sesuai pegawai & periode
                 $absensiPegawai = $absensi
                     ->where('pegawai_uuid', $pegawai->uuid)
                     ->whereBetween('tgl_absen', [$tgl_mulai, $tgl_selesai]);
 
-                // Hitung jumlah hari
-                $jumlahHadir  = $absensiPegawai->where('status', '1')->count();
-                $jumlahLembur = $absensiPegawai->where('status', '2')->count();
-                $jumlahTelat  = $absensiPegawai->where('status', '3')->count();
-                $jumlahAlpha  = $absensiPegawai->where('status', '4')->count();
+                // Hitung status absensi
+                $jumlahHadir  = $absensiPegawai->where('status', 'Masuk')->count();
+                $jumlahLembur = $absensiPegawai->where('status', 'Lembur')->count();
+                $jumlahTelat  = $absensiPegawai->where('status', 'Telat')->count();
+                $jumlahAlpha  = $absensiPegawai->where('status', 'Alpha')->count();
 
-                // Ambil bonus & potongan per kategori
+                // Hitung gaji pokok sesuai jabatan tiap absensi
+                $gaji_pokok_total = $absensiPegawai->reduce(function ($total, $absen) {
+                    if ($absen->status === 'Alpha') {
+                        return $total;
+                    }
+                    return $total + ($absen->jabatan ? $absen->jabatan->gaji : 0);
+                }, 0);
+
+                // Ambil aturan bonus/potongan
                 $bonusKehadiran = BonusPotongan::where('kode', 'bonus_keehadiran')->first();
-                $bonusLembur = BonusPotongan::where('kode', 'bonus_lembur')->first();
-                $potonganTelat = BonusPotongan::where('kode', 'potongan_terlambat')->first();
-                
-                // Hitung bonus kehadiran
-                $total_bonusKehadiran = 0;
-                if ($jumlahAlpha == 0 && $bonusKehadiran) {
-                    $total_bonusKehadiran += $bonusKehadiran->nominal;
-                }
-                
-                //Hitung bonus lembur
-                $total_bonusLembur = 0;
-                if ($jumlahLembur > 0 && $bonusLembur) {
-                    $total_bonusLembur += ($jumlahLembur * $bonusLembur->nominal);
-                }
+                $bonusLembur    = BonusPotongan::where('kode', 'bonus_lembur')->first();
+                $potonganTelat  = BonusPotongan::where('kode', 'potongan_terlambat')->first();
 
-                // Hitung potongan
-                $total_potongan = 0;
-                if ($jumlahTelat > 0 && $potonganTelat) {
-                    $total_potongan += ($jumlahTelat * $potonganTelat->nominal);
-                }
+                // Hitung bonus & potongan
+                $total_bonusKehadiran = ($jumlahAlpha == 0 && $bonusKehadiran) ? $bonusKehadiran->nominal : 0;
+                $total_bonusLembur    = $jumlahLembur * ($bonusLembur->nominal ?? 0);
+                $total_potongan       = $jumlahTelat * ($potonganTelat->nominal ?? 0);
 
-                $jabatan = $pegawai->jabatan;
-                $gaji_pokok = $jabatan->gaji;
-                $total_gaji = $gaji_pokok + $total_bonusLembur + $total_bonusKehadiran - $total_potongan;
-                
+                // Hitung total gaji
+                $total_gaji = $gaji_pokok_total + $total_bonusLembur + $total_bonusKehadiran - $total_potongan;
+
+                $absensiHarian = $pegawai->absensi()
+                    ->whereBetween('tgl_absen', [$tgl_mulai, $tgl_selesai])
+                    ->with('jabatan')
+                    ->orderBy('tgl_absen', 'asc')
+                    ->get()
+                    ->map(function ($absen) {
+                        return [
+                            'tanggal' => Carbon::parse($absen->tgl_absen)->format('l, d-M-y'),
+                            'jabatan' => $absen->jabatan ? $absen->jabatan->jabatan : '-',
+                            'gaji'    => $absen->jabatan ? $absen->jabatan->gaji : 0,
+                            'status'  => $absen->status,
+                        ];
+                    });
                 return [
                     'pegawai'         => $pegawai,
                     'grup'            => $pegawai->grup,
@@ -193,24 +96,24 @@ class GajianController extends Controller
                     'jumlah_telat'    => $jumlahTelat,
                     'jumlah_alpha'    => $jumlahAlpha,
                     'jumlah_lembur'   => $jumlahLembur,
-                    'gaji_pokok'      => $gaji_pokok,
+                    'gaji_pokok'      => $gaji_pokok_total, // sudah total dari absensi
                     'bonus_lembur'    => $total_bonusLembur,
                     'bonus_kehadiran' => $total_bonusKehadiran,
                     'total_potongan'  => $total_potongan,
                     'total_gaji'      => $total_gaji,
+                    'detail_absensi'  => $absensiHarian,
                     'status_gajian'   => '0'
                 ];
-            })
-            ->values();
-            
-            $semua_gajian = collect($belum_gajian)->merge($sudah_gajian);
-            // dd($semua_gajian);
-            return view('gajian.index', [
-                'semua_gajian' => $semua_gajian,
-            ]);
+            });
+        }
+
+
+        return view('gajian.index', [
+            'semua_gajian' => $semua_gajian,
+            'periodes'     => $periodes,
+            'periodeUuid'  => $periodeUuid,
+        ]);
     }
-
-
     /**
      * Show the form for creating a new resource.
      */
@@ -308,7 +211,7 @@ class GajianController extends Controller
             ->firstOrFail();
 
         $pdf = Pdf::loadView('gajian.slip', compact('gaji'))
-                ->setPaper('A4', 'portrait');
+            ->setPaper('A4', 'portrait');
         $nama = strtolower(trim($gaji->pegawai->nama));
         $tanggal = $gaji->created_at->translatedFormat('dmy');
 

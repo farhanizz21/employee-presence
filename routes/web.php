@@ -79,5 +79,17 @@ Route::post('/absensi/ganti-shift-jobdesk', [AbsensiController::class, 'gantiShi
 Route::post('/pegawai/update', [AbsensiController::class, 'update'])->name('pegawai.update');
 Route::post('/absensi/update-cell', [AbsensiController::class, 'updateCell'])->name('absensi.updateCell');
 
+Route::get('/gajian/preview/{periode_uuid}', [GajianController::class,'preview'])
+    ->name('gajian.preview');
+Route::post('/gajian/save-draft/{periode_uuid}', [GajianController::class,'saveDraft'])
+    ->name('gajian.saveDraft');
+Route::post('/gajian/finalize/{periode_uuid}', [GajianController::class,'finalize'])
+    ->name('gajian.finalize');
+Route::get('/gajian/slip/{uuid}', [GajianController::class,'slip'])->name('gajian.slip');
+Route::get('/gajian/generate', [GajianController::class, 'generatePayroll'])->name('gajian.generate');
+
+
+
+
 
 });

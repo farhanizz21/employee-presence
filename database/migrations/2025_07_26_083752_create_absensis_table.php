@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('pegawai_uuid');
             $table->uuid('periode_uuid');
             $table->uuid('grup_uuid'); // Optional foreign key to Grup
-            $table->uuid('jabatan_uuid', 20);
+            $table->uuid('jabatan_uuid');
             $table->string('status', 20);
             $table->integer('pencapaian')->nullable();
             $table->date('tgl_absen'); // Date of attendance

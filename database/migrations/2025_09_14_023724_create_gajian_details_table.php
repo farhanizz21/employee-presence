@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('gajian_details', function (Blueprint $table) {
         $table->bigIncrements('id');
+        $table->uuid('uuid');
         $table->uuid('gajian_uuid');
         $table->date('tanggal');
         $table->enum('jenis', ['gaji_harian','lembur','potongan','bonus']);
         $table->integer('nominal');
         $table->text('keterangan')->nullable();
-        $table->string('source_type')->nullable(); // opsional, untuk trace
+        $table->string('tipe')->nullable(); // opsional, untuk trace
         $table->uuid('source_uuid')->nullable();   // opsional, untuk trace
         $table->timestamps();
         $table->softDeletes();
