@@ -114,7 +114,13 @@
 
     <!--begin::Script-->
 
-    
+    <!-- CSS -->
+<link rel="stylesheet" href="{{ asset('adminlte/dist/css/daterangepicker.css') }}">
+
+<!-- JS -->
+<script src="{{ asset('adminlte/dist/js/moment.min.js') }}"></script>
+<script src="{{ asset('adminlte/dist/js/daterangepicker.min.js') }}"></script>
+
     
     
     <!--begin::Required Plugin(AdminLTE)-->

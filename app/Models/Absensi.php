@@ -46,11 +46,6 @@ class Absensi extends Model
         return $this->belongsTo(Jabatan::class, 'jabatan_uuid', 'uuid');
     }
 
-    public function grup()
-    {
-        return $this->belongsTo(Grup::class, 'grup_uuid', 'uuid');
-    }
-
     public function periode()
     {
         return $this->belongsTo(AbsensiPeriode::class, 'periode_uuid', 'uuid');

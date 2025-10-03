@@ -4,7 +4,6 @@ namespace App\Models\Master;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 use App\Models\Absensi;
 
 class Pegawai extends Model
@@ -34,16 +33,23 @@ class Pegawai extends Model
         return $this->hasOne(User::class);
     }
 
-    public function absensi() {
+    public function absensi()
+    {
         return $this->hasMany(Absensi::class, 'pegawai_uuid', 'uuid');
     }
-    public function gajians() {
+
+    public function gajians()
+    {
         return $this->hasMany(Gajian::class, 'pegawai_uuid', 'uuid');
     }
-    public function jabatan() {
+
+    public function jabatan()
+    {
         return $this->belongsTo(Jabatan::class, 'jabatan_uuid', 'uuid');
     }
-    public function grup() {
+
+    public function grup()
+    {
         return $this->belongsTo(Grup::class, 'grup_uuid', 'uuid');
     }
 }

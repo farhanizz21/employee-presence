@@ -9,7 +9,7 @@ use App\Models\Master\Pegawai;
 use App\Models\Master\Jabatan;
 
 class Gajian extends Model
-{    
+{
     use SoftDeletes;
 
     protected $fillable = [
@@ -24,14 +24,17 @@ class Gajian extends Model
         'jumlah_hadir',
         'jumlah_lembur',
         'jumlah_telat',
+        'periode_uuid',
         'jumlah_alpha',
         'keterangan',
     ];
 
-    public function pegawai() {
+    public function pegawai()
+    {
         return $this->belongsTo(Pegawai::class, 'pegawai_uuid', 'uuid');
     }
-    public function details() {
+    public function details()
+    {
         return $this->hasMany(GajianDetail::class, 'gajian_uuid', 'uuid');
     }
 
@@ -44,4 +47,14 @@ class Gajian extends Model
     {
         return 'uuid';
     }
+
+    public function periode()
+    {
+        return $this->belongsTo(AbsensiPeriode::class, 'periode_uuid', 'uuid');
+    }
+
+    public function absensiPeriode()
+{
+    return $this->belongsTo(AbsensiPeriode::class, 'periode_uuid', 'uuid');
+}
 }

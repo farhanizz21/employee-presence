@@ -12,12 +12,14 @@ class Jabatan extends Model
     protected $fillable = [
         'uuid',
         'jabatan',
-        'gaji',
+        'gaji_pagi',
+        'gaji_malam',
         'harian',
         'created_at',
         'updated_at',
         'deleted_at'
     ];
+
 
     public function getRouteKeyName()
     {

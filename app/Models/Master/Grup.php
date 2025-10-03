@@ -4,7 +4,6 @@ namespace App\Models\Master;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 use App\Models\Absensi;
 
 class Grup extends Model
@@ -33,5 +32,4 @@ class Grup extends Model
     {
         return $this->hasMany(Absensi::class, 'grup_uuid', 'uuid');
     }
-
 }

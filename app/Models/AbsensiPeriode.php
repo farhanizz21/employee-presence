@@ -25,4 +25,12 @@ class AbsensiPeriode extends Model
     {
         return $this->hasMany(Absensi::class, 'periode_uuid', 'uuid');
     }
+
+    public function getLabelAttribute()
+    {
+        $start = \Carbon\Carbon::parse($this->tanggal_mulai)->translatedFormat('d M Y');
+        $end = \Carbon\Carbon::parse($this->tanggal_selesai)->translatedFormat('d M Y');
+        return "$start s/d $end";
+    }
 }
+

@@ -147,7 +147,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $gaji['pegawai']->nama}}</td>
-                                            <td>{{ $gaji['grup']->grup}}</td>
+                                            <td>{{ $gaji['pegawai']->grup_uuid}}</td>
                                             <td>{{ $gaji['jabatan']->jabatan}}</td>
                                             <td><strong>Rp
                                                     {{ number_format($gaji['total_gaji'], 0, ',', '.') }}</strong>
@@ -161,40 +161,42 @@
                                             </td>
                                             <td class="text-center">
                                                 <button class="btn btn-sm btn-success btn-detail"
-    type="button"
-    data-toggle="modal"
-    data-target="#detailGaji"
-    data-nama="{{ $gaji['pegawai']->nama }}"
-    data-pegawai_uuid="{{ $gaji['pegawai']->uuid }}"
-    data-jabatan="{{ $gaji['jabatan']->jabatan }}"
-    data-jabatan_uuid="{{ $gaji['jabatan']->uuid }}"
-    data-pokok="{{ number_format($gaji['gaji_pokok'], 0, ',', '.') }}"
-    data-bonus_lembur="{{ number_format($gaji['bonus_lembur'], 0, ',', '.') }}"
-    data-bonus_kehadiran="{{ number_format($gaji['bonus_kehadiran'], 0, ',', '.') }}"
-    data-potongan="{{ number_format($gaji['total_potongan'], 0, ',', '.') }}"
-    data-total="{{ number_format($gaji['total_gaji'], 0, ',', '.') }}"
-    data-hadir="{{ $gaji['jumlah_hadir'] }}"
-    data-telat="{{ $gaji['jumlah_telat'] }}"
-    data-alpha="{{ $gaji['jumlah_alpha'] }}"
-    data-lembur="{{ $gaji['jumlah_lembur'] }}"
-    data-periode_mulai="{{ $gaji['periode_mulai'] }}"
-    data-periode_selesai="{{ $gaji['periode_selesai'] }}"
-    data-status="{{ $gaji['status_gajian'] }}"
-    data-detail='@json($gaji["detail_absensi"], JSON_HEX_APOS | JSON_HEX_QUOT)'>
-    <i class="fas fa-info-circle me-2"></i> Detail
-</button>
+                                                    type="button"
+                                                    data-toggle="modal"
+                                                    data-target="#detailGaji"
+                                                    data-nama="{{ $gaji['pegawai']->nama }}"
+                                                    data-pegawai_uuid="{{ $gaji['pegawai']->uuid }}"
+                                                    data-jabatan="{{ $gaji['jabatan']->jabatan }}"
+                                                    data-jabatan_uuid="{{ $gaji['jabatan']->uuid }}"
+                                                    data-pokok="{{ number_format($gaji['gaji_pokok'], 0, ',', '.') }}"
+                                                    data-bonus_lembur="{{ number_format($gaji['bonus_lembur'], 0, ',', '.') }}"
+                                                    data-bonus_kehadiran="{{ number_format($gaji['bonus_kehadiran'], 0, ',', '.') }}"
+                                                    data-potongan="{{ number_format($gaji['total_potongan'], 0, ',', '.') }}"
+                                                    data-total="{{ number_format($gaji['total_gaji'], 0, ',', '.') }}"
+                                                    data-hadir="{{ $gaji['jumlah_hadir'] }}"
+                                                    data-telat="{{ $gaji['jumlah_telat'] }}"
+                                                    data-alpha="{{ $gaji['jumlah_alpha'] }}"
+                                                    data-lembur="{{ $gaji['jumlah_lembur'] }}"
+                                                    data-periode_mulai="{{ $gaji['periode_mulai'] }}"
+                                                    data-periode_selesai="{{ $gaji['periode_selesai'] }}"
+                                                    data-status="{{ $gaji['status_gajian'] }}"
+                                                    data-detail='@json($gaji["detail_absensi"], JSON_HEX_APOS | JSON_HEX_QUOT)'>
+                                                    <i class="fas fa-info-circle me-2"></i> Detail
+                                                </button>
 
 
                                                 <!-- <button type="button" class="btn btn-sm btn-primary"
                                                     {{ $gaji['status_gajian'] != '1' ? 'disabled' : '' }}>
                                                     <i class="fas fa-print me-1"></i> Cetak Slip Gaji
                                                 </button> -->
-                                                @unless($gaji['status_gajian'] != '1')
+                                                @if($gaji['status_gajian'] == '1')
                                                 <a href="{{ route('gajian.cetak', $gaji['uuid']) }}" target="_blank"
                                                     class="btn btn-sm btn-primary">
                                                     <i class="fas fa-print me-1"></i> Cetak Slip Gaji
-                                                </a>
-                                                @endunless
+                                                    </a>
+                                                    @endif
+
+
                                             </td>
 
                                             </td>
@@ -250,6 +252,7 @@
                                 <input type="hidden" name="pegawai_uuid" id="pegawaiUuidInput">
                                 <p class="mb-0"><strong>Jabatan : </strong> <span id="modalJabatan"></span></p>
                                 <input type="hidden" name="jabatan_uuid" id="jabatanUuidInput">
+                                <input type="hidden" name="periode_uuid" value="{{ $periodeUuid }}">
                             </div>
                         </div>
                         <hr>
@@ -330,6 +333,7 @@
                                     <tr>
                                         <th>Tanggal</th>
                                         <th>Jabatan</th>
+                                        <th>Shift</th>
                                         <th>Gaji Harian</th>
                                         <th>Status</th>
                                     </tr>
@@ -373,70 +377,81 @@
 
     @push('scripts')
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const detailButtons = document.querySelectorAll('.btn-detail');
+        document.addEventListener('DOMContentLoaded', function() {
+            const detailButtons = document.querySelectorAll('.btn-detail');
 
-    detailButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Header & hidden inputs
-            document.getElementById('modalNama').textContent = this.dataset.nama;
-            document.getElementById('modalJabatan').textContent = this.dataset.jabatan;
-            document.getElementById('pegawaiUuidInput').value = this.dataset.pegawai_uuid;
-            document.getElementById('jabatanUuidInput').value = this.dataset.jabatan_uuid;
+            detailButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Header & hidden inputs
+                    document.getElementById('modalNama').textContent = this.dataset.nama;
+                    document.getElementById('modalJabatan').textContent = this.dataset.jabatan;
+                    document.getElementById('pegawaiUuidInput').value = this.dataset.pegawai_uuid;
+                    document.getElementById('jabatanUuidInput').value = this.dataset.jabatan_uuid;
 
-            document.getElementById('modalHadir').textContent = this.dataset.hadir;
-            document.getElementById('modalLembur').textContent = this.dataset.lembur;
-            document.getElementById('modalTelat').textContent = this.dataset.telat;
-            document.getElementById('modalAlpha').textContent = this.dataset.alpha;
-            document.getElementById('jumlahHadirInput').value = this.dataset.hadir;
-            document.getElementById('jumlahLemburInput').value = this.dataset.lembur;
-            document.getElementById('jumlahTelatInput').value = this.dataset.telat;
-            document.getElementById('jumlahAlphaInput').value = this.dataset.alpha;
+                    document.getElementById('modalHadir').textContent = this.dataset.hadir;
+                    document.getElementById('modalLembur').textContent = this.dataset.lembur;
+                    document.getElementById('modalTelat').textContent = this.dataset.telat;
+                    document.getElementById('modalAlpha').textContent = this.dataset.alpha;
+                    document.getElementById('jumlahHadirInput').value = this.dataset.hadir;
+                    document.getElementById('jumlahLemburInput').value = this.dataset.lembur;
+                    document.getElementById('jumlahTelatInput').value = this.dataset.telat;
+                    document.getElementById('jumlahAlphaInput').value = this.dataset.alpha;
 
-            document.getElementById('modalPokok').textContent = this.dataset.pokok;
-            document.getElementById('modalBonusLembur').textContent = this.dataset.bonus_lembur;
-            document.getElementById('modalBonusKehadiran').textContent = this.dataset.bonus_kehadiran;
-            document.getElementById('modalPotongan').textContent = this.dataset.potongan;
-            document.getElementById('modalTotal').textContent = this.dataset.total;
-            document.getElementById('gajiPokokInput').value = this.dataset.pokok;
-            document.getElementById('bonusLemburInput').value = this.dataset.bonus_lembur;
-            document.getElementById('bonusKehadiranInput').value = this.dataset.bonus_kehadiran;
-            document.getElementById('totalPotonganInput').value = this.dataset.potongan;
-            document.getElementById('totalGajiInput').value = this.dataset.total;
+                    document.getElementById('modalPokok').textContent = this.dataset.pokok;
+                    document.getElementById('modalBonusLembur').textContent = this.dataset.bonus_lembur;
+                    document.getElementById('modalBonusKehadiran').textContent = this.dataset.bonus_kehadiran;
+                    document.getElementById('modalPotongan').textContent = this.dataset.potongan;
+                    document.getElementById('modalTotal').textContent = this.dataset.total;
+                    document.getElementById('gajiPokokInput').value = this.dataset.pokok;
+                    document.getElementById('bonusLemburInput').value = this.dataset.bonus_lembur;
+                    document.getElementById('bonusKehadiranInput').value = this.dataset.bonus_kehadiran;
+                    document.getElementById('totalPotonganInput').value = this.dataset.potongan;
+                    document.getElementById('totalGajiInput').value = this.dataset.total;
 
-            // Periode
-            const periodeMulai = new Date(this.dataset.periode_mulai + 'T00:00:00');
-            const periodeSelesai = new Date(this.dataset.periode_selesai + 'T00:00:00');
-            const options = { day:'2-digit', month:'long', year:'numeric'};
-            document.getElementById('modalPeriodeMulai').textContent = new Intl.DateTimeFormat('id-ID',options).format(periodeMulai);
-            document.getElementById('modalPeriodeSelesai').textContent = new Intl.DateTimeFormat('id-ID',options).format(periodeSelesai);
+                    // Periode
+                    const periodeMulai = new Date(this.dataset.periode_mulai + 'T00:00:00');
+                    const periodeSelesai = new Date(this.dataset.periode_selesai + 'T00:00:00');
+                    const options = {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    };
+                    document.getElementById('modalPeriodeMulai').textContent = new Intl.DateTimeFormat('id-ID', options).format(periodeMulai);
+                    document.getElementById('modalPeriodeSelesai').textContent = new Intl.DateTimeFormat('id-ID', options).format(periodeSelesai);
 
-            // Detail Absensi
-            let detailAbsensi = [];
-            try {
-                detailAbsensi = JSON.parse(this.dataset.detail || '[]');
-            } catch(e) {
-                detailAbsensi = [];
-                console.error('JSON detail_absensi error', e);
-            }
+                    // Detail Absensi
+                    let detailAbsensi = [];
+                    try {
+                        detailAbsensi = JSON.parse(this.dataset.detail || '[]');
+                    } catch (e) {
+                        detailAbsensi = [];
+                        console.error('JSON detail_absensi error', e);
+                    }
 
-            const modalDetailAbsensi = document.getElementById('modalDetailAbsensi');
-            modalDetailAbsensi.innerHTML = '';
-            if(detailAbsensi.length === 0){
-                modalDetailAbsensi.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Tidak ada data</td></tr>';
-            } else {
-                detailAbsensi.forEach(row => {
-                    modalDetailAbsensi.innerHTML += `<tr>
-                        <td>${row.tanggal}</td>
-                        <td>${row.jabatan}</td>
-                        <td>${new Intl.NumberFormat('id-ID').format(row.gaji)}</td>
-                        <td>${row.status}</td>
-                    </tr>`;
+                    const modalDetailAbsensi = document.getElementById('modalDetailAbsensi');
+                    modalDetailAbsensi.innerHTML = ''; // reset
+
+                    if (detailAbsensi.length > 0) {
+                        detailAbsensi.forEach(item => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+            <td>${new Intl.DateTimeFormat('id-ID', options).format(new Date(item.tanggal))}</td>
+            <td>${item.jabatan}</td><td>${item.grup_uuid}</td>
+            <td class="text-end">Rp ${parseInt(item.gaji).toLocaleString('id-ID')}</td>
+            <td class="text-center">${item.status}</td>
+        `;
+                            modalDetailAbsensi.appendChild(tr);
+                        });
+                    } else {
+                        modalDetailAbsensi.innerHTML = `
+        <tr>
+            <td colspan="4" class="text-center text-muted">Tidak ada data</td>
+        </tr>
+    `;
+                    }
                 });
-            }
+            });
         });
-    });
-});
-</script>
+    </script>
 
     @endpush

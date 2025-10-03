@@ -1,103 +1,135 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <title>Slip Gaji</title>
     <style>
-    body {
-        font-family: sans-serif;
-        font-size: 12px;
-    }
-
-    h2 {
-        text-align: center;
-        margin-bottom: 0;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-
-    th,
-    td {
-        border: 1px solid #000;
-        padding: 6px;
-    }
-
-    th {
-        width: 30%;
-        /* batasi lebar kolom label */
-        font-weight: bold;
-        background: #f2f2f2;
-    }
-
-    .text-right {
-        text-align: right;
-    }
-
-    .text-center {
-        text-align: center;
-    }
-
-    .text-left {
-        text-align: left;
-    }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
+        .table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .table th, .table td { border: 1px solid #333; padding: 5px; }
+        .table th { background: #f2f2f2; }
+        .text-center { text-align: center; }
+        .text-end { text-align: right; }
+        .text-danger { color: red; }
+        .fw-bold { font-weight: bold; }
+        .table-primary { background: #d9eaf7; }
+        .mb-3 { margin-bottom: 15px; }
+        .mb-1 { margin-bottom: 5px; }
+        hr { margin: 10px 0; border: none; border-top: 1px solid #ccc; }
     </style>
 </head>
-
 <body>
-    <h2>Slip Gaji Pegawai</h2>
-    <p style="text-align:center;">Periode: {{ \Carbon\Carbon::parse($gaji->periode_mulai)->translatedFormat('d F Y') }}
-        s/d {{ \Carbon\Carbon::parse($gaji->periode_selesai)->translatedFormat('d F Y') }}</p>
 
-    <table>
-        <tr>
-            <th class="text-left">Nama Pegawai</th>
-            <td>{{ $gaji->pegawai->nama }}</td>
-        </tr>
-        <tr>
-            <th class="text-left">Jabatan</th>
-            <td>{{ $gaji->jabatan->jabatan }}</td>
-        </tr>
+    <div class="row mb-3">
+        <div class="col-md-9">
+            <h5 class="mb-1">{{ $gaji->pegawai->nama }}</h5>
+            <p class="mb-0">
+                <strong>Jabatan : </strong>
+                {{ $gaji->jabatan->jabatan ?? '-' }}
+            </p>
+            <p class="mb-0">
+                <strong>Periode : </strong>
+                {{ $gaji->absensiPeriode->nama_periode ?? '-' }}
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Rekap Kehadiran -->
+    <h6 class="fw-bold mb-2">Rekap Kehadiran</h6>
+    <table class="table table-sm table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Keterangan</th>
+                <th class="text-center">Jumlah Hari</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Hadir</td>
+                <td class="text-center">{{ $gaji->jumlah_hadir }}</td>
+            </tr>
+            <tr>
+                <td>Lembur</td>
+                <td class="text-center">{{ $gaji->jumlah_lembur }}</td>
+            </tr>
+            <tr>
+                <td>Terlambat</td>
+                <td class="text-center">{{ $gaji->jumlah_telat }}</td>
+            </tr>
+            <tr>
+                <td>Alpha</td>
+                <td class="text-center">{{ $gaji->jumlah_alpha }}</td>
+            </tr>
+        </tbody>
     </table>
 
-    <h4>Rincian Gaji</h4>
-    <table>
-        <tr>
-            <th>Deskripsi</th>
-            <th class="text-right">Nominal (Rp)</th>
-        </tr>
-        <tr>
-            <td>Gaji Pokok</td>
-            <td class="text-right">{{ number_format($gaji->gaji_pokok, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td>Bonus Lembur</td>
-            <td class="text-right">{{ number_format($gaji->bonus_lembur, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td>Bonus Kehadiran</td>
-            <td class="text-right">{{ number_format($gaji->bonus_kehadiran, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td>Potongan</td>
-            <td class="text-right text-danger">-{{ number_format($gaji->total_potongan, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <th>Total Gaji</th>
-            <th class="text-right">{{ number_format($gaji->total_gaji, 0, ',', '.') }}</th>
-        </tr>
+    <!-- Rincian Gaji -->
+    <h6 class="fw-bold mb-2">Rincian Gaji</h6>
+    <table class="table table-sm table-bordered mb-3">
+        <thead>
+            <tr>
+                <th>Deskripsi</th>
+                <th class="text-end">Nominal (Rp)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Gaji Pokok</td>
+                <td class="text-end">{{ number_format($gaji->gaji_pokok,0,',','.') }}</td>
+            </tr>
+            <tr>
+                <td>Bonus Lembur</td>
+                <td class="text-end">{{ number_format($gaji->bonus_lembur ?? 0,0,',','.') }}</td>
+            </tr>
+            <tr>
+                <td>Bonus Kehadiran</td>
+                <td class="text-end">{{ number_format($gaji->bonus_kehadiran ?? 0,0,',','.') }}</td>
+            </tr>
+            <tr>
+                <td class="text-danger">Potongan Terlambat</td>
+                <td class="text-end text-danger">
+                    -{{ number_format($gaji->total_potongan ?? 0,0,',','.') }}
+                </td>
+            </tr>
+            <tr class="table-primary fw-bold">
+                <td>Total Gaji Diterima</td>
+                <td class="text-end">{{ number_format($gaji->total_gaji,0,',','.') }}</td>
+            </tr>
+        </tbody>
     </table>
 
-    <p style="margin-top: 40px;">Keterangan: {{ $gaji->keterangan ?? '-' }}</p>
+    <!-- Rincian Absensi -->
+    <h6 class="mt-3">Rincian Absensi Periode</h6>
+    <table class="table table-sm table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Jabatan</th>
+                <th>Shift</th>
+                <th>Gaji Harian</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if(!empty($gaji->detail_absensi) && is_array($gaji->detail_absensi))
+                @foreach($gaji->detail_absensi as $detail)
+                    <tr>
+                        <td>{{ $detail['tanggal'] }}</td>
+                        <td>{{ $detail['jabatan'] }}</td>
+                        <td>{{ $detail['grup_uuid'] }}</td>
+                        <td class="text-end">{{ number_format($detail['gaji'],0,',','.') }}</td>
+                        <td>{{ $detail['status'] }}</td>
+                    </tr>
+                @endforeach
+            @else
+                <tr>
+                    <td colspan="5" class="text-center text-muted">Tidak ada data</td>
+                </tr>
+            @endif
+        </tbody>
+    </table>
 
-    <p style="text-align:right; margin-top:60px;">
-        <em>{{ now()->translatedFormat('d F Y') }}</em><br>
-        <strong>Management</strong>
-    </p>
 </body>
-
 </html>

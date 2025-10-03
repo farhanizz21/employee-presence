@@ -17,62 +17,61 @@ use Illuminate\Support\Str;
 class AbsensiController extends Controller
 {
 
-    public function index(Request $request)
-    {
-        $periodeUuid = $request->get('periode_uuid');
-        $periodes = AbsensiPeriode::orderBy('tanggal_mulai', 'desc')->get();
+public function index(Request $request)
+{
+    $bulanTahun = $request->get('bulan_tahun'); // format: YYYY-MM
+    $periodeUuid = $request->get('periode_uuid');
 
-        // Default pakai periode terbaru
-        if (!$periodeUuid && $periodes->isNotEmpty()) {
-            $periodeUuid = $periodes->first()->uuid;
-        }
+    // Ambil semua periode (desc)
+    $periodes = AbsensiPeriode::orderBy('tanggal_mulai', 'desc')->get();
 
-        $periode = AbsensiPeriode::where('uuid', $periodeUuid)->first();
-
-        $dates = [];
-        if ($periode) {
-            $start = Carbon::parse($periode->tanggal_mulai);
-            $end   = Carbon::parse($periode->tanggal_selesai);
-
-            while ($start->lte($end)) {
-                $dates[] = $start->format('Y-m-d');
-                $start->addDay();
-            }
-        }
-
-        $pegawais = Pegawai::all();
-        $grups    = Grup::all();
-
-        $absensis = collect();
-        if ($periode) {
-            $absensis = Absensi::with(['grup', 'jabatan'])
-                ->where('periode_uuid', $periode->uuid)
-                ->get()
-                ->keyBy(fn($item) => $item->pegawai_uuid . '_' . $item->tgl_absen);
-        }
-
-        // Ambil hasil produksi berdasarkan tanggal (bukan pegawai)
-        $hasilProduksi = Hasil_produksi::whereBetween('tanggal', [
-            $periode->tanggal_mulai,
-            $periode->tanggal_selesai
-        ])
-            ->get()
-            ->keyBy('tanggal');  // jadi gampang dipanggil pakai $hasilProduksi[$tgl]
-
-
-        return view('absensi.index', compact(
-            'periodes',
-            'periodeUuid',
-            'periode',
-            'dates',
-            'pegawais',
-            'grups',
-            'hasilProduksi',
-            'absensis'
-        ));
+    // Filter periode berdasarkan bulan-tahun jika ada
+    if ($bulanTahun) {
+        [$y, $m] = explode('-', $bulanTahun);
+        $filteredPeriodes = $periodes->filter(function($p) use($y, $m){
+            return Carbon::parse($p->tanggal_mulai)->year == $y &&
+                   Carbon::parse($p->tanggal_mulai)->month == $m;
+        })->values();
+    } else {
+        $filteredPeriodes = $periodes;
     }
 
+    // Default periodeUuid: periode pertama hasil filter
+    if (!$periodeUuid && $filteredPeriodes->isNotEmpty()) {
+        $periodeUuid = $filteredPeriodes->first()->uuid;
+    }
 
+    $periode = $periodeUuid ? AbsensiPeriode::where('uuid', $periodeUuid)->first() : null;
+
+    // Generate range tanggal
+    $dates = [];
+    if ($periode) {
+        $start = Carbon::parse($periode->tanggal_mulai);
+        $end   = Carbon::parse($periode->tanggal_selesai);
+
+        while ($start->lte($end)) {
+            $dates[] = $start->format('Y-m-d');
+            $start->addDay();
+        }
+    }
+
+    $pegawais = Pegawai::all();
+    $grups    = Grup::all();
+    $jabatans = Jabatan::all();
+
+    $absensis = collect();
+    if ($periode) {
+        $absensis = Absensi::with('jabatan')
+            ->where('periode_uuid', $periode->uuid)
+            ->get()
+            ->keyBy(fn($item) => $item->pegawai_uuid . '_' . $item->tgl_absen);
+    }
+
+    return view('absensi.index', compact(
+        'periodes','filteredPeriodes','periodeUuid','bulanTahun',
+        'periode','dates','pegawais','grups','jabatans','absensis'
+    ));
+}
 
     public function store(Request $request)
     {
@@ -272,7 +271,7 @@ class AbsensiController extends Controller
     {
         $tanggalMulai = $request->input('tanggal_mulai');
         $tanggalSelesai = $request->input('tanggal_selesai');
-if ($tanggalMulai && $tanggalSelesai) {
+        if ($tanggalMulai && $tanggalSelesai) {
             // Cek apakah ada periode yang overlap
             $cekOverlap = AbsensiPeriode::where(function ($q) use ($tanggalMulai, $tanggalSelesai) {
                 $q->where('tanggal_mulai', '<=', $tanggalSelesai)
@@ -397,60 +396,120 @@ if ($tanggalMulai && $tanggalSelesai) {
 
 
     public function rekap(Request $request)
-    {
-        // ambil range tanggal dari request
-        $tanggalMulai   = $request->get('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
-        $tanggalSelesai = $request->get('tanggal_selesai', Carbon::now()->endOfMonth()->toDateString());
+{
+    $tanggalMulai   = $request->get('tanggal_mulai', Carbon::now()->startOfMonth()->toDateString());
+    $tanggalSelesai = $request->get('tanggal_selesai', Carbon::now()->endOfMonth()->toDateString());
 
-        // bikin array tanggal
-        $dates = [];
-        $start = Carbon::parse($tanggalMulai);
-        $end   = Carbon::parse($tanggalSelesai);
-        while ($start->lte($end)) {
-            $dates[] = $start->format('Y-m-d');
-            $start->addDay();
-        }
-
-        // data referensi pegawai & grup
-        $pegawais = Pegawai::with('grup')->get();
-        $grups    = Grup::all();
-
-        return view('absensi.rekap', compact(
-            'tanggalMulai',
-            'tanggalSelesai',
-            'dates',
-            'pegawais',
-            'grups'
-        ));
+    // Generate array tanggal
+    $dates = [];
+    $start = Carbon::parse($tanggalMulai);
+    $end   = Carbon::parse($tanggalSelesai);
+    while ($start->lte($end)) {
+        $dates[] = $start->format('Y-m-d');
+        $start->addDay();
     }
 
+    // Ambil pegawai & data referensi
+    $pegawais = Pegawai::with('jabatan')->get();
+    $grups    = ['Pagi', 'Malam']; // enum langsung
+    $jabatans = Jabatan::all();
+
+    return view('absensi.rekap', compact(
+        'tanggalMulai',
+        'tanggalSelesai',
+        'dates',
+        'pegawais',
+        'grups',
+        'jabatans'
+    ));
+}
 
     public function updateCell(Request $request)
     {
         $validated = $request->validate([
-            'pegawai_uuid' => 'required',
+            'pegawai_uuid' => 'required|uuid',
             'tanggal'      => 'required|date',
-            'status'       => 'required',
-            'shift'        => 'required',
-            'grup_uuid'    => 'nullable'
+            'status'       => 'required|string',
+            'grup_uuid'    => 'required|string',
+            'jabatan_uuid' => 'nullable|uuid',
+            'pencapaian'   => 'nullable|integer',
         ]);
+$absensi = Absensi::updateOrCreate(
+    [
+        'pegawai_uuid' => $validated['pegawai_uuid'],
+        'tgl_absen'    => $validated['tanggal'],
+    ],
+    [
+        'status'       => $validated['status'],
+        'grup_uuid'    => $validated['grup_uuid'],
+        'jabatan_uuid' => $validated['jabatan_uuid'],
+        'pencapaian'   => $validated['pencapaian'] ?? null,
+    ]
+);
 
-        $absensi = Absensi::updateOrCreate(
-            [
-                'pegawai_uuid' => $validated['pegawai_uuid'],
-                'tgl_absen'    => $validated['tanggal'],
-            ],
-            [
-                'uuid'       => Str::uuid()->toString(), // generate uuid jika insert baru
-                'status'     => $validated['status'],
-                'shift'      => $validated['shift'],
-                'grup_uuid'  => $validated['grup_uuid'],
-            ]
-        );
 
         return response()->json([
             'success' => true,
             'absensi' => $absensi
         ]);
     }
+
+    public function getPeriodeByBulanTahun(Request $request)
+{
+    $bulanTahun = $request->get('bulan_tahun');
+    [$year, $month] = explode('-', $bulanTahun);
+
+    $periodes = AbsensiPeriode::whereYear('tanggal_mulai', $year)
+        ->whereMonth('tanggal_mulai', $month)
+        ->get();
+
+    return response()->json($periodes);
+}
+
+public function getData(Request $request)
+{
+    $periodeUuid = $request->get('periode_uuid');
+
+    $absensis = Absensi::with(['pegawai','jabatan','grup'])
+        ->where('absensi_periode_uuid', $periodeUuid)
+        ->get();
+
+    return response()->json($absensis);
+}
+
+public function getAbsensiByPeriode(Request $request)
+{
+    $periodeUuid = $request->get('periode_uuid');
+    $absensis = Absensi::with(['pegawai', 'jabatan', 'grup'])
+        ->where('periode_uuid', $periodeUuid)
+        ->get();
+
+    $html = view('absensi.partials.table', compact('absensis'))->render();
+
+    return response()->json(['html' => $html]);
+}
+
+public function getAbsensiData(Request $request)
+{
+    $periodeUuid = $request->get('periode_uuid');
+    $absensis = Absensi::with(['pegawai', 'jabatan', 'grup'])
+        ->where('periode_uuid', $periodeUuid)
+        ->get()
+        ->map(function($a) {
+            return [
+                'uuid' => $a->uuid,
+                'pegawai' => ['nama' => $a->pegawai->nama],
+                'jabatan' => $a->jabatan ? ['jabatan' => $a->jabatan->jabatan] : null,
+                'grup' => $a->grup ? ['nama' => $a->grup->nama] : null,
+                'status_label' => match($a->status){
+                    1 => 'Hadir', 2 => 'Lembur', 3 => 'Telat', 4 => 'Alpha', default => 'Unknown'
+                }
+            ];
+        });
+
+    return response()->json($absensis);
+}
+
+
+
 }

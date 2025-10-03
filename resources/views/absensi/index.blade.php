@@ -2,196 +2,245 @@
 
 @section('content')
 <div class="container">
-    <h3>Absensi Pegawai</h3>
+    <div class="card shadow mb-4">
+        {{-- Header Card --}}
+        <div class="card-header">
+            <h5 class="card-title mb-0">Absensi Pegawai</h5>
+            <div class="card-tools ml-auto">
+                <a href="{{ route('absensi.rekap')}}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Data
+                </a>
+            </div>
+        </div>
 
-    {{-- Filter --}}
-    <form method="GET" action="{{ route('absensi.index') }}" class="mb-3">
-  <label>Pilih Periode:</label>
-  <select name="periode_uuid" onchange="this.form.submit()" class="form-control" style="max-width: 250px; display:inline-block;">
-      @foreach($periodes as $p)
-          <option value="{{ $p->uuid }}" {{ $periodeUuid == $p->uuid ? 'selected' : '' }}>
-              {{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d M Y') }} 
-              - {{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d M Y') }}
-          </option>
-      @endforeach
-  </select>
-</form>
+        {{-- Body Card --}}
+        <div class="card-body">
+            {{-- Filter --}}
+            <form method="GET" action="{{ route('absensi.index') }}" class="mb-3 d-flex align-items-center">
+                <label class="me-2 mb-0">Pilih Periode:</label>
+                <select name="periode_uuid" onchange="this.form.submit()" class="form-control" style="max-width: 250px;">
+                    @foreach($periodes as $p)
+                    <option value="{{ $p->uuid }}" {{ $periodeUuid == $p->uuid ? 'selected' : '' }}>
+                        {{ \Carbon\Carbon::parse($p->tanggal_mulai)->format('d M Y') }}
+                        - {{ \Carbon\Carbon::parse($p->tanggal_selesai)->format('d M Y') }}
+                    </option>
+                    @endforeach
+                </select>
+            </form>
 
-  <div class="table-responsive">
-    <table class="table table-bordered table-sm">
-        <thead class="table-dark">
-    <tr>
-        <th>No.</th>
-        <th>Nama Karyawan</th>
-        <th>Ket.</th>
-        @foreach ($dates as $tgl)
-            <th colspan="2">
-                {{ \Carbon\Carbon::parse($tgl)->format('d M Y') }}
-            </th>
-        @endforeach
-    </tr>
-    <tr>
-        <th
-    colspan="3">Hasil Produksi</th>
-    @foreach ($dates as $tgl)
-        <th>P : {{ $hasilProduksi[$tgl]->hasil_pagi ?? '-' }}</th>
-        <th>M : {{ $hasilProduksi[$tgl]->hasil_malam ?? '-' }}</th>
-    @endforeach
-    </tr>
-</thead>
-        <tbody>
-            @foreach($pegawais as $i => $pegawai)
-            <tr>
-                <td>{{ $i+1 }}</td>
-                    <td>{{ $pegawai->nama }}</td>
-                    <td>
-                        <div><strong>Status</strong></div>
-                        <div><strong>Shift</strong></div>
-                        <div><strong>Jobdesk</strong></div>
-                        <div><strong>Hasil Produksi</strong></div>
-                        <div><strong>Aksi</strong></div>
-                    </td>
-                @foreach($dates as $tgl)
-                @php
-                $absensi = $absensis[$pegawai->uuid.'_'.$tgl] ?? null;
-                @endphp
-                    <td colspan="2">
-                            <div class="cell-status">{{ $absensi->status ?? '-' }}</div>
-                            <div class="cell-shift">{{ $absensi->grup->grup ?? '-' }}</div>
-                            <div class="cell-grup">{{ $absensi->jabatan->jabatan ?? '-' }}</div>
-                            <div class="cell-grup">{{ $absensi->pencapaian ?? '-' }}</div>
-                            <div>
-                                <button class="btn btn-sm btn-primary edit-btn"
-                        data-pegawai="{{ $pegawai->uuid }}"
-                        data-tanggal="{{ $tgl }}"
-                        data-nama="{{ $pegawai->nama }}"
-                        data-status="{{ $absensi->status ?? '' }}"
-                        data-shift="{{ $absensi->shift ?? '' }}"
-                        data-grup="{{ $absensi->grup_uuid ?? '' }}">
-                        Edit
-                    </button></div>
-                </td>
-                @endforeach
-            </tr>
-            @endforeach
-        </tbody>
+            {{-- Table --}}
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm table-hover">
+                    <thead class="table-dark text-center align-middle">
+                        <tr>
+                            <th rowspan="2">No.</th>
+                            <th rowspan="2">Nama Karyawan</th>
+                            <th rowspan="2">Ket.</th>
+                            @foreach ($dates as $tgl)
+                            <th colspan="2">{{ \Carbon\Carbon::parse($tgl)->format('d M Y') }}</th>
+                            @endforeach
+                        </tr>
+                        <tr class="text-center">
+                            @foreach ($dates as $tgl)
+                            <th>P</th>
+                            <th>M</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pegawais as $i => $pegawai)
+                        <tr>
+                            <td class="text-center">{{ $i+1 }}</td>
+                            <td>{{ $pegawai->nama }}</td>
+                            <td>
+                                <div><strong>Status</strong></div>
+                                <div><strong>Shift</strong></div>
+                                <div><strong>Jobdesk</strong></div>
+                                <div><strong>Hasil Produksi</strong></div>
+                                <div><strong>Aksi</strong></div>
+                            </td>
+                            @foreach($dates as $tgl)
+                            @php
+                            $absensi = $absensis[$pegawai->uuid.'_'.$tgl] ?? null;
+                            @endphp
+                            <td colspan="2">
+                                <div class="cell-status">{{ $absensi->status ?? '-' }}</div>
+                                <div class="cell-grup">{{ $absensi->grup_uuid ?? '-' }}</div>
+                                <div class="cell-jabatan">{{ $absensi->jabatan->jabatan ?? '-' }}</div>
+                                <div class="cell-pencapaian">{{ $absensi->pencapaian ?? '-' }}</div>
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-primary edit-btn"
+                                        data-toggle="modal"
+                                        data-target="#ubahModal"
+                                        data-pegawai="{{ $pegawai->uuid }}"
+                                        data-tanggal="{{ $tgl }}"
+                                        data-nama="{{ $pegawai->nama }}"
+                                        data-status="{{ $absensi->status ?? 'Masuk' }}"
+                                        data-shift="{{ $absensi->shift ?? 'Pagi' }}"
+                                        data-jabatan="{{ $absensi->jabatan->uuid ?? '' }}"
+                                        data-grup="{{ $absensi->grup_uuid ?? '' }}"
+                                        data-pencapaian="{{ $absensi->pencapaian ?? '' }}">
+                                        Edit
+                                    </button>
 
-    </table>
+                                </div>
+                            </td>
+                            @endforeach
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     {{-- Modal Ubah --}}
     <div class="modal fade" id="ubahModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form id="modalForm" onsubmit="return false;">
-            <div class="modal-header">
-              <h5 class="modal-title">Ubah Absensi</h5>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <div class="modal-body">
-              <input type="hidden" id="modalPegawai">
-              <input type="hidden" id="modalTanggal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="modalForm" onsubmit="return false;">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ubah Absensi</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="modalPegawai">
+                        <input type="hidden" id="modalTanggal">
 
-              <div class="form-group">
-                <label>Nama Pegawai</label>
-                <input type="text" id="modalNama" class="form-control" readonly>
+                        <div class="form-group">
+                            <label>Nama Pegawai</label>
+                            <input type="text" id="modalNama" class="form-control" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="modalStatus" class="form-control">
+                                <option value="Alpha">Alpha</option>
+                                <option value="Masuk">Masuk</option>
+                                <option value="Izin">Izin</option>
+                                <option value="Telat">Telat</option>
+                                <option value="Lembur">Lembur</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Shift</label>
+                            <select id="modalShift" class="form-control">
+                                <option value="Pagi">Pagi</option>
+                                <option value="Malam">Malam</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Jobdesk</label>
+                            <select id="modalJabatan" class="form-control">
+                                <option value="">-- Pilih Jabatan --</option>
+                                @foreach($jabatans as $jabatan)
+                                <option value="{{ $jabatan->uuid }}" data-harian="{{ $jabatan->harian }}">
+                                    {{ $jabatan->jabatan }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="pencapaianGroup" style="display:none;">
+                            <label>Pencapaian</label>
+                            <input type="text" id="modalPencapaian" class="form-control">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="modalSaveBtn" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
             </div>
-
-            <div class="form-group">
-                <label>Status</label>
-                <select id="modalStatus" class="form-control">
-                  <option value="Alpha">Alpha</option>
-                  <option value="Masuk">Masuk</option>
-                  <option value="Izin">Izin</option>
-                  <option value="Telat">Telat</option>
-                  <option value="Lembur">Lembur</option>
-              </select>
-          </div>
-
-          <div class="form-group">
-            <label>Shift</label>
-            <select id="modalShift" class="form-control">
-              <option value="Pagi">Pagi</option>
-              <option value="Malam">Malam</option>
-          </select>
-      </div>
-
-      <div class="form-group">
-        <label>Jobdesk</label>
-        <select id="modalGrup" class="form-control">
-          @foreach($grups as $grup)
-          <option value="{{ $grup->uuid }}">{{ $grup->grup }}</option>
-          @endforeach
-      </select>
-  </div>
-</div>
-<div class="modal-footer">
-  <button type="button" id="modalSaveBtn" class="btn btn-primary">Simpan Perubahan</button>
-</div>
-</form>
-</div>
-</div>
-</div>
-
-</div>
+        </div>
+    </div>
 </div>
 <script>
     let currentCell = null;
 
-// buka modal saat klik tombol edit
-    document.querySelectorAll(".edit-btn").forEach(btn => {
-        btn.addEventListener("click", function () {
-            currentCell = this.closest("td");
+    // Event saat modal akan tampil
+    $('#ubahModal').on('show.bs.modal', function(event) {
+        var button = event.relatedTarget; // DOM element
+        var modal = $(this); // jQuery object
 
-            document.getElementById("modalPegawai").value = this.dataset.pegawai;
-            document.getElementById("modalTanggal").value = this.dataset.tanggal;
-            document.getElementById("modalNama").value    = this.dataset.nama;
+        currentCell = button.closest('td'); // sekarang DOM element murni
 
-            document.getElementById("modalStatus").value = this.dataset.status || 'Masuk';
-            document.getElementById("modalShift").value  = this.dataset.shift || 'Pagi';
-            document.getElementById("modalGrup").value   = this.dataset.grup || '';
+        // Set modal fields
+        modal.find('#modalPegawai').val(button.dataset.pegawai);
+        modal.find('#modalTanggal').val(button.dataset.tanggal);
+        modal.find('#modalNama').val(button.dataset.nama);
+        modal.find('#modalStatus').val(button.dataset.status || 'Masuk');
+        modal.find('#modalShift').val(button.dataset.shift || 'Pagi');
+        modal.find('#modalJabatan').val(button.dataset.jabatan || '');
+        modal.find('#modalPencapaian').val(button.dataset.pencapaian || '');
 
-        $('#ubahModal').modal('show'); // tampilkan modal
+        if (button.dataset.pencapaian) {
+            modal.find('#pencapaianGroup').show();
+        } else {
+            modal.find('#pencapaianGroup').hide();
+        }
     });
+
+
+    // Event listener Jobdesk di modal
+    document.getElementById("modalJabatan").addEventListener("change", function() {
+        let selectedOption = this.options[this.selectedIndex];
+        let harian = selectedOption.dataset.harian;
+        if (harian == '2') {
+            document.getElementById("pencapaianGroup").style.display = 'block';
+        } else {
+            document.getElementById("pencapaianGroup").style.display = 'none';
+            document.getElementById("modalPencapaian").value = '';
+        }
     });
 
-// simpan perubahan
-    document.getElementById("modalSaveBtn").addEventListener("click", function () {
+    // Simpan perubahan
+    document.getElementById("modalSaveBtn").addEventListener("click", function() {
         if (!currentCell) return;
 
         let pegawai_uuid = document.getElementById("modalPegawai").value;
-        let tanggal      = document.getElementById("modalTanggal").value;
-        let status       = document.getElementById("modalStatus").value;
-        let shift        = document.getElementById("modalShift").value;
-        let grup         = document.getElementById("modalGrup").value;
+        let tanggal = document.getElementById("modalTanggal").value;
+        let status = document.getElementById("modalStatus").value;
+        let shift = document.getElementById("modalShift").value;
+        let grup_uuid = shift;
+        let jabatan_uuid = document.getElementById("modalJabatan").value;
+        let pencapaian = document.getElementById("modalPencapaian").value;
 
         fetch("{{ route('absensi.updateCell') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({
-                pegawai_uuid: pegawai_uuid,
-                tanggal: tanggal,
-                status: status,
-                shift: shift,
-                grup_uuid: grup
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    pegawai_uuid: pegawai_uuid,
+                    tanggal: tanggal,
+                    status: status,
+                    shift: shift,
+                    jabatan_uuid: jabatan_uuid,
+                    grup_uuid: grup_uuid,
+                    pencapaian: pencapaian
+                })
             })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-            // update tampilan cell
-                currentCell.querySelector(".cell-status").textContent = status;
-                currentCell.querySelector(".cell-shift").textContent  = shift;
-                currentCell.querySelector(".cell-grup").textContent   =
-                document.querySelector(`#modalGrup option[value="${grup}"]`)?.textContent || '';
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    currentCell.querySelector(".cell-status").textContent = status;
+                    currentCell.querySelector(".cell-grup").textContent = shift;
+                    currentCell.querySelector(".cell-jabatan").textContent =
+                        document.querySelector(`#modalJabatan option[value="${jabatan_uuid}"]`)?.textContent || '-';
+                    currentCell.querySelector(".cell-pencapaian").textContent = pencapaian || '-';
 
-                $('#ubahModal').modal('hide');
-            } else {
-                alert("Gagal simpan data: " + (data.message || ''));
-            }
-        })
-        .catch(err => console.error("Error:", err));
+                    // Hide modal
+                    $('#ubahModal').modal('hide');
+                } else {
+                    alert("Gagal simpan data: " + (data.message || ''));
+                }
+            })
+            .catch(err => console.error("Error:", err));
+
     });
 </script>
 

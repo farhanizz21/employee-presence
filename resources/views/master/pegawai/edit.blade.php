@@ -40,7 +40,7 @@
                 </div>
                 <!--end::Header-->
                 <!--begin::Form-->
-                <form class="pegawai" method="post" action="{{ route('pegawai.update',$pegawai->uuid) }}">
+                <form method="POST" action="{{ route('pegawai.update', $pegawai->uuid) }}">
                     @csrf
                     @method('PUT')
                     <!--begin::Body-->
@@ -59,15 +59,10 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Grup <span class="text-danger">*</span></label>
-                                <select name="grup_uuid" class="form-select @error('grup_uuid') is-invalid @enderror"
-                                    required>
+                                <select name="grup_uuid" class="form-select @error('grup_uuid') is-invalid @enderror" required>
                                     <option disabled {{ !$pegawai->grup_uuid ? 'selected' : '' }}>Pilih Grup</option>
-                                    @foreach ($grups as $grup)
-                                    <option value="{{ $grup->uuid }}"
-                                        {{ (old('grup', $pegawai->grup->uuid ?? '') == $grup->uuid) ? 'selected' : '' }}>
-                                        {{ $grup->grup }}
-                                    </option>
-                                    @endforeach
+                                    <option value="Pagi" {{ old('grup_uuid', $pegawai->grup_uuid) == 'Pagi' ? 'selected' : '' }}>Pagi</option>
+                                    <option value="Malam" {{ old('grup_uuid', $pegawai->grup_uuid) == 'Malam' ? 'selected' : '' }}>Malam</option>
                                 </select>
                                 @error('grup')
                                 <div class="invalid-feedback d-block">

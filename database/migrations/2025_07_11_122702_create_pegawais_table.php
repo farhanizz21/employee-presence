@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('nama', 100);
             $table->string('telepon');
-            $table->uuid('grup_uuid');
+            $table->enum('grup_uuid', ['Pagi', 'Malam']);
             $table->uuid('jabatan_uuid');
             $table->string('alamat', 255)->nullable();
             $table->string('keterangan', 255)->nullable();

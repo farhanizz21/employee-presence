@@ -111,16 +111,12 @@
                                             </th>
                                             <th>
                                                 <form method="GET" action="{{ route('pegawai.index') }}">
-                                                    <select name="filter_grup" class="form-select form-select-sm"
-                                                        onchange="this.form.submit()">
+                                                    <select name="filter_grup" class="form-select form-select-sm" onchange="this.form.submit()">
                                                         <option value="">Semua Grup</option>
-                                                        @foreach ($grups as $grup)
-                                                        <option value="{{ $grup->uuid }}" {{
-                                                            request('filter_grup')==$grup->uuid ? 'selected' : '' }}>
-                                                            {{ $grup->grup }}
-                                                        </option>
-                                                        @endforeach
+                                                        <option value="Pagi" {{ request('filter_grup')=='Pagi' ? 'selected' : '' }}>Pagi</option>
+                                                        <option value="Malam" {{ request('filter_grup')=='Malam' ? 'selected' : '' }}>Malam</option>
                                                     </select>
+
                                                     <input type="hidden" name="search" value="{{ request('search') }}">
                                                     <input type="hidden" name="sort_by"
                                                         value="{{ request('sort_by') }}">
@@ -141,7 +137,7 @@
                                                 {{ $pegawai->nama }}
                                             </td>
                                             <td class="text-truncate">{{ $pegawai->jabatan->jabatan }}</td>
-                                            <td class="text-truncate">{{ $pegawai->grup->grup }}</td>
+                                            <td class="text-truncate">{{ $pegawai->grup_uuid }}</td>
                                             <td class="text-truncate">{{ $pegawai->telepon }}</td>
                                             <td class="text-truncate">{{ $pegawai->keterangan }}</td>
                                             <td>
