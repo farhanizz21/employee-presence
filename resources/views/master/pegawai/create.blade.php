@@ -56,10 +56,12 @@
                         <div class="form-group row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Jabatan <span class="text-danger">*</span></label>
-                                <select name="jabatan" class="form-select @error('jabatan') is-invalid @enderror" required>
+                                <select name="jabatan" class="form-select @error('jabatan') is-invalid @enderror"
+                                    required>
                                     <option disabled selected>Pilih Jabatan</option>
                                     @foreach ($jabatans as $jabatan)
-                                    <option value="{{ $jabatan->uuid }}" {{ old('jabatan') == $jabatan->uuid ? 'selected' : '' }}>
+                                    <option value="{{ $jabatan->uuid }}"
+                                        {{ old('jabatan') == $jabatan->uuid ? 'selected' : '' }}>
                                         {{ $jabatan->jabatan }}
                                     </option>
                                     @endforeach
@@ -69,8 +71,9 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Telepon</label>
-                                <input type="tel" name="telepon" class="form-control @error('telepon') is-invalid @enderror"
+                                <label class="form-label">Telepon <span class="text-danger">*</span></label>
+                                <input type="tel" name="telepon"
+                                    class="form-control @error('telepon') is-invalid @enderror"
                                     value="{{ old('telepon') }}">
                                 @error('telepon')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -81,7 +84,8 @@
                         <div class="form-group row">
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Alamat</label>
-                                <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat') }}</textarea>
+                                <textarea name="alamat"
+                                    class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat') }}</textarea>
                                 @error('alamat')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -91,7 +95,8 @@
                         <div class="form-group row">
                             <div class="col-md-12">
                                 <label class="form-label">Keterangan</label>
-                                <textarea name="keterangan" class="form-control @error('keterangan') is-invalid @enderror">{{ old('keterangan') }}</textarea>
+                                <textarea name="keterangan"
+                                    class="form-control @error('keterangan') is-invalid @enderror">{{ old('keterangan') }}</textarea>
                                 @error('keterangan')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
