@@ -237,7 +237,7 @@ class GajianController extends Controller
             });
 
             // 3️⃣ Gabungkan: data gajians override data absensi
-            $semua_gajian = $hasilHitung->merge($sudah_gajian);
+            $semua_gajian = $hasilHitung->filter()->merge($sudah_gajian);
         }
 
         return view('gajian.index', [
@@ -304,7 +304,7 @@ class GajianController extends Controller
         ]);
 
         return redirect()
-           ->to('/gajian?periode_uuid=' . $request->periode_uuid)
+            ->to('/gajian?periode_uuid=' . $request->periode_uuid)
             ->with('success', 'Data gajian berhasil ditambahkan!');
     }
 
