@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Master\Pegawai;
-use App\Models\Master\Grup;
 use App\Models\Master\Jabatan;
 
 class PegawaiController extends Controller
@@ -29,11 +28,6 @@ class PegawaiController extends Controller
             $query->where('jabatan_uuid', $request->filter_jabatan);
         }
 
-        // Filter Grup
-        if ($request->filled('filter_grup')) {
-            $query->where('grup_uuid', $request->filter_grup);
-        }
-
         // Urutan
         if ($request->filled('sort_by') && in_array($request->sort_order, ['asc', 'desc'])) {
             $query->orderBy($request->sort_by, $request->sort_order);
@@ -44,16 +38,14 @@ class PegawaiController extends Controller
         $pegawais = $query->paginate(10)->appends($request->all());
 
         $jabatans = Jabatan::all();
-        $grups = Grup::all();
 
-        return view('master.pegawai.index', compact('pegawais', 'jabatans', 'grups'));
+        return view('master.pegawai.index', compact('pegawais', 'jabatans'));
     }
 
     public function create()
     {
-        $grups = Grup::all();
         $jabatans = Jabatan::all();
-        return view('master.pegawai.create', compact('jabatans', 'grups'));
+        return view('master.pegawai.create', compact('jabatans'));
     }
 
     /**
@@ -99,9 +91,8 @@ class PegawaiController extends Controller
     {
         $pegawai = Pegawai::where('uuid', $uuid)->firstOrFail();
         $jabatans = Jabatan::all();
-        $grups = Grup::all();
         // dd($Pegawai);
-        return view('master.pegawai.edit', compact('pegawai', 'jabatans', 'grups'));
+        return view('master.pegawai.edit', compact('pegawai', 'jabatans'));
     }
 
     /**

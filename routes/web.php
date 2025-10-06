@@ -8,7 +8,6 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\Master\PegawaiController;
 use App\Http\Controllers\Master\JabatanController;
-use App\Http\Controllers\Master\GrupController;
 use App\Http\Controllers\Master\BonusPotonganController;
 
 use App\Http\Controllers\AbsensiController;
@@ -90,7 +89,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/pegawai/search', [PegawaiController::class, 'search'])->name('pegawai.search');
     Route::resource('pegawai', PegawaiController::class);
     Route::resource('jabatan', JabatanController::class);
-    Route::resource('grup', GrupController::class);
 
     /*
     |--------------------------------------------------------------------------

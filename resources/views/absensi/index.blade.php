@@ -63,7 +63,7 @@
                             @php
                             $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
                             @endphp
-                            <td class="text-center align-middle">{{ $absensi->shift ?? '-' }}</td>
+                            <td class="text-center align-middle">{{ $absensi->grup_uuid ?? '-' }}</td>
                             @endforeach
                         </tr>
 

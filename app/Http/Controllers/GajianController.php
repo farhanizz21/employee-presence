@@ -94,7 +94,7 @@ class GajianController extends Controller
                 });
 
             // 2️⃣ Ambil absensi pegawai untuk periode
-            $pegawais = Pegawai::with('grup')->get();
+            $pegawais = Pegawai::get();
 
             $hasilHitung = $pegawais->mapWithKeys(function ($pegawai) use ($periodeAktif, $tgl_mulai, $tgl_selesai) {
                 $absensiPegawai = $pegawai->absensi()
@@ -137,7 +137,51 @@ class GajianController extends Controller
 
                 $total_bonusLembur = $jumlahLembur * ($bonusLembur->nominal ?? 0);
                 $total_potongan    = $jumlahTelat * ($potonganTelat->nominal ?? 0);
-                $total_bonusKehadiran = 0; // contoh sederhana
+                $total_bonusKehadiran = 0;
+
+                // === Bonus Kehadiran Berkelanjutan ===
+                if ($bonusKehadiran) {
+                    $nominalBonus = (int) ($bonusKehadiran->nominal ?? 0);
+
+                    // hitung jumlah hari kerja di periode aktif
+                    $hariPeriodeSekarang = \Carbon\Carbon::parse($tgl_mulai)->diffInDays(\Carbon\Carbon::parse($tgl_selesai)) + 1;
+
+                    // ambil periode sebelumnya (berdasarkan tanggal_selesai < periode aktif)
+                    $periodeSebelumnya = \App\Models\AbsensiPeriode::where('tanggal_selesai', '<', $tgl_mulai)
+                        ->orderBy('tanggal_selesai', 'desc')
+                        ->first();
+
+                    $hadirPenuhSekarang = false;
+                    $hadirPenuhSebelumnya = false;
+
+                    // cek kehadiran periode sekarang
+                    if ($jumlahHadir >= $hariPeriodeSekarang && $jumlahAlpha == 0) {
+                        $hadirPenuhSekarang = true;
+                    }
+
+                    // cek kehadiran periode sebelumnya
+                    if ($periodeSebelumnya) {
+                        $absensiSebelum = $pegawai->absensi()
+                            ->whereBetween('tgl_absen', [$periodeSebelumnya->tanggal_mulai, $periodeSebelumnya->tanggal_selesai])
+                            ->get();
+
+                        $hariPeriodeSebelum = \Carbon\Carbon::parse($periodeSebelumnya->tanggal_mulai)
+                            ->diffInDays(\Carbon\Carbon::parse($periodeSebelumnya->tanggal_selesai)) + 1;
+
+                        $jumlahHadirSebelum = $absensiSebelum->whereIn('status', ['Masuk', 'Telat', 'Lembur'])->count();
+                        $jumlahAlphaSebelum = $absensiSebelum->where('status', 'Alpha')->count();
+
+                        if ($jumlahHadirSebelum >= $hariPeriodeSebelum && $jumlahAlphaSebelum == 0) {
+                            $hadirPenuhSebelumnya = true;
+                        }
+                    }
+
+                    // jika hadir penuh di dua periode berturut-turut, aktifkan bonus
+                    if ($hadirPenuhSekarang && $hadirPenuhSebelumnya) {
+                        $total_bonusKehadiran = $nominalBonus;
+                    }
+                }
+
 
                 $total_gaji = $gaji_pokok_total + $total_bonusLembur + $total_bonusKehadiran - $total_potongan;
                 $absensiHarian = $pegawai->absensi()
@@ -260,7 +304,7 @@ class GajianController extends Controller
         ]);
 
         return redirect()
-            ->route('gajian.index')
+           ->to('/gajian?periode_uuid=' . $request->periode_uuid)
             ->with('success', 'Data gajian berhasil ditambahkan!');
     }
 
@@ -297,53 +341,52 @@ class GajianController extends Controller
     }
 
     public function cetakSlip($uuid)
-{
-    $gaji = Gajian::with(['pegawai', 'jabatan', 'absensiPeriode'])
-        ->where('uuid', $uuid)
-        ->firstOrFail();
+    {
+        $gaji = Gajian::with(['pegawai', 'jabatan', 'absensiPeriode'])
+            ->where('uuid', $uuid)
+            ->firstOrFail();
 
-    // Ambil ulang detail absensi dari tabel absensi
-    $periode = $gaji->absensiPeriode;
-    if ($periode) {
-        $detailAbsensi = $gaji->pegawai->absensi()
-            ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
-            ->with('jabatan')
-            ->orderBy('tgl_absen', 'asc')
-            ->get()
-            ->map(function ($absen) {
-                $jabatan = $absen->jabatan;
-                $gajiHari = 0;
-                if ($jabatan) {
-                    if ($jabatan->harian == 1) {
-                        $gajiHari = $absen->grup_uuid == 'Pagi'
-                            ? ($jabatan->gaji_pagi ?? 0)
-                            : ($jabatan->gaji_malam ?? 0);
-                    } elseif ($jabatan->harian == 2) {
-                        $gajiHari = $absen->grup_uuid == 'Pagi'
-                            ? ($absen->pencapaian ?? 0) * ($jabatan->gaji_pagi ?? 0)
-                            : ($absen->pencapaian ?? 0) * ($jabatan->gaji_malam ?? 0);
+        // Ambil ulang detail absensi dari tabel absensi
+        $periode = $gaji->absensiPeriode;
+        if ($periode) {
+            $detailAbsensi = $gaji->pegawai->absensi()
+                ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
+                ->with('jabatan')
+                ->orderBy('tgl_absen', 'asc')
+                ->get()
+                ->map(function ($absen) {
+                    $jabatan = $absen->jabatan;
+                    $gajiHari = 0;
+                    if ($jabatan) {
+                        if ($jabatan->harian == 1) {
+                            $gajiHari = $absen->grup_uuid == 'Pagi'
+                                ? ($jabatan->gaji_pagi ?? 0)
+                                : ($jabatan->gaji_malam ?? 0);
+                        } elseif ($jabatan->harian == 2) {
+                            $gajiHari = $absen->grup_uuid == 'Pagi'
+                                ? ($absen->pencapaian ?? 0) * ($jabatan->gaji_pagi ?? 0)
+                                : ($absen->pencapaian ?? 0) * ($jabatan->gaji_malam ?? 0);
+                        }
                     }
-                }
-                return [
-                    'tanggal'     => \Carbon\Carbon::parse($absen->tgl_absen)->format('d-m-Y'),
-                    'jabatan'     => $jabatan?->jabatan ?? '-',
-                    'grup_uuid'   => $absen->grup_uuid,
-                    'gaji'        => $gajiHari,
-                    'status'      => $absen->status,
-                    'pencapaian'  => $absen->pencapaian ?? 0,
-                ];
-            })->toArray();
+                    return [
+                        'tanggal'     => \Carbon\Carbon::parse($absen->tgl_absen)->format('d-m-Y'),
+                        'jabatan'     => $jabatan?->jabatan ?? '-',
+                        'grup_uuid'   => $absen->grup_uuid,
+                        'gaji'        => $gajiHari,
+                        'status'      => $absen->status,
+                        'pencapaian'  => $absen->pencapaian ?? 0,
+                    ];
+                })->toArray();
 
-        $gaji->detail_absensi = $detailAbsensi;
+            $gaji->detail_absensi = $detailAbsensi;
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('gajian.slip', compact('gaji'))
+            ->setPaper('A4', 'portrait');
+
+        $nama = strtolower(trim($gaji->pegawai->nama));
+        $tanggal = $gaji->created_at->translatedFormat('dmy');
+
+        return $pdf->stream('slip-gaji_' . $nama . '_' . $tanggal . '.pdf');
     }
-
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('gajian.slip', compact('gaji'))
-        ->setPaper('A4', 'portrait');
-
-    $nama = strtolower(trim($gaji->pegawai->nama));
-    $tanggal = $gaji->created_at->translatedFormat('dmy');
-
-    return $pdf->stream('slip-gaji_' . $nama . '_' . $tanggal . '.pdf');
-}
-
 }

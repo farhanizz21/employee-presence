@@ -47,9 +47,4 @@ class Pegawai extends Model
     {
         return $this->belongsTo(Jabatan::class, 'jabatan_uuid', 'uuid');
     }
-
-    public function grup()
-    {
-        return $this->belongsTo(Grup::class, 'grup_uuid', 'uuid');
-    }
 }

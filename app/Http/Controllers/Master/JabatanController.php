@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Jabatan;
-use App\Models\Master\Grup;
 
 class JabatanController extends Controller
 {
@@ -39,8 +38,7 @@ class JabatanController extends Controller
      */
     public function create()
     {
-        $grups = Grup::all();
-        return view('master.jabatan.create', compact('grups'));
+        return view('master.jabatan.create');
     }
 
     /**

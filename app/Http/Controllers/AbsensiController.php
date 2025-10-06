@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use App\Models\Absensi;
 use App\Models\Hasil_produksi;
 use App\Models\Master\Pegawai;
-use App\Models\Master\Grup;
 use App\Models\Master\Jabatan;
 use App\Models\AbsensiPeriode;
 use Illuminate\Support\Str;
@@ -56,7 +55,6 @@ public function index(Request $request)
     }
 
     $pegawais = Pegawai::all();
-    $grups    = Grup::all();
     $jabatans = Jabatan::all();
 
     $absensis = collect();
@@ -69,7 +67,7 @@ public function index(Request $request)
 
     return view('absensi.index', compact(
         'periodes','filteredPeriodes','periodeUuid','bulanTahun',
-        'periode','dates','pegawais','grups','jabatans','absensis'
+        'periode','dates','pegawais','jabatans','absensis'
     ));
 }
 
@@ -282,8 +280,7 @@ public function index(Request $request)
                 return back()->with('error', 'Range tanggal sudah ada dalam periode sebelumnya!');
             }
         }
-        $pegawais = Pegawai::with('grup', 'jabatan')->get(); // ambil juga default grup/jobdesk
-        $grups = Grup::all();
+        $pegawais = Pegawai::with('jabatan')->get();
         $jabatans = Jabatan::all();
 
         // generate range tanggal
@@ -297,7 +294,6 @@ public function index(Request $request)
 
         return view('absensi.rekap', compact(
             'pegawais',
-            'grups',
             'jabatans',
             'dates',
             'tanggalMulai',
@@ -411,7 +407,7 @@ public function index(Request $request)
 
     // Ambil pegawai & data referensi
     $pegawais = Pegawai::with('jabatan')->get();
-    $grups    = ['Pagi', 'Malam']; // enum langsung
+    $grups    = ['Pagi', 'Malam'];
     $jabatans = Jabatan::all();
 
     return view('absensi.rekap', compact(
@@ -470,7 +466,7 @@ public function getData(Request $request)
 {
     $periodeUuid = $request->get('periode_uuid');
 
-    $absensis = Absensi::with(['pegawai','jabatan','grup'])
+    $absensis = Absensi::with(['pegawai','jabatan'])
         ->where('absensi_periode_uuid', $periodeUuid)
         ->get();
 
@@ -480,7 +476,7 @@ public function getData(Request $request)
 public function getAbsensiByPeriode(Request $request)
 {
     $periodeUuid = $request->get('periode_uuid');
-    $absensis = Absensi::with(['pegawai', 'jabatan', 'grup'])
+    $absensis = Absensi::with(['pegawai', 'jabatan'])
         ->where('periode_uuid', $periodeUuid)
         ->get();
 
@@ -492,7 +488,7 @@ public function getAbsensiByPeriode(Request $request)
 public function getAbsensiData(Request $request)
 {
     $periodeUuid = $request->get('periode_uuid');
-    $absensis = Absensi::with(['pegawai', 'jabatan', 'grup'])
+    $absensis = Absensi::with(['pegawai', 'jabatan'])
         ->where('periode_uuid', $periodeUuid)
         ->get()
         ->map(function($a) {
