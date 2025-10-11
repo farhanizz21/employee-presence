@@ -23,6 +23,7 @@ class Absensi extends Model
         'grup_uuid',
         'jabatan_uuid',
         'shift',
+        'grup_sb',
         'periode_uuid',
         'status',
         'pencapaian',

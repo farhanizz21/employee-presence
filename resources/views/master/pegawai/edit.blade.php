@@ -58,9 +58,9 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Grup <span class="text-danger">*</span></label>
+                                <label class="form-label">Shift <span class="text-danger">*</span></label>
                                 <select name="grup_uuid" class="form-select @error('grup_uuid') is-invalid @enderror" required>
-                                    <option disabled {{ !$pegawai->grup_uuid ? 'selected' : '' }}>Pilih Grup</option>
+                                    <option disabled {{ !$pegawai->grup_uuid ? 'selected' : '' }}>Pilih Shift</option>
                                     <option value="Pagi" {{ old('grup_uuid', $pegawai->grup_uuid) == 'Pagi' ? 'selected' : '' }}>Pagi</option>
                                     <option value="Malam" {{ old('grup_uuid', $pegawai->grup_uuid) == 'Malam' ? 'selected' : '' }}>Malam</option>
                                 </select>
@@ -90,14 +90,19 @@
                                 </div>
                                 @enderror
                             </div>
-
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Telepon <span class="text-danger">
-                                        *</span></label>
-                                <input type="number" name="telepon"
-                                    class="form-control @error('telepon') is-invalid @enderror"
-                                    value="{{ $pegawai->telepon }}" required>
-                                @error('telepon')
+                                <label class="form-label">Grup <span class="text-danger">*</span></label>
+                                <select name="grup_sb"
+                                    class="form-select @error('grup_sb') is-invalid @enderror" required>
+                                    <option disabled {{ !$pegawai->grup_sb ? 'selected' : '' }}>Pilih Grup</option>
+                                    @foreach ($grups as $grup)
+                                    <option value="{{ $grup->uuid }}"
+                                        {{ (old('grup', $pegawai->grupSb->uuid ?? '') == $grup->uuid) ? 'selected' : '' }}>
+                                        {{ $grup->nama }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('grup_sb')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
                                 </div>
@@ -105,11 +110,23 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label class="form-label">Alamat</label>
                                 <textarea name="alamat"
                                     class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat', $pegawai->alamat) }}</textarea>
                                 @error('alamat')
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Telepon <span class="text-danger">
+                                        *</span></label>
+                                <input type="number" name="telepon"
+                                    class="form-control @error('telepon') is-invalid @enderror"
+                                    value="{{ $pegawai->telepon }}" required>
+                                @error('telepon')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
                                 </div>

@@ -28,90 +28,129 @@
                     @endforeach
                 </select>
             </form>
+            {{-- Loop tiap grup_sb --}}
+            @foreach($pegawaisByGrupSb as $grupSb => $pegawais)
+            @php
+            $namaGrup = $pegawais->first()->grupSb->nama ?? $grupSbUuid;
+            $grupId = Str::slug($grupSb ?? 'tidak_diketahui');
+            @endphp
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+                    data-bs-toggle="collapse" data-bs-target="#collapse-{{ $grupId }}" style="cursor: pointer;">
+                    <h5 class="mb-0">Grup {{ $namaGrup ?? 'Tidak Diketahui' }}</h5>
+                </div>
 
-            {{-- Table --}}
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-sm table-hover">
-                    <thead class="table-dark text-center align-middle">
-                        <tr>
-                            <th rowspan="2" class="align-middle">No.</th>
-                            <th rowspan="2" class="align-middle">Nama Karyawan</th>
-                            <th rowspan="2" class="align-middle">Ket.</th>
-                            @foreach ($dates as $tgl)
-                            <th class="align-middle">{{ \Carbon\Carbon::parse($tgl)->format('d M Y') }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pegawais as $i => $pegawai)
-                        {{-- Baris Status --}}
-                        <tr>
-                            <td rowspan="5" class="text-center align-middle fw-semibold">{{ $i + 1 }}</td>
-                            <td rowspan="5" class="align-middle fw-semibold">{{ $pegawai->nama }}</td>
-                            <td class="align-middle fw-semibold">Status</td>
-                            @foreach ($dates as $tgl)
-                            @php
-                            $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
-                            @endphp
-                            <td class="text-center align-middle">{{ $absensi->status ?? '-' }}</td>
-                            @endforeach
-                        </tr>
+                <div id="collapse-{{ $grupId }}" class="collapse show">
+                    <div class="card-body">
+                        {{-- Table --}}
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm table-hover paginated-table" id="table-{{ $grupId }}">
+                                <thead class="table-dark text-center align-middle">
+                                    <tr>
+                                        <th rowspan="2" class="align-middle">No.</th>
+                                        <th rowspan="2" class="align-middle">Nama Karyawan</th>
+                                        <th rowspan="2" class="align-middle">Ket.</th>
+                                        @foreach ($dates as $tgl)
+                                        <th class="align-middle">{{ \Carbon\Carbon::parse($tgl)->format('d M Y') }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($pegawais as $i => $pegawai)
+                                    {{-- Baris Status --}}
+                                    <tr>
+                                        <td rowspan="5" class="text-center align-middle fw-semibold">{{ $i + 1 }}</td>
+                                        <td rowspan="5" class="align-middle fw-semibold">{{ $pegawai->nama }}</td>
+                                        <td class="align-middle fw-semibold">Status</td>
+                                        @foreach ($dates as $tgl)
+                                        @php
+                                        $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
+                                        @endphp
+                                        <td class="text-center align-middle cell-status"
+                                            data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">
+                                            {{ $absensi->status ?? '-' }}
+                                        </td>
 
-                        <tr>
-                            <td class="align-middle fw-semibold">Shift</td>
-                            @foreach ($dates as $tgl)
-                            @php
-                            $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
-                            @endphp
-                            <td class="text-center align-middle">{{ $absensi->grup_uuid ?? '-' }}</td>
-                            @endforeach
-                        </tr>
+                                        @endforeach
+                                    </tr>
 
-                        <tr>
-                            <td class="align-middle fw-semibold">Jobdesk</td>
-                            @foreach ($dates as $tgl)
-                            @php
-                            $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
-                            @endphp
-                            <td class="text-center align-middle">{{ $absensi->jabatan->jabatan ?? '-' }}</td>
-                            @endforeach
-                        </tr>
+                                    <tr>
+                                        <td class="align-middle fw-semibold">Shift</td>
+                                        @foreach ($dates as $tgl)
+                                        @php
+                                        $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
+                                        @endphp
+                                        <td class="text-center align-middle cell-shift"
+                                            data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">
+                                            {{ $absensi->grup_uuid ?? '-' }}
+                                        </td>
 
-                        <tr>
-                            <td class="align-middle fw-semibold">Hasil Produksi</td>
-                            @foreach ($dates as $tgl)
-                            @php
-                            $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
-                            @endphp
-                            <td class="text-center align-middle">{{ $absensi->pencapaian ?? '-' }}</td>
-                            @endforeach
-                        </tr>
+                                        @endforeach
+                                    </tr>
 
-                        <tr>
-                            <td class="align-middle fw-semibold">Aksi</td>
-                            @foreach ($dates as $tgl)
-                            @php
-                            $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
-                            @endphp
-                            <td class="text-center align-middle">
-                                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                                    data-target="#ubahModal" data-pegawai="{{ $pegawai->uuid }}"
-                                    data-tanggal="{{ $tgl }}" data-nama="{{ $pegawai->nama }}"
-                                    data-status="{{ $absensi->status ?? 'Masuk' }}"
-                                    data-shift="{{ $absensi->shift ?? 'Pagi' }}"
-                                    data-jabatan="{{ $absensi->jabatan->uuid ?? '' }}"
-                                    data-grup="{{ $absensi->grup_uuid ?? '' }}"
-                                    data-pencapaian="{{ $absensi->pencapaian ?? '' }}">
-                                    <i class="fas fa-edit"></i>
-                                    Edit
-                                </button>
-                            </td>
-                            @endforeach
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                    <tr>
+                                        <td class="align-middle fw-semibold">Jobdesk</td>
+                                        @foreach ($dates as $tgl)
+                                        @php
+                                        $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
+                                        @endphp
+                                        <td class="text-center align-middle cell-jobdesk"
+                                            data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">
+                                            {{ $absensi->jabatan->jabatan ?? '-' }}
+                                        </td>
+
+                                        @endforeach
+                                    </tr>
+
+                                    <tr>
+                                        <td class="align-middle fw-semibold">Hasil Produksi</td>
+                                        @foreach ($dates as $tgl)
+                                        @php
+                                        $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
+                                        @endphp
+                                        <td class="text-center align-middle cell-hasil"
+                                            data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">
+                                            {{ $absensi->pencapaian ?? '-' }}
+                                        </td>
+
+                                        @endforeach
+                                    </tr>
+
+                                    <tr>
+                                        <td class="align-middle fw-semibold">Aksi</td>
+                                        @foreach ($dates as $tgl)
+                                        @php
+                                        $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
+                                        @endphp
+                                        <td class="text-center align-middle">
+                                            <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
+                                                data-target="#ubahModal" data-pegawai="{{ $pegawai->uuid }}"
+                                                data-tanggal="{{ $tgl }}" data-nama="{{ $pegawai->nama }}"
+                                                data-status="{{ $absensi->status ?? 'Masuk' }}"
+                                                data-shift="{{ $absensi->shift ?? 'Pagi' }}"
+                                                data-jabatan="{{ $absensi->jabatan->uuid ?? '' }}"
+                                                data-grup="{{ $absensi->grup_uuid ?? '' }}"
+                                                data-pencapaian="{{ $absensi->pencapaian ?? '' }}">
+                                                <i class="fas fa-edit"></i>
+                                                Edit
+                                            </button>
+                                        </td>
+                                        @endforeach
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        {{-- Pagination container --}}
+                        <div class="d-flex justify-content-center mt-2">
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0" id="pagination-{{ $grupId }}"></ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
             </div>
+            @endforeach
         </div>
     </div>
 
@@ -177,92 +216,172 @@
         </div>
     </div>
 </div>
+
 <script>
-let currentCell = null;
+    let currentCell = null;
 
-// Event saat modal akan tampil
-$('#ubahModal').on('show.bs.modal', function(event) {
-    var button = event.relatedTarget; // DOM element
-    var modal = $(this); // jQuery object
+    // Saat modal ditampilkan
+    $('#ubahModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var modal = $(this);
 
-    currentCell = button.closest('td'); // sekarang DOM element murni
+        currentCell = button.closest('td'); // sel tombol edit
 
-    // Set modal fields
-    modal.find('#modalPegawai').val(button.dataset.pegawai);
-    modal.find('#modalTanggal').val(button.dataset.tanggal);
-    modal.find('#modalNama').val(button.dataset.nama);
-    modal.find('#modalStatus').val(button.dataset.status || 'Masuk');
-    modal.find('#modalShift').val(button.dataset.shift || 'Pagi');
-    modal.find('#modalJabatan').val(button.dataset.jabatan || '');
-    modal.find('#modalPencapaian').val(button.dataset.pencapaian || '');
+        modal.find('#modalPegawai').val(button.data('pegawai'));
+        modal.find('#modalTanggal').val(button.data('tanggal'));
+        modal.find('#modalNama').val(button.data('nama'));
+        modal.find('#modalStatus').val(button.data('status') || 'Masuk');
+        modal.find('#modalShift').val(button.data('shift') || 'Pagi');
+        modal.find('#modalJabatan').val(button.data('jabatan') || '');
+        modal.find('#modalPencapaian').val(button.data('pencapaian') || '');
 
-    if (button.dataset.pencapaian) {
-        modal.find('#pencapaianGroup').show();
-    } else {
-        modal.find('#pencapaianGroup').hide();
-    }
-});
+        if (button.data('pencapaian')) {
+            modal.find('#pencapaianGroup').show();
+        } else {
+            modal.find('#pencapaianGroup').hide();
+        }
+    });
 
+    // Tampilkan input pencapaian hanya untuk jabatan harian == 2
+    $('#modalJabatan').on('change', function() {
+        const harian = $(this).find(':selected').data('harian');
+        if (harian == '2') {
+            $('#pencapaianGroup').show();
+        } else {
+            $('#pencapaianGroup').hide();
+            $('#modalPencapaian').val('');
+        }
+    });
 
-// Event listener Jobdesk di modal
-document.getElementById("modalJabatan").addEventListener("change", function() {
-    let selectedOption = this.options[this.selectedIndex];
-    let harian = selectedOption.dataset.harian;
-    if (harian == '2') {
-        document.getElementById("pencapaianGroup").style.display = 'block';
-    } else {
-        document.getElementById("pencapaianGroup").style.display = 'none';
-        document.getElementById("modalPencapaian").value = '';
-    }
-});
+    // Tombol Simpan
+    $('#modalSaveBtn').on('click', function() {
+        if (!currentCell) return;
 
-// Simpan perubahan
-document.getElementById("modalSaveBtn").addEventListener("click", function() {
-    if (!currentCell) return;
+        let pegawai_uuid = $('#modalPegawai').val();
+        let tanggal = $('#modalTanggal').val();
+        let status = $('#modalStatus').val();
+        let shift = $('#modalShift').val();
+        let grup_uuid = shift;
+        let jabatan_uuid = $('#modalJabatan').val();
+        let pencapaian = $('#modalPencapaian').val();
+        let jabatan_nama = $('#modalJabatan option:selected').text();
 
-    let pegawai_uuid = document.getElementById("modalPegawai").value;
-    let tanggal = document.getElementById("modalTanggal").value;
-    let status = document.getElementById("modalStatus").value;
-    let shift = document.getElementById("modalShift").value;
-    let grup_uuid = shift;
-    let jabatan_uuid = document.getElementById("modalJabatan").value;
-    let pencapaian = document.getElementById("modalPencapaian").value;
-
-    fetch("{{ route('absensi.updateCell') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({
-                pegawai_uuid: pegawai_uuid,
-                tanggal: tanggal,
-                status: status,
-                shift: shift,
-                jabatan_uuid: jabatan_uuid,
-                grup_uuid: grup_uuid,
-                pencapaian: pencapaian
+        fetch("{{ route('absensi.updateCell') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    pegawai_uuid: pegawai_uuid,
+                    tanggal: tanggal,
+                    status: status,
+                    shift: shift,
+                    jabatan_uuid: jabatan_uuid,
+                    grup_uuid: grup_uuid,
+                    pencapaian: pencapaian
+                })
             })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                currentCell.querySelector(".cell-status").textContent = status;
-                currentCell.querySelector(".cell-grup").textContent = shift;
-                currentCell.querySelector(".cell-jabatan").textContent =
-                    document.querySelector(`#modalJabatan option[value="${jabatan_uuid}"]`)?.textContent ||
-                    '-';
-                currentCell.querySelector(".cell-pencapaian").textContent = pencapaian || '-';
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
 
-                // Hide modal
-                $('#ubahModal').modal('hide');
-            } else {
-                alert("Gagal simpan data: " + (data.message || ''));
-            }
-        })
-        .catch(err => console.error("Error:", err));
+                    // ✅ Update langsung di tabel tanpa reload
+                    const tdAksi = $(currentCell);
+                    const pegawai_uuid_sel = $('#modalPegawai').val();
+                    const tanggal_sel = $('#modalTanggal').val();
 
-});
+                    // Cari <td> berdasarkan pegawai & tanggal
+                    $(`td.cell-status[data-pegawai='${pegawai_uuid_sel}'][data-tanggal='${tanggal_sel}']`).text(status);
+                    $(`td.cell-shift[data-pegawai='${pegawai_uuid_sel}'][data-tanggal='${tanggal_sel}']`).text(shift);
+                    $(`td.cell-jobdesk[data-pegawai='${pegawai_uuid_sel}'][data-tanggal='${tanggal_sel}']`).text(jabatan_nama || '-');
+                    $(`td.cell-hasil[data-pegawai='${pegawai_uuid_sel}'][data-tanggal='${tanggal_sel}']`).text(pencapaian || '-');
+
+
+                    // ✅ Tutup modal (Bootstrap 4)
+                    $('#ubahModal').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                } else {
+                    alert("Gagal simpan data: " + (data.message || ''));
+                }
+            })
+            .catch(err => console.error("Error:", err));
+    });
 </script>
 
+<script>
+    // --- Pagination Lokal Tiap Grup ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const rowsPerPage = 5; // jumlah pegawai per grup yang tampil
+        document.querySelectorAll('.paginated-table').forEach(table => {
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr')).filter((r, i) => r.firstElementChild?.rowSpan);
+            const totalRows = rows.length;
+            const grupId = table.id.replace('table-', '');
+            const pagination = document.getElementById('pagination-' + grupId);
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            function showPage(page) {
+                rows.forEach((row, i) => {
+                    const isVisible = Math.floor(i / 1) >= (page - 1) * rowsPerPage && Math.floor(i / 1) < page * rowsPerPage;
+                    for (let j = 0; j < 5; j++) {
+                        const nextRow = row.parentElement.children[i * 5 + j];
+                        if (nextRow) nextRow.style.display = isVisible ? '' : 'none';
+                    }
+                });
+            }
+
+            // buat tombol
+            pagination.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.className = 'page-item' + (i === 1 ? ' active' : '');
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.addEventListener('click', e => {
+                    e.preventDefault();
+                    pagination.querySelectorAll('.page-item').forEach(p => p.classList.remove('active'));
+                    li.classList.add('active');
+                    showPage(i);
+                });
+                pagination.appendChild(li);
+            }
+
+            showPage(1);
+        });
+    });
+
+    // --- Animasi ikon collapse ---
+    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(header => {
+        const icon = header.querySelector('i');
+        header.addEventListener('click', () => {
+            setTimeout(() => {
+                const collapseEl = document.querySelector(header.dataset.bsTarget);
+                if (collapseEl.classList.contains('show')) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    icon.classList.add('fa-chevron-down');
+                    icon.classList.remove('fa-chevron-up');
+                }
+            }, 250);
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.paginated-table tbody').forEach(tbody => {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        for (let i = 0; i < rows.length; i += 5) {
+            const color = (Math.floor(i / 5) % 2 === 0) ? '#393a3bff' : '#ffffff';
+            for (let j = 0; j < 5; j++) {
+                if (rows[i + j]) {
+                    rows[i + j].style.backgroundColor = color;
+                }
+            }
+        }
+    });
+});
+
+</script>
 @endsection

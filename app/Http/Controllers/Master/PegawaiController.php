@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Str;
 use App\Models\Master\Pegawai;
 use App\Models\Master\Jabatan;
+use App\Models\Master\Grup;
 
 class PegawaiController extends Controller
 {
@@ -16,7 +18,7 @@ class PegawaiController extends Controller
 
     public function index(Request $request)
     {
-        $query = Pegawai::query();
+        $query = Pegawai::with(['jabatan', 'grupSb']);
 
         // Pencarian
         if ($request->filled('search')) {
@@ -38,19 +40,18 @@ class PegawaiController extends Controller
         $pegawais = $query->paginate(10)->appends($request->all());
 
         $jabatans = Jabatan::all();
+        $grups = Grup::all();
 
-        return view('master.pegawai.index', compact('pegawais', 'jabatans'));
+        return view('master.pegawai.index', compact('pegawais', 'jabatans', 'grups'));
     }
 
     public function create()
     {
         $jabatans = Jabatan::all();
-        return view('master.pegawai.create', compact('jabatans'));
+        $grups = Grup::all();
+        return view('master.pegawai.create', compact('jabatans', 'grups'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -58,6 +59,7 @@ class PegawaiController extends Controller
     'grup' => 'required|string|in:Pagi,Malam',
     'telepon' => 'required|string|max:20',
     'jabatan' => 'required|string',
+    'grup_sb' => 'required|string',
     'alamat' => 'nullable|string|max:255',
     'keterangan' => 'nullable|string|max:255',
 ]);
@@ -66,6 +68,7 @@ class PegawaiController extends Controller
             'uuid' => \Illuminate\Support\Str::uuid(), // Generate UUID otomatis
             'nama' => $validated['nama'],
             'grup_uuid' => $validated['grup'],
+            'grup_sb' => $validated['grup_sb'],
             'telepon' => $validated['telepon'],
             'jabatan_uuid' => $validated['jabatan'],
             'alamat' => $validated['alamat'],
@@ -91,8 +94,9 @@ class PegawaiController extends Controller
     {
         $pegawai = Pegawai::where('uuid', $uuid)->firstOrFail();
         $jabatans = Jabatan::all();
+        $grups = Grup::all();
         // dd($Pegawai);
-        return view('master.pegawai.edit', compact('pegawai', 'jabatans'));
+        return view('master.pegawai.edit', compact('pegawai', 'jabatans', 'grups'));
     }
 
     /**
@@ -104,7 +108,8 @@ class PegawaiController extends Controller
         'nama' => 'required|string|max:100',
         'telepon' => 'required|string|max:20',
         'grup_uuid' => 'required|string|in:Pagi,Malam', // pastikan hanya enum ini
-        'jabatan_uuid' => 'required|exists:jabatans,uuid', // pastikan jabatan valid
+        'jabatan_uuid' => 'required|exists:jabatans,uuid',
+        'grup_sb' => 'required|exists:grups,uuid',
         'alamat' => 'nullable|string|max:255',
         'keterangan' => 'nullable|string|max:255',
     ]);

@@ -41,9 +41,9 @@
                 <li class="nav-header">MASTER DATA</li>
 
                 <li
-                    class="nav-item has-treeview {{ request()->is('user*','pegawai*','jabatan*','bonuspotongan*') ? 'menu-open' : '' }}">
+                    class="nav-item has-treeview {{ request()->is('user*','pegawai*', 'grup*', 'jabatan*','bonuspotongan*') ? 'menu-open' : '' }}">
                     <a href="#"
-                        class="nav-link {{ request()->is('user*','pegawai*','jabatan*','bonuspotongan*') ? 'active' : '' }}">
+                        class="nav-link {{ request()->is('user*','pegawai*','jabatan*','grup*', 'bonuspotongan*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-database"></i>
                         <p>
                             Master Data
@@ -73,6 +73,14 @@
                                 class="nav-link {{ request()->routeIs('jabatan.*') ? 'active' : '' }}">
                                 <i class="fas fa-briefcase me-2"></i>
                                 <p>Jabatan</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('grup.index') }}"
+                                class="nav-link {{ request()->routeIs('grup.*') ? 'active' : '' }}">
+                                <i class="fas fa-briefcase me-2"></i>
+                                <p>Group</p>
                             </a>
                         </li>
 

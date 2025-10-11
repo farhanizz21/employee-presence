@@ -111,8 +111,28 @@
                                             </th>
                                             <th>
                                                 <form method="GET" action="{{ route('pegawai.index') }}">
-                                                    <select name="filter_grup" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                    <select name="filter_grup_sb" class="form-select form-select-sm"
+                                                        onchange="this.form.submit()">
                                                         <option value="">Semua Grup</option>
+                                                        @foreach ($grups as $grupsb)
+                                                        <option value="{{ $grupsb->uuid }}" {{
+                                                            request('filter_grup_sb')==$grupsb->uuid ? 'selected' : ''
+                                                            }}>
+                                                            {{ $grupsb->nama }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                                    <input type="hidden" name="sort_by"
+                                                        value="{{ request('sort_by') }}">
+                                                    <input type="hidden" name="sort_order"
+                                                        value="{{ request('sort_order') }}">
+                                                </form>
+                                            </th>
+                                            <th>
+                                                <form method="GET" action="{{ route('pegawai.index') }}">
+                                                    <select name="filter_grup" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                        <option value="">Semua Shift</option>
                                                         <option value="Pagi" {{ request('filter_grup')=='Pagi' ? 'selected' : '' }}>Pagi</option>
                                                         <option value="Malam" {{ request('filter_grup')=='Malam' ? 'selected' : '' }}>Malam</option>
                                                     </select>
@@ -137,6 +157,7 @@
                                                 {{ $pegawai->nama }}
                                             </td>
                                             <td class="text-truncate">{{ $pegawai->jabatan->jabatan }}</td>
+                                            <td class="text-truncate">{{ $pegawai->grupSb->nama }}</td>
                                             <td class="text-truncate">{{ $pegawai->grup_uuid }}</td>
                                             <td class="text-truncate">{{ $pegawai->telepon }}</td>
                                             <td class="text-truncate">{{ $pegawai->keterangan }}</td>
