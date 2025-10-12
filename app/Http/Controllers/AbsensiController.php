@@ -10,6 +10,7 @@ use App\Models\Absensi;
 use App\Models\Hasil_produksi;
 use App\Models\Master\Pegawai;
 use App\Models\Master\Jabatan;
+use App\Models\Master\Grup;
 use App\Models\AbsensiPeriode;
 use Illuminate\Support\Str;
 
@@ -56,6 +57,7 @@ class AbsensiController extends Controller
 
         $pegawais = Pegawai::all();
         $jabatans = Jabatan::all();
+        $grups = Grup::all();
         $pegawaisByGrupSb = $pegawais->groupBy('grup_sb');
 
         $absensis = collect();
@@ -76,6 +78,7 @@ class AbsensiController extends Controller
             'dates',
             'pegawais',
             'jabatans',
+            'grups',
             'absensis'
         ));
     }
