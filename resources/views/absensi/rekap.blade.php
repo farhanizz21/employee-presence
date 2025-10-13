@@ -114,13 +114,17 @@
                                             @foreach($pegawais as $pegawai)
                                             <tr>
                                                 <td class="text-center align-middle sticky-col first-col border">
-                                                    {{ $pegawai->nama }}</td>
+                                                    {{ $pegawai->nama }}
+                                                </td>
                                                 <td class="text-center align-middle sticky-col second-col border">
-                                                    {{ $pegawai->grupSb->nama ?? '-' }}</td>
+                                                    {{ $pegawai->grupSb->nama ?? '-' }}
+                                                </td>
                                                 <td class="text-center align-middle sticky-col second-col border">
-                                                    {{ $pegawai->grup_uuid ?? '-' }}</td>
+                                                    {{ $pegawai->grup_uuid ?? '-' }}
+                                                </td>
                                                 <td class="text-center align-middle sticky-col third-col border">
-                                                    {{ $pegawai->jabatan->jabatan ?? '-' }}</td>
+                                                    {{ $pegawai->jabatan->jabatan ?? '-' }}
+                                                </td>
                                                 @foreach($dates as $tgl)
                                                 <td>
                                                     {{-- Select Status --}}
@@ -144,7 +148,7 @@
                                                     <input type="hidden"
                                                         name="absensi[{{ $pegawai->uuid }}][{{ $tgl }}][grup_sb]"
                                                         class="grupsb-input"
-                                                        value="{{ $pegawai->grup->grup_sb ?? '-' }}">
+                                                        value="{{ $pegawai->grup_sb ?? '-' }}">
 
                                                     {{-- Placeholder untuk info perubahan (kosong dulu, diisi via JS jika berubah) --}}
                                                     <div class="change-info mt-1 small text-muted"></div>
@@ -202,8 +206,14 @@
                                             <label>Nama Pegawai</label>
                                             <input type="text" id="modalNama" class="form-control" readonly>
                                         </div>
-
-
+                                        <div class="form-group">
+                                            <label>Grup</label>
+                                            <select id="modalGrupSb" class="form-control">
+                                                @foreach($grupSbs as $grup)
+                                                <option value="{{ $grup->uuid }}">{{ $grup->nama }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         <div class="form-group">
                                             <label>Status</label>
                                             <select id="modalStatus" class="form-control">
@@ -262,181 +272,227 @@
         <!--end::Container-->
     </div>
     <!--end::App Content-->
-
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const modalPegawai = document.getElementById("modalPegawai");
-        const modalTanggal = document.getElementById("modalTanggal");
-        const modalNama = document.getElementById("modalNama");
-        const modalGrup = document.getElementById("modalGrup");
-        const modalJabatan = document.getElementById("modalJabatan");
-        const modalStatus = document.getElementById("modalStatus");
-        const modalPencapaianWrapper = document.createElement("div");
-        const modalPencapaian = document.createElement("input");
-        modalPencapaianWrapper.classList.add("form-group", "mt-2");
-        modalPencapaian.type = "number";
-        modalPencapaian.classList.add("form-control");
-        modalPencapaian.placeholder = "Pencapaian";
-        modalPencapaianWrapper.appendChild(modalPencapaian);
-        // append ke modal
-        document.querySelector("#ubahModal .modal-body").appendChild(modalPencapaianWrapper);
-        modalPencapaianWrapper.style.display = "none";
+        document.addEventListener("DOMContentLoaded", () => {
+            const modalPegawai = document.getElementById("modalPegawai");
+            const modalTanggal = document.getElementById("modalTanggal");
+            const modalNama = document.getElementById("modalNama");
+            const modalGrup = document.getElementById("modalGrup");
+            const modalGrupSb = document.getElementById("modalGrupSb");
+            const modalJabatan = document.getElementById("modalJabatan");
+            const modalStatus = document.getElementById("modalStatus");
+            const modalSaveBtn = document.getElementById("modalSaveBtn");
 
-        const modalSaveBtn = document.getElementById("modalSaveBtn");
+            // Buat elemen pencapaian di modal
+            const modalPencapaianWrapper = document.createElement("div");
+            const modalPencapaian = document.createElement("input");
+            modalPencapaianWrapper.classList.add("form-group", "mt-2");
+            modalPencapaian.type = "number";
+            modalPencapaian.classList.add("form-control");
+            modalPencapaian.placeholder = "Pencapaian";
+            modalPencapaianWrapper.appendChild(modalPencapaian);
+            document.querySelector("#ubahModal .modal-body").appendChild(modalPencapaianWrapper);
+            modalPencapaianWrapper.style.display = "none";
 
-        let targetCell = null;
+            let targetCell = null;
+            const qs = (el, sel) => el.querySelector(sel);
 
-        const qs = (el, sel) => el.querySelector(sel);
+            // --- Fungsi: tampil/sembunyikan input pencapaian di modal ---
+            function handleJabatanHarian() {
+                const opt = modalJabatan.options[modalJabatan.selectedIndex];
+                const harian = opt?.getAttribute("data-harian");
+                const status = modalStatus.value; // ambil status dari modal
 
-        function handleJabatanHarian() {
-            const opt = modalJabatan.options[modalJabatan.selectedIndex];
-            const harian = opt.getAttribute("data-harian");
+                // Jika status Izin atau Alpha → sembunyikan pencapaian apapun jabatan-nya
+                if (status === "Izin" || status === "Alpha") {
+                    modalPencapaianWrapper.style.display = "none";
+                    modalPencapaian.value = '';
+                    return; // keluar dari fungsi
+                }
 
-            // Tampilkan/Hide input pencapaian di modal
-            if (harian === "2") {
-                modalPencapaianWrapper.style.display = "block";
-                // isi nilai pencapaian dari cell jika ada
-                const pencapaianInput = qs(targetCell, ".pencapaian-input");
-                modalPencapaian.value = pencapaianInput ? pencapaianInput.value : '';
-            } else {
-                modalPencapaianWrapper.style.display = "none";
-                modalPencapaian.value = '';
-            }
-        }
-
-        document.querySelectorAll(".edit-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-                targetCell = btn.closest("td");
-                modalPegawai.value = btn.dataset.pegawai;
-                modalTanggal.value = btn.dataset.tanggal;
-                modalNama.value = btn.dataset.nama;
-                modalGrup.value = btn.dataset.shift;
-                modalGrupSb.value = btn.dataset.grup;
-                modalJabatan.value = btn.dataset.jabatan; // <-- update sesuai dataset
-                modalStatus.value = qs(targetCell, ".status-select").value;
-
-                handleJabatanHarian();
-            });
-        });
-
-        modalJabatan.addEventListener("change", handleJabatanHarian);
-
-        modalSaveBtn.addEventListener("click", () => {
-            const hiddenShift = qs(targetCell, ".shift-input");
-            const hiddenJabatan = qs(targetCell, ".jabatan-input");
-            const statusSelect = qs(targetCell, ".status-select");
-            const pencapaianInput = qs(targetCell, ".pencapaian-input");
-            const infoBox = qs(targetCell, ".change-info");
-
-            const grupText = modalGrup.options[modalGrup.selectedIndex]?.text || '';
-            const jabatanText = modalJabatan.options[modalJabatan.selectedIndex]?.text || '';
-            const pencapaianVal = modalPencapaianWrapper.style.display === "block" ? modalPencapaian
-                .value :
-                '';
-
-            const changes = [];
-
-            // update hidden shift & jabatan
-            if (hiddenShift && hiddenShift.value !== modalGrup.value) {
-                hiddenShift.value = modalGrup.value;
-                changes.push(`Shift: <span class="text-primary">${grupText}</span>`);
-            }
-            if (hiddenJabatan && hiddenJabatan.value !== modalJabatan.value) {
-                hiddenJabatan.value = modalJabatan.value;
-                changes.push(`Jobdesk: <span class="text-primary">${jabatanText}</span>`);
-            }
-
-            // update status select
-            if (statusSelect) statusSelect.value = modalStatus.value;
-
-            // update pencapaian di cell
-            if (pencapaianInput) {
-                if (modalPencapaianWrapper.style.display === "block") {
-                    pencapaianInput.style.display = "block";
-                    pencapaianInput.value = pencapaianVal;
+                // Kalau bukan izin/alpha → cek apakah jabatan harian
+                if (harian === "2") {
+                    modalPencapaianWrapper.style.display = "block";
+                    const pencapaianInput = qs(targetCell, ".pencapaian-input");
+                    modalPencapaian.value = pencapaianInput ? pencapaianInput.value : '';
                 } else {
-                    pencapaianInput.style.display = "none";
-                    pencapaianInput.value = '';
+                    modalPencapaianWrapper.style.display = "none";
+                    modalPencapaian.value = '';
                 }
             }
 
-            // tampilkan info perubahan
-            if (infoBox) {
-                infoBox.innerHTML = changes.length ?
-                    `<div class="badge bg-warning text-dark">${changes.join(' | ')}</div>` :
-                    '';
+
+            // --- Fungsi: tampil/sembunyikan input pencapaian di tabel (berdasarkan status) ---
+            function handleStatusChange(select) {
+                const cell = select.closest("td");
+                const pencapaianInput = cell.querySelector(".pencapaian-input");
+                if (!pencapaianInput) return;
+
+                const status = select.value;
+                if (status === "Izin" || status === "Alpha") {
+                    pencapaianInput.style.display = "none";
+                    pencapaianInput.value = "";
+                } else {
+                    const harian = cell.querySelector(".jabatan-input")?.dataset.harian;
+                    if (harian == "2") pencapaianInput.style.display = "block";
+                }
             }
 
-            $("#ubahModal").modal("hide");
+            // Listener untuk setiap dropdown status di tabel
+            document.querySelectorAll(".status-select").forEach(select => {
+                handleStatusChange(select); // jalankan saat load pertama
+                select.addEventListener("change", () => handleStatusChange(select));
+            });
+
+            // --- Klik tombol edit ---
+            document.querySelectorAll(".edit-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    targetCell = btn.closest("td");
+
+                    modalPegawai.value = btn.dataset.pegawai;
+                    modalTanggal.value = btn.dataset.tanggal;
+                    modalNama.value = btn.dataset.nama;
+                    modalGrup.value = btn.dataset.shift;
+                    modalGrupSb.value = btn.dataset.grup;
+                    modalStatus.value = qs(targetCell, ".status-select").value;
+
+                    // ✅ ambil jabatan langsung dari dataset (karena kolom pegawai.jabatan_uuid)
+                    modalJabatan.value = btn.dataset.jabatan;
+
+                    // pastikan event change dijalankan agar tampil pencapaian jika harian == 2
+                    modalJabatan.dispatchEvent(new Event("change"));
+                    handleJabatanHarian();
+                });
+            });
+
+            // ubah input pencapaian modal saat ganti jabatan
+            modalJabatan.addEventListener("change", handleJabatanHarian);
+            modalStatus.addEventListener("change", handleJabatanHarian);
+
+            // --- Klik tombol simpan di modal ---
+            modalSaveBtn.addEventListener("click", () => {
+                const hiddenShift = qs(targetCell, ".shift-input");
+                const hiddenGrupSb = qs(targetCell, ".grupsb-input");
+                const hiddenJabatan = qs(targetCell, ".jabatan-input");
+                const statusSelect = qs(targetCell, ".status-select");
+                const pencapaianInput = qs(targetCell, ".pencapaian-input");
+                const infoBox = qs(targetCell, ".change-info");
+
+                const grupText = modalGrup.options[modalGrup.selectedIndex]?.text || '';
+                const jabatanText = modalJabatan.options[modalJabatan.selectedIndex]?.text || '';
+                const pencapaianVal = modalPencapaianWrapper.style.display === "block" ? modalPencapaian.value : '';
+                const changes = [];
+
+                // update hidden shift & jabatan
+                if (hiddenShift && hiddenShift.value !== modalGrup.value) {
+                    hiddenShift.value = modalGrup.value;
+                    changes.push(`Shift: <span class="text-primary">${grupText}</span>`);
+                }
+                if (hiddenJabatan && hiddenJabatan.value !== modalJabatan.value) {
+                    hiddenJabatan.value = modalJabatan.value;
+                    changes.push(`Jobdesk: <span class="text-primary">${jabatanText}</span>`);
+                }
+                // update grup_sb
+                if (hiddenGrupSb && hiddenGrupSb.value !== modalGrupSb.value) {
+                    hiddenGrupSb.value = modalGrupSb.value;
+                    changes.push(`Grup SB: <span class="text-primary">${modalGrupSb.value}</span>`);
+                }
+
+
+                // update status select di cell
+                if (statusSelect) {
+                    statusSelect.value = modalStatus.value;
+                    handleStatusChange(statusSelect); // sembunyikan pencapaian jika izin/alpha
+                }
+
+                // update input pencapaian di cell
+                if (pencapaianInput) {
+                    if (modalPencapaianWrapper.style.display === "block") {
+                        pencapaianInput.style.display = "block";
+                        pencapaianInput.value = pencapaianVal;
+                    } else {
+                        pencapaianInput.style.display = "none";
+                        pencapaianInput.value = '';
+                    }
+                }
+
+                // tampilkan badge perubahan
+                if (infoBox) {
+                    infoBox.innerHTML = changes.length ?
+                        `<div class="badge bg-warning text-dark">${changes.join(' | ')}</div>` : '';
+                }
+
+                $("#ubahModal").modal("hide");
+            });
         });
-    });
     </script>
 
+
     <script>
-    $(function() {
-        $('#tanggal_range').daterangepicker({
-            locale: {
-                format: 'YYYY-MM-DD'
-            },
-            autoUpdateInput: false
-        });
+        $(function() {
+            $('#tanggal_range').daterangepicker({
+                locale: {
+                    format: 'YYYY-MM-DD'
+                },
+                autoUpdateInput: false
+            });
 
-        $('#tanggal_range').on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
-                'YYYY-MM-DD'));
-            $('#tanggal_mulai').val(picker.startDate.format('YYYY-MM-DD'));
-            $('#tanggal_selesai').val(picker.endDate.format('YYYY-MM-DD'));
+            $('#tanggal_range').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
+                    'YYYY-MM-DD'));
+                $('#tanggal_mulai').val(picker.startDate.format('YYYY-MM-DD'));
+                $('#tanggal_selesai').val(picker.endDate.format('YYYY-MM-DD'));
 
-            // langsung submit form filter
-            $(this).closest("form").submit();
+                // langsung submit form filter
+                $(this).closest("form").submit();
+            });
         });
-    });
     </script>
 
     <style>
-    /* semua kolom sticky */
-    .sticky-col {
-        position: sticky;
-        background: #fff;
-        z-index: 2;
-    }
+        /* semua kolom sticky */
+        .sticky-col {
+            position: sticky;
+            background: #fff;
+            z-index: 2;
+        }
 
-    /* Kolom pertama */
-    .first-col {
-        left: 0;
-        z-index: 3;
-        box-shadow: 2px 0 0 #dee2e6 inset;
-        /* garis kanan */
-        border-right: 1px solid #dee2e6;
-        /* backup border */
-    }
+        /* Kolom pertama */
+        .first-col {
+            left: 0;
+            z-index: 3;
+            box-shadow: 2px 0 0 #dee2e6 inset;
+            /* garis kanan */
+            border-right: 1px solid #dee2e6;
+            /* backup border */
+        }
 
-    /* Kolom kedua */
-    .second-col {
-        left: 150px;
-        z-index: 3;
-        box-shadow: 2px 0 0 #dee2e6 inset;
-        border-right: 1px solid #dee2e6;
-    }
+        /* Kolom kedua */
+        .second-col {
+            left: 150px;
+            z-index: 3;
+            box-shadow: 2px 0 0 #dee2e6 inset;
+            border-right: 1px solid #dee2e6;
+        }
 
-    /* Kolom ketiga */
-    .third-col {
-        left: 300px;
-        z-index: 3;
-        box-shadow: 2px 0 0 #dee2e6 inset;
-        border-right: 1px solid #dee2e6;
-    }
+        /* Kolom ketiga */
+        .third-col {
+            left: 300px;
+            z-index: 3;
+            box-shadow: 2px 0 0 #dee2e6 inset;
+            border-right: 1px solid #dee2e6;
+        }
 
-    /* biar border bawah tetap ada di tbody */
-    .table-bordered tbody td {
-        border: 1px solid #dee2e6 !important;
-    }
+        /* biar border bawah tetap ada di tbody */
+        .table-bordered tbody td {
+            border: 1px solid #dee2e6 !important;
+        }
 
-    /* header gelap tetap rapi */
-    .table-dark .sticky-col {
-        background: #343a40;
-        color: #fff;
-    }
+        /* header gelap tetap rapi */
+        .table-dark .sticky-col {
+            background: #343a40;
+            color: #fff;
+        }
     </style>
 
     @endsection

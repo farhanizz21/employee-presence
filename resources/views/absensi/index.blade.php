@@ -140,8 +140,10 @@
                                             @php
                                             $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
                                             @endphp
-                                            <td class="text-center align-middle">{{ $absensi->status ?? '-' }}
-                                            </td>
+                                            <td class="text-center align-middle">
+    <span class="cell-status" data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">{{ $absensi->status ?? '-' }}</span>
+</td>
+
                                             @endforeach
                                         </tr>
 
@@ -152,7 +154,8 @@
                                             $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
                                             @endphp
                                             <td class="text-center align-middle">
-                                                {{ $absensi->grup->nama ?? '-' }}</td>
+                                                <span class="cell-grup_sb" data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">
+                                                {{ $absensi->grup->nama ?? '-' }}</span></td>
                                             @endforeach
                                         </tr>
 
@@ -163,7 +166,8 @@
                                             $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
                                             @endphp
                                             <td class="text-center align-middle">
-                                                {{ $absensi->grup_uuid ?? '-' }}</td>
+    <span class="cell-grup" data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">{{ $absensi->grup_uuid ?? '-' }}</span>
+</td>
                                             @endforeach
                                         </tr>
 
@@ -174,8 +178,8 @@
                                             $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
                                             @endphp
                                             <td class="text-center align-middle">
-                                                {{ $absensi->jabatan->jabatan ?? '-' }}
-                                            </td>
+    <span class="cell-jabatan" data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">{{ $absensi->jabatan->jabatan ?? '-' }}</span>
+</td>
                                             @endforeach
                                         </tr>
 
@@ -186,7 +190,8 @@
                                             $absensi = $absensis[$pegawai->uuid . '_' . $tgl] ?? null;
                                             @endphp
                                             <td class="text-center align-middle">
-                                                {{ $absensi->pencapaian ?? '-' }}</td>
+    <span class="cell-pencapaian" data-pegawai="{{ $pegawai->uuid }}" data-tanggal="{{ $tgl }}">{{ $absensi->pencapaian ?? '-' }}</span>
+</td>
                                             @endforeach
                                         </tr>
 
@@ -201,9 +206,10 @@
                                                     data-target="#ubahModal" data-pegawai="{{ $pegawai->uuid }}"
                                                     data-tanggal="{{ $tgl }}" data-nama="{{ $pegawai->nama }}"
                                                     data-status="{{ $absensi->status ?? 'Masuk' }}"
-                                                    data-shift="{{ $absensi->shift ?? 'Pagi' }}"
+                                                    data-shift="{{ $absensi->grup_uuid ?? 'Pagi' }}"
                                                     data-jabatan="{{ $absensi->jabatan->uuid ?? '' }}"
                                                     data-grup="{{ $absensi->grup_uuid ?? '' }}"
+                                                    data-grupsb="{{ $absensi->grup_sb ?? '' }}"
                                                     data-pencapaian="{{ $absensi->pencapaian ?? '' }}">
                                                     <i class="fas fa-edit"></i>
                                                     Edit
@@ -261,7 +267,17 @@
                                 <option value="Lembur">Lembur</option>
                             </select>
                         </div>
-
+<div class="form-group">
+                            <label>Grup</label>
+                            <select id="modalGrupsb" class="form-control">
+                                <option value="">-- Pilih Grup --</option>
+                                @foreach($grups as $grsb)
+                                <option value="{{ $grsb->uuid }}" data-grupsb="{{ $grsb->grup_sb }}">
+                                    {{ $grsb->nama }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label>Shift</label>
                             <select id="modalShift" class="form-control">
@@ -305,21 +321,29 @@ $('#ubahModal').on('show.bs.modal', function(event) {
     var button = event.relatedTarget; // DOM element
     var modal = $(this); // jQuery object
 
-    currentCell = button.closest('td'); // sekarang DOM element murni
+    currentCell = button.closest('td');
 
-    // Set modal fields
+    // Set nilai awal modal
     modal.find('#modalPegawai').val(button.dataset.pegawai);
     modal.find('#modalTanggal').val(button.dataset.tanggal);
     modal.find('#modalNama').val(button.dataset.nama);
     modal.find('#modalStatus').val(button.dataset.status || 'Masuk');
     modal.find('#modalShift').val(button.dataset.shift || 'Pagi');
     modal.find('#modalJabatan').val(button.dataset.jabatan || '');
+    modal.find('#modalGrupsb').val(button.dataset.grupsb || '');
     modal.find('#modalPencapaian').val(button.dataset.pencapaian || '');
 
-    if (button.dataset.pencapaian) {
+    // ✅ Cek apakah jabatan harian == 2
+    let selectedOption = modal.find('#modalJabatan')[0].options[
+        modal.find('#modalJabatan')[0].selectedIndex
+    ];
+    let harian = selectedOption ? selectedOption.dataset.harian : null;
+
+    if (harian == '2') {
         modal.find('#pencapaianGroup').show();
     } else {
         modal.find('#pencapaianGroup').hide();
+        modal.find('#modalPencapaian').val('');
     }
 });
 
@@ -346,6 +370,7 @@ document.getElementById("modalSaveBtn").addEventListener("click", function() {
     let shift = document.getElementById("modalShift").value;
     let grup_uuid = shift;
     let jabatan_uuid = document.getElementById("modalJabatan").value;
+    let grup_sb = document.getElementById("modalGrupsb").value;
     let pencapaian = document.getElementById("modalPencapaian").value;
 
     fetch("{{ route('absensi.updateCell') }}", {
@@ -359,6 +384,7 @@ document.getElementById("modalSaveBtn").addEventListener("click", function() {
                 tanggal: tanggal,
                 status: status,
                 shift: shift,
+                grup_sb: grup_sb,
                 jabatan_uuid: jabatan_uuid,
                 grup_uuid: grup_uuid,
                 pencapaian: pencapaian
@@ -367,19 +393,35 @@ document.getElementById("modalSaveBtn").addEventListener("click", function() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                currentCell.querySelector(".cell-status").textContent = status;
-                currentCell.querySelector(".cell-grup").textContent = shift;
-                currentCell.querySelector(".cell-jabatan").textContent =
-                    document.querySelector(`#modalJabatan option[value="${jabatan_uuid}"]`)
-                    ?.textContent ||
-                    '-';
-                currentCell.querySelector(".cell-pencapaian").textContent = pencapaian || '-';
+    console.log("Data berhasil disimpan:", data);
 
-                // Hide modal
-                $('#ubahModal').modal('hide');
-            } else {
-                alert("Gagal simpan data: " + (data.message || ''));
-            }
+    // Ambil data pegawai & tanggal
+    const pegawai_uuid = document.getElementById("modalPegawai").value;
+    const tanggal = document.getElementById("modalTanggal").value;
+
+    // Update cell status
+    const cellStatus = document.querySelector(`.cell-status[data-pegawai='${pegawai_uuid}'][data-tanggal='${tanggal}']`);
+    if (cellStatus) cellStatus.textContent = status;
+
+    // Update cell shift
+    const cellGrup = document.querySelector(`.cell-grup[data-pegawai='${pegawai_uuid}'][data-tanggal='${tanggal}']`);
+    if (cellGrup) cellGrup.textContent = shift;
+
+    // Update cell jabatan
+    const cellJabatan = document.querySelector(`.cell-jabatan[data-pegawai='${pegawai_uuid}'][data-tanggal='${tanggal}']`);
+    if (cellJabatan) {
+        const jabatanText = document.querySelector(`#modalJabatan option[value='${jabatan_uuid}']`)?.textContent || '-';
+        cellJabatan.textContent = jabatanText;
+    }
+
+    // Update cell pencapaian
+    const cellPencapaian = document.querySelector(`.cell-pencapaian[data-pegawai='${pegawai_uuid}'][data-tanggal='${tanggal}']`);
+    if (cellPencapaian) cellPencapaian.textContent = pencapaian || '-';
+
+    // Tutup modal
+    $('#ubahModal').modal('hide');
+}
+
         })
         .catch(err => console.error("Error:", err));
 

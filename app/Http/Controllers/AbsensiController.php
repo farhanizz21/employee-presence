@@ -176,7 +176,7 @@ class AbsensiController extends Controller
                     'tgl_absen' => $request->tgl_absen,
                 ],
                 [
-                    'uuid' => \Str::uuid(),
+                    'uuid' => Str::uuid(),
                     'status' => 4, // Alpha/Diganti
                     'grup_uuid' => $request->grup_uuid,
                 ]
@@ -189,7 +189,7 @@ class AbsensiController extends Controller
                     'tgl_absen' => $request->tgl_absen,
                 ],
                 [
-                    'uuid' => \Str::uuid(),
+                    'uuid' => Str::uuid(),
                     'status' => 1, // Hadir
                     'grup_uuid' => $request->grup_uuid,
                 ]
@@ -227,8 +227,7 @@ class AbsensiController extends Controller
                     'tgl_absen' => $request->tgl_absen
                 ],
                 [
-                    'uuid'
-                    => \Str::uuid(),
+                    'uuid'  => \Str::uuid(),
                     'status' => 1, // Hadir
                     'grup_uuid' => $request->grup_uuid
                 ]
@@ -296,7 +295,7 @@ class AbsensiController extends Controller
         }
         $pegawais = Pegawai::with('jabatan')->get();
         $jabatans = Jabatan::all();
-
+        $grupSbs = Grup::all();
         // generate range tanggal
         $dates = [];
         $current = strtotime($tanggalMulai);
@@ -311,6 +310,7 @@ class AbsensiController extends Controller
             'jabatans',
             'pegawaisByGrupSb',
             'dates',
+            'grupSbs',
             'tanggalMulai',
             'tanggalSelesai'
         ));
@@ -347,7 +347,7 @@ class AbsensiController extends Controller
                         'status'    => $data['status'] ?? 'Alpha',
                         'grup_uuid'     => $data['shift'],
                         'jabatan_uuid' => $data['jabatan_uuid'],
-                        'grup_sb' => $data['grup_sb'] ?? $pegawai->grup_sb ?? '-',
+                        'grup_sb' => $data['grup_sb'],
                         'pencapaian' => $data['pencapaian'] ?? null,
                         'periode_uuid' => $periode->uuid,
 
@@ -386,7 +386,7 @@ class AbsensiController extends Controller
                 'tgl_absen' => $request->tanggal,
             ],
             [
-                'uuid' => Str::uuid()->toString(),
+                'uuid' => \Str::uuid()->toString(),
                 'status' => 'Masuk', // default saja
                 'shift' => $request->shift,
                 'grup_uuid' => $request->grup_uuid,
@@ -440,34 +440,38 @@ class AbsensiController extends Controller
     }
 
     public function updateCell(Request $request)
-    {
-        $validated = $request->validate([
-            'pegawai_uuid' => 'required|uuid',
-            'tanggal'      => 'required|date',
-            'status'       => 'required|string',
-            'grup_uuid'    => 'required|string',
-            'jabatan_uuid' => 'nullable|uuid',
-            'pencapaian'   => 'nullable|integer',
-        ]);
-        $absensi = Absensi::updateOrCreate(
-            [
-                'pegawai_uuid' => $validated['pegawai_uuid'],
-                'tgl_absen'    => $validated['tanggal'],
-            ],
-            [
-                'status'       => $validated['status'],
-                'grup_uuid'    => $validated['grup_uuid'],
-                'jabatan_uuid' => $validated['jabatan_uuid'],
-                'pencapaian'   => $validated['pencapaian'] ?? null,
-            ]
-        );
+{
+    $validated = $request->validate([
+        'pegawai_uuid' => 'required|uuid',
+        'tanggal'      => 'required|date',
+        'status'       => 'required|string',
+        'grup_uuid'    => 'required|string', // isi Pagi / Malam
+        'jabatan_uuid' => 'nullable|uuid',
+        'grup_sb'      => 'nullable|string', // tambahkan ini
+        'pencapaian'   => 'nullable|string', // ubah dari integer → string
+    ]);
 
+    $absensi = Absensi::updateOrCreate(
+        [
+            'pegawai_uuid' => $validated['pegawai_uuid'],
+            'tgl_absen'    => $validated['tanggal'],
+        ],
+        [
+            'status'       => $validated['status'],
+            'grup_uuid'    => $validated['grup_uuid'],
+            'jabatan_uuid' => $validated['jabatan_uuid'] ?? null,
+            'grup_sb'      => $validated['grup_sb'] ?? null, // tambahkan ini
+            'pencapaian'   => $validated['pencapaian'] ?? null,
+        ]
+    );
 
-        return response()->json([
-            'success' => true,
-            'absensi' => $absensi
-        ]);
-    }
+    return response()->json([
+        'success' => true,
+        'message' => 'Data absensi berhasil diperbarui',
+        'absensi' => $absensi
+    ]);
+}
+
 
     public function getPeriodeByBulanTahun(Request $request)
     {
