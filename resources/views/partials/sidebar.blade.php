@@ -47,15 +47,18 @@
                         <i class="nav-icon fas fa-database"></i>
                         <p>
                             Master Data
-                            <i class="nav-arrow bi bi-chevron-right"></i>
+                            <i class="right fas fa-angle-left transition-all"
+                                style="transition: transform 0.3s ease;
+               {{ request()->is('user*','pegawai*','jabatan*','grup*','bonuspotongan*') ? 'transform: rotate(-90deg);' : '' }}">
+                            </i>
                         </p>
                     </a>
-                    <ul class="nav nav-treeview">
 
+                    <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('user.index') }}"
                                 class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}">
-                                <i class="fas fa-user me-2"></i>
+                                <i class="fas fa-user nav-icon"></i>
                                 <p>User</p>
                             </a>
                         </li>
@@ -63,7 +66,7 @@
                         <li class="nav-item">
                             <a href="{{ route('pegawai.index') }}"
                                 class="nav-link {{ request()->routeIs('pegawai.*') ? 'active' : '' }}">
-                                <i class="fas fa-users me-2"></i>
+                                <i class="fas fa-users nav-icon"></i>
                                 <p>Pegawai</p>
                             </a>
                         </li>
@@ -71,7 +74,7 @@
                         <li class="nav-item">
                             <a href="{{ route('jabatan.index') }}"
                                 class="nav-link {{ request()->routeIs('jabatan.*') ? 'active' : '' }}">
-                                <i class="fas fa-briefcase me-2"></i>
+                                <i class="fas fa-briefcase nav-icon"></i>
                                 <p>Jabatan</p>
                             </a>
                         </li>
@@ -79,7 +82,7 @@
                         <li class="nav-item">
                             <a href="{{ route('grup.index') }}"
                                 class="nav-link {{ request()->routeIs('grup.*') ? 'active' : '' }}">
-                                <i class="fas fa-briefcase me-2"></i>
+                                <i class="fas fa-layer-group nav-icon"></i>
                                 <p>Group</p>
                             </a>
                         </li>
@@ -87,13 +90,14 @@
                         <li class="nav-item">
                             <a href="{{ route('bonuspotongan.index') }}"
                                 class="nav-link {{ request()->routeIs('bonuspotongan.*') ? 'active' : '' }}">
-                                <i class="fas fa-gift me-2"></i>
+                                <i class="fas fa-gift nav-icon"></i>
                                 <p>Bonus & Potongan</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
+
+
             </ul>
             <!--end::Sidebar Menu-->
         </nav>

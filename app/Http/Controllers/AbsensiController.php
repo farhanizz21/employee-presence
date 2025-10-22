@@ -54,8 +54,30 @@ class AbsensiController extends Controller
                 $start->addDay();
             }
         }
+        $pegawais = Pegawai::query();
 
-        $pegawais = Pegawai::all();
+        // 🔹 Filter berdasarkan pencarian nama
+        if ($request->filled('search')) {
+            $pegawais->where('nama', 'like', '%' . $request->search . '%');
+        }
+
+        // 🔹 Filter berdasarkan jabatan
+        if ($request->filled('jabatan_uuid')) {
+            $pegawais->where('jabatan_uuid', $request->jabatan_uuid);
+        }
+
+        // 🔹 Filter berdasarkan shift (pagi/malam)
+        if ($request->filled('shift')) {
+            $pegawais->where('grup_uuid', $request->shift);
+        }
+
+        // 🔹 Filter berdasarkan grup_sb
+        if ($request->filled('grup_sb')) {
+            $pegawais->where('grup_sb', $request->grup_sb);
+        }
+
+        $pegawais = $pegawais->paginate(10)->withQueryString();
+
         $jabatans = Jabatan::all();
         $grups = Grup::all();
         $pegawaisByGrupSb = $pegawais->groupBy('grup_sb');
@@ -293,7 +315,29 @@ class AbsensiController extends Controller
                 return back()->with('error', 'Range tanggal sudah ada dalam periode sebelumnya!');
             }
         }
-        $pegawais = Pegawai::with('jabatan')->get();
+        $pegawais = Pegawai::query();
+
+        // 🔹 Filter berdasarkan pencarian nama
+        if ($request->filled('search')) {
+            $pegawais->where('nama', 'like', '%' . $request->search . '%');
+        }
+
+        // 🔹 Filter berdasarkan jabatan
+        if ($request->filled('jabatan_uuid')) {
+            $pegawais->where('jabatan_uuid', $request->jabatan_uuid);
+        }
+
+        // 🔹 Filter berdasarkan shift (pagi/malam)
+        if ($request->filled('shift')) {
+            $pegawais->where('grup_uuid', $request->shift);
+        }
+
+        // 🔹 Filter berdasarkan grup_sb
+        if ($request->filled('grup_sb')) {
+            $pegawais->where('grup_sb', $request->grup_sb);
+        }
+
+        $pegawais = $pegawais->paginate(10)->withQueryString();
         $jabatans = Jabatan::all();
         $grupSbs = Grup::all();
         // generate range tanggal
@@ -328,8 +372,6 @@ class AbsensiController extends Controller
             'tanggal_mulai'  => $tanggalMulai,
             'tanggal_selesai' => $tanggalSelesai,
         ]);
-
-
 
         // Loop input absensi pegawai
         foreach ($request->input('absensi', []) as $pegawaiUuid => $tanggalData) {

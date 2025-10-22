@@ -67,7 +67,7 @@
                                 </div>
                             </form>
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
+                                <table class="table table-bordered table-striped table-hover">
                                     @php
                                     $currentSort = request('sort_by');
                                     $currentOrder = request('sort_order') == 'asc' ? 'desc' : 'asc';
@@ -131,10 +131,15 @@
                                             </th>
                                             <th>
                                                 <form method="GET" action="{{ route('pegawai.index') }}">
-                                                    <select name="filter_grup" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                    <select name="filter_grup" class="form-select form-select-sm"
+                                                        onchange="this.form.submit()">
                                                         <option value="">Semua Shift</option>
-                                                        <option value="Pagi" {{ request('filter_grup')=='Pagi' ? 'selected' : '' }}>Pagi</option>
-                                                        <option value="Malam" {{ request('filter_grup')=='Malam' ? 'selected' : '' }}>Malam</option>
+                                                        <option value="Pagi"
+                                                            {{ request('filter_grup')=='Pagi' ? 'selected' : '' }}>Pagi
+                                                        </option>
+                                                        <option value="Malam"
+                                                            {{ request('filter_grup')=='Malam' ? 'selected' : '' }}>
+                                                            Malam</option>
                                                     </select>
 
                                                     <input type="hidden" name="search" value="{{ request('search') }}">
