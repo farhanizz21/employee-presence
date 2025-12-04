@@ -74,6 +74,9 @@
     </style>
 </head>
 <body>
+@php
+    \Carbon\Carbon::setLocale('id');
+@endphp
 
     <div class="row mb-3">
         <div class="col-md-9">
@@ -163,7 +166,7 @@
             @if(!empty($gaji->detail_absensi) && is_array($gaji->detail_absensi))
                 @foreach($gaji->detail_absensi as $detail)
                     <tr>
-                        <td>{{ $detail['tanggal'] }}</td>
+                        <td>{{ \Carbon\Carbon::parse($detail['tanggal'])->translatedFormat('l, d M Y') }}</td>
                         <td>{{ $detail['jabatan'] }}</td>
                         <td>{{ $detail['grup_uuid'] }}</td>
                         <td class="text-end">{{ number_format($detail['gaji'],0,',','.') }}</td>
@@ -177,6 +180,17 @@
             @endif
         </tbody>
     </table>
+
+    <br><br>
+
+                <p>Dicetak pada: <strong>{{ \Carbon\Carbon::parse($gaji->created_at)->translatedFormat('l, d F Y') }}
+</strong></p>
+  
+                <p>Mengetahui,</p>
+                <br><br><br>
+                <p class="fw-bold" style="text-decoration: underline; margin-bottom:0;">__________________________</p>
+                <p class="text-bold" style="margin-top:0; margin-left:50px;">( HRD )</p>
+
 
 </body>
 </html>

@@ -77,7 +77,7 @@
                                             <th style="width: 10px">#</th>
                                             <th>
                                                 <a href="{{ route('bonuspotongan.index', ['sort_by' => 'nama', 'sort_order' => $currentOrder] + request()->all()) }}"
-                                                    class="text-secondary fw-bold">
+                                                    class="text-light fw-bold">
                                                     Nama
                                                     @if(request('sort_by') == 'nama' && request('sort_order')
                                                     ==
@@ -202,3 +202,15 @@
 
 
     @endsection
+
+    
+    <style>
+        .table thead th {
+ 
+    background-color: #343a40 !important;
+    color: #fff;
+    
+    text-align: center;
+    vertical-align: middle;
+}
+    </style>

@@ -1,31 +1,31 @@
     <style>
-/* Warna sesuai status */
-.gajian-sudah {
-    background-color: #28a745;
-}
+        /* Warna sesuai status */
+        .gajian-sudah {
+            background-color: #28a745;
+        }
 
-.gajian-belum {
-    background-color: #ffc107;
-}
+        .gajian-belum {
+            background-color: #ffc107;
+        }
 
-/* Legend kotak kecil */
-.legend-box {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin-left: 10px;
-    margin-right: 5px;
-    border-radius: 50%;
-}
+        /* Legend kotak kecil */
+        .legend-box {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-left: 10px;
+            margin-right: 5px;
+            border-radius: 50%;
+        }
 
-.legend-box.gajian-sudah {
-    background-color: #28a745;
-}
+        .legend-box.gajian-sudah {
+            background-color: #28a745;
+        }
 
-table thead.bg-info th {
-    background-color: #3d4041ff !important;
-    color: #fff !important;
-}
+        table thead.bg-info th {
+            background-color: #3d4041ff !important;
+            color: #fff !important;
+        }
     </style>
 
     @extends('layouts.app')
@@ -74,7 +74,6 @@ table thead.bg-info th {
                                         <select name="periode_uuid" id="periode_uuid"
                                             class="form-select form-select-sm border-primary" style="max-width: 250px;"
                                             onchange="this.form.submit()">
-                                            <option value="">-- Pilih Periode --</option>
                                             @foreach($periodes as $periode)
                                             <option value="{{ $periode->uuid }}"
                                                 {{ $periodeUuid == $periode->uuid ? 'selected' : '' }}>
@@ -99,7 +98,7 @@ table thead.bg-info th {
                                     </button>
                                 </div>
                                 <div class="col-auto">
-                                    <a href="" class="btn btn-warning">
+                                    <a href="{{ route('gajian.index') }}" class="btn btn-warning">
                                         <i class="fas fa-redo"></i> Reset
                                     </a>
                                 </div>
@@ -357,103 +356,114 @@ table thead.bg-info th {
 
     @push('scripts')
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const detailButtons = document.querySelectorAll('.btn-detail');
-    detailButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Header & hidden inputs
-            document.getElementById('modalNama').textContent = this.dataset.nama;
-            document.getElementById('modalJabatan').textContent = this.dataset.jabatan;
-            document.getElementById('pegawaiUuidInput').value = this.dataset.pegawai_uuid;
-            document.getElementById('jabatanUuidInput').value = this.dataset.jabatan_uuid;
+        document.addEventListener('DOMContentLoaded', function() {
+            const detailButtons = document.querySelectorAll('.btn-detail');
+            detailButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Header & hidden inputs
+                    document.getElementById('modalNama').textContent = this.dataset.nama;
+                    document.getElementById('modalJabatan').textContent = this.dataset.jabatan;
+                    document.getElementById('pegawaiUuidInput').value = this.dataset.pegawai_uuid;
+                    document.getElementById('jabatanUuidInput').value = this.dataset.jabatan_uuid;
 
-            document.getElementById('modalHadir').textContent = this.dataset.hadir;
-            document.getElementById('modalLembur').textContent = this.dataset.lembur;
-            document.getElementById('modalTelat').textContent = this.dataset.telat;
-            document.getElementById('modalAlpha').textContent = this.dataset.alpha;
-            document.getElementById('jumlahHadirInput').value = this.dataset.hadir;
-            document.getElementById('jumlahLemburInput').value = this.dataset.lembur;
-            document.getElementById('jumlahTelatInput').value = this.dataset.telat;
-            document.getElementById('jumlahAlphaInput').value = this.dataset.alpha;
+                    document.getElementById('modalHadir').textContent = this.dataset.hadir;
+                    document.getElementById('modalLembur').textContent = this.dataset.lembur;
+                    document.getElementById('modalTelat').textContent = this.dataset.telat;
+                    document.getElementById('modalAlpha').textContent = this.dataset.alpha;
+                    document.getElementById('jumlahHadirInput').value = this.dataset.hadir;
+                    document.getElementById('jumlahLemburInput').value = this.dataset.lembur;
+                    document.getElementById('jumlahTelatInput').value = this.dataset.telat;
+                    document.getElementById('jumlahAlphaInput').value = this.dataset.alpha;
 
-            document.getElementById('modalPokok').textContent = this.dataset.pokok;
-            document.getElementById('modalBonusLembur').textContent = this.dataset.bonus_lembur;
-            document.getElementById('modalBonusKehadiran').textContent = this.dataset
-                .bonus_kehadiran;
-            document.getElementById('modalPotongan').textContent = this.dataset.potongan;
-            document.getElementById('modalTotal').textContent = this.dataset.total;
-            document.getElementById('gajiPokokInput').value = this.dataset.pokok;
-            document.getElementById('bonusLemburInput').value = this.dataset.bonus_lembur;
-            document.getElementById('bonusKehadiranInput').value = this.dataset.bonus_kehadiran;
-            document.getElementById('totalPotonganInput').value = this.dataset.potongan;
-            document.getElementById('totalGajiInput').value = this.dataset.total;
+                    document.getElementById('modalPokok').textContent = this.dataset.pokok;
+                    document.getElementById('modalBonusLembur').textContent = this.dataset.bonus_lembur;
+                    document.getElementById('modalBonusKehadiran').textContent = this.dataset
+                        .bonus_kehadiran;
+                    document.getElementById('modalPotongan').textContent = this.dataset.potongan;
+                    document.getElementById('modalTotal').textContent = this.dataset.total;
+                    document.getElementById('gajiPokokInput').value = this.dataset.pokok;
+                    document.getElementById('bonusLemburInput').value = this.dataset.bonus_lembur;
+                    document.getElementById('bonusKehadiranInput').value = this.dataset.bonus_kehadiran;
+                    document.getElementById('totalPotonganInput').value = this.dataset.potongan;
+                    document.getElementById('totalGajiInput').value = this.dataset.total;
 
-            // Periode
-            const periodeMulai = new Date(this.dataset.periode_mulai + 'T00:00:00');
-            const periodeSelesai = new Date(this.dataset.periode_selesai + 'T00:00:00');
-            const options = {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            };
-            document.getElementById('modalPeriodeMulai').textContent = new Intl.DateTimeFormat(
-                'id-ID', options).format(periodeMulai);
-            document.getElementById('modalPeriodeSelesai').textContent = new Intl
-                .DateTimeFormat('id-ID', options).format(periodeSelesai);
+                    // Periode
+                    const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
+                    const bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-            // Detail Absensi
-            let detailAbsensi = [];
-            try {
-                detailAbsensi = JSON.parse(this.dataset.detail || '[]');
-            } catch (e) {
-                detailAbsensi = [];
-                console.error('JSON detail_absensi error', e);
-            }
+                    const periodeMulai = new Date(this.dataset.periode_mulai + 'T00:00:00');
+                    const periodeSelesai = new Date(this.dataset.periode_selesai + 'T00:00:00');
 
-            const modalDetailAbsensi = document.getElementById('modalDetailAbsensi');
-            modalDetailAbsensi.innerHTML = ''; // reset
+                    // Format tanggal Indonesia pakai Intl.DateTimeFormat
+                    const options = {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    };
+                    const tanggalMulai = new Intl.DateTimeFormat('id-ID', options).format(periodeMulai);
+                    const tanggalSelesai = new Intl.DateTimeFormat('id-ID', options).format(periodeSelesai);
 
-            if (detailAbsensi.length > 0) {
-                detailAbsensi.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
+                    // Gabungkan HARI + TANGGAL
+                    document.getElementById('modalPeriodeMulai').textContent =
+                        hari[periodeMulai.getDay()] + ", " + tanggalMulai;
+
+                    document.getElementById('modalPeriodeSelesai').textContent =
+                        hari[periodeSelesai.getDay()] + ", " + tanggalSelesai;
+
+
+                    // Detail Absensi
+                    let detailAbsensi = [];
+                    try {
+                        detailAbsensi = JSON.parse(this.dataset.detail || '[]');
+                    } catch (e) {
+                        detailAbsensi = [];
+                        console.error('JSON detail_absensi error', e);
+                    }
+
+                    const modalDetailAbsensi = document.getElementById('modalDetailAbsensi');
+                    modalDetailAbsensi.innerHTML = ''; // reset
+
+                    if (detailAbsensi.length > 0) {
+                        detailAbsensi.forEach(item => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
             <td>${new Intl.DateTimeFormat('id-ID', options).format(new Date(item.tanggal))}</td>
             <td>${item.jabatan}</td><td>${item.grup_uuid}</td>
             <td class="text-end">Rp ${parseInt(item.gaji).toLocaleString('id-ID')}</td>
             <td class="text-center">${item.status}</td>
         `;
-                    modalDetailAbsensi.appendChild(tr);
-                });
-            } else {
-                modalDetailAbsensi.innerHTML = `
+                            modalDetailAbsensi.appendChild(tr);
+                        });
+                    } else {
+                        modalDetailAbsensi.innerHTML = `
         <tr>
             <td colspan="4" class="text-center text-muted">Tidak ada data</td>
         </tr>
     `;
-            }
+                    }
+                });
+            });
         });
-    });
-});
     </script>
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const detailButtons = document.querySelectorAll('.btn-detail');
-    const btnBayar = document.getElementById('btnBayar');
+        document.addEventListener('DOMContentLoaded', function() {
+            const detailButtons = document.querySelectorAll('.btn-detail');
+            const btnBayar = document.getElementById('btnBayar');
 
-    detailButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // isi data modal seperti biasa ...
-            document.getElementById('modalNama').textContent = this.dataset.nama;
-            // dst... (semua pengisian lain tidak perlu diubah)
+            detailButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // isi data modal seperti biasa ...
+                    document.getElementById('modalNama').textContent = this.dataset.nama;
+                    // dst... (semua pengisian lain tidak perlu diubah)
 
-            // Tampilkan / sembunyikan tombol Bayar sesuai status_gajian
-            if (this.dataset.status == '1') {
-                btnBayar.style.display = 'none';
-            } else {
-                btnBayar.style.display = 'inline-block';
-            }
+                    // Tampilkan / sembunyikan tombol Bayar sesuai status_gajian
+                    if (this.dataset.status == '1') {
+                        btnBayar.style.display = 'none';
+                    } else {
+                        btnBayar.style.display = 'inline-block';
+                    }
+                });
+            });
         });
-    });
-});
     </script>
     @endpush

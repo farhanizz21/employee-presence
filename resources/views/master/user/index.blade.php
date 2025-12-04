@@ -76,11 +76,8 @@
                                         <tr>
                                             <th style="width: 10px">#</th>
                                             <th>
-                                                Nama
-                                            </th>
-                                            <th>
                                                 <a href="{{ route('user.index', ['sort_by' => 'username', 'sort_order' => $currentOrder] + request()->all()) }}"
-                                                    class="text-secondary fw-bold">
+                                                    class="text-light fw-bold">
                                                     username
                                                     @if(request('sort_by') == 'username' && request('sort_order') ==
                                                     'asc')
@@ -122,10 +119,7 @@
                                         @forelse($users as $user)
                                         <tr class="align-middle">
                                             <td>{{ $loop->iteration }}</td>
-                                            <td class="text-truncate" style="max-width: 200px;">
-                                                {{ $user->pegawai->nama ?? '-' }}
-
-                                            </td>
+                                           
                                             <td class="text-truncate">{{ $user->username }}</td>
                                             <td class="text-truncate">{{ $user->email }}</td>
                                             <td class="text-truncate">{{ $user->role_label }}</td>
@@ -177,3 +171,15 @@
 
 
     @endsection
+
+    
+    <style>
+        .table thead th {
+ 
+    background-color: #343a40 !important;
+    color: #fff;
+    
+    text-align: center;
+    vertical-align: middle;
+}
+    </style>

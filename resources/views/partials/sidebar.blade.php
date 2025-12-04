@@ -1,3 +1,12 @@
+<style>
+    .nav-item.has-treeview > a .right {
+    transition: transform 0.3s ease;
+}
+
+.nav-item.menu-open > a .right {
+    transform: rotate(-90deg);
+}
+</style>
 <!--begin::Sidebar-->
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
     <!--begin::Sidebar Brand-->
@@ -41,20 +50,19 @@
                 <li class="nav-header">MASTER DATA</li>
 
                 <li
-                    class="nav-item has-treeview {{ request()->is('user*','pegawai*', 'grup*', 'jabatan*','bonuspotongan*') ? 'menu-open' : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->is('user*','pegawai*','jabatan*','grup*', 'bonuspotongan*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-database"></i>
-                        <p>
-                            Master Data
-                            <i class="right fas fa-angle-left transition-all"
-                                style="transition: transform 0.3s ease;
-               {{ request()->is('user*','pegawai*','jabatan*','grup*','bonuspotongan*') ? 'transform: rotate(-90deg);' : '' }}">
-                            </i>
-                        </p>
-                    </a>
+    class="nav-item has-treeview {{ request()->is('user*','pegawai*','grup*','jabatan*','bonuspotongan*') ? 'menu-open' : '' }}">
+    
+    <a href="#"
+       class="nav-link {{ request()->is('user*','pegawai*','jabatan*','grup*','bonuspotongan*') ? 'active' : '' }}">
+       
+        <i class="nav-icon fas fa-database"></i>
+        <p>
+            Master Data 
+            <i class="right fas fa-angle-left"></i>
+        </p>
+    </a>
 
-                    <ul class="nav nav-treeview">
+    <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('user.index') }}"
                                 class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}">

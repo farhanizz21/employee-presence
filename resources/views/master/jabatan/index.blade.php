@@ -73,10 +73,10 @@
                                     @endphp
                                     <thead>
                                         <tr>
-                                            <th style="width: 10px" rowspan="2">#</th>
-                                            <th rowspan="2">
+                                            <th style="width: 10px; text-align:center; vertical-align:middle;" rowspan="2">#</th>
+                                            <th rowspan="2" style="text-align:center; vertical-align:middle;">
                                                 <a href="{{ route('jabatan.index', ['sort_by' => 'jabatan', 'sort_order' => $currentOrder] + request()->all()) }}"
-                                                    class="text-secondary fw-bold">
+                                                    class="text-light fw-bold">
                                                     Jabatan
                                                     @if(request('sort_by') == 'jabatan' && request('sort_order') ==
                                                     'asc')
@@ -89,13 +89,13 @@
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th rowspan="2">Sistem Gaji</th>
-                                            <th colspan="2">Gaji</th>
-                                            <th rowspan="2">Aksi</th>
+                                            <th rowspan="2" style="text-align:center; vertical-align:middle;">Sistem Gaji</th>
+                                            <th colspan="2" style="text-align:center; vertical-align:middle;">Gaji</th>
+                                            <th rowspan="2" style="text-align:center; vertical-align:middle;">Aksi</th>
                                         </tr>
                                         <tr>
-                                            <th>Gaji Pagi</th>
-                                            <th>Gaji Malam</th>
+                                            <th style="text-align:center; vertical-align:middle;">Gaji Pagi</th>
+                                            <th style="text-align:center; vertical-align:middle;">Gaji Malam</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -105,11 +105,14 @@
                                             <td class="text-truncate" style="max-width: 200px;">{{ $jabatan->jabatan }}
                                             </td>
                                             <td class="text-truncate" style="max-width: 200px;">
-                                                {{ $jabatan->harian_text }}</td>
+                                                {{ $jabatan->harian_text }}
+                                            </td>
                                             <td class="text-truncate" style="max-width: 200px;">Rp
-                                                {{ number_format($jabatan->gaji_pagi, 0, ',', '.') }}</td>
+                                                {{ number_format($jabatan->gaji_pagi, 0, ',', '.') }}
+                                            </td>
                                             <td class="text-truncate" style="max-width: 200px;">Rp
-                                                {{ number_format($jabatan->gaji_malam, 0, ',', '.') }}</td>
+                                                {{ number_format($jabatan->gaji_malam, 0, ',', '.') }}
+                                            </td>
                                             <td>
                                                 <a href="{{ route('jabatan.edit', $jabatan->uuid) }}"
                                                     class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
@@ -155,3 +158,14 @@
     </div>
     <!--end::App Content-->
     @endsection
+
+    <style>
+        .table thead th {
+ 
+    background-color: #343a40 !important;
+    color: #fff;
+    
+    text-align: center;
+    vertical-align: middle;
+}
+    </style>

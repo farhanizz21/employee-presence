@@ -301,64 +301,71 @@ class AbsensiController extends Controller
     }
 
     public function formRekap(Request $request)
-    {
-        $tanggalMulai = $request->input('tanggal_mulai') ?? now()->toDateString();
-        $tanggalSelesai = $request->input('tanggal_selesai') ?? now()->toDateString();
-        if ($tanggalMulai && $tanggalSelesai) {
-            // Cek apakah ada periode yang overlap
-            $cekOverlap = AbsensiPeriode::where(function ($q) use ($tanggalMulai, $tanggalSelesai) {
-                $q->where('tanggal_mulai', '<=', $tanggalSelesai)
-                    ->where('tanggal_selesai', '>=', $tanggalMulai);
-            })->exists();
+{
+    $tanggalMulai   = $request->input('tanggal_mulai');
+    $tanggalSelesai = $request->input('tanggal_selesai');
 
-            if ($cekOverlap) {
-                return back()->with('error', 'Range tanggal sudah ada dalam periode sebelumnya!');
-            }
-        }
-        $pegawais = Pegawai::query();
+    // ✅ CEK OVERLAP HANYA JIKA FORM DISUBMIT
+    if ($request->filled('tanggal_mulai') && $request->filled('tanggal_selesai')) {
 
-        // 🔹 Filter berdasarkan pencarian nama
-        if ($request->filled('search')) {
-            $pegawais->where('nama', 'like', '%' . $request->search . '%');
-        }
+        $cekOverlap = AbsensiPeriode::where(function ($q) use ($tanggalMulai, $tanggalSelesai) {
+            $q->where('tanggal_mulai', '<=', $tanggalSelesai)
+              ->where('tanggal_selesai', '>=', $tanggalMulai);
+        })->exists();
 
-        // 🔹 Filter berdasarkan jabatan
-        if ($request->filled('jabatan_uuid')) {
-            $pegawais->where('jabatan_uuid', $request->jabatan_uuid);
+        if ($cekOverlap) {
+            return back()->with('error', 'Range tanggal sudah ada dalam periode sebelumnya!');
         }
-
-        // 🔹 Filter berdasarkan shift (pagi/malam)
-        if ($request->filled('shift')) {
-            $pegawais->where('grup_uuid', $request->shift);
-        }
-
-        // 🔹 Filter berdasarkan grup_sb
-        if ($request->filled('grup_sb')) {
-            $pegawais->where('grup_sb', $request->grup_sb);
-        }
-
-        $pegawais = $pegawais->paginate(10)->withQueryString();
-        $jabatans = Jabatan::all();
-        $grupSbs = Grup::all();
-        // generate range tanggal
-        $dates = [];
-        $current = strtotime($tanggalMulai);
-        $end = strtotime($tanggalSelesai);
-        while ($current <= $end) {
-            $dates[] = date('Y-m-d', $current);
-            $current = strtotime("+1 day", $current);
-        }
-        $pegawaisByGrupSb = $pegawais->groupBy('grup_sb');
-        return view('absensi.rekap', compact(
-            'pegawais',
-            'jabatans',
-            'pegawaisByGrupSb',
-            'dates',
-            'grupSbs',
-            'tanggalMulai',
-            'tanggalSelesai'
-        ));
     }
+
+    // ✅ DEFAULT DATE HANYA UNTUK TAMPILAN
+    $tanggalMulai   = $tanggalMulai ?? now()->toDateString();
+    $tanggalSelesai = $tanggalSelesai ?? now()->toDateString();
+
+    $pegawais = Pegawai::query();
+
+    if ($request->filled('search')) {
+        $pegawais->where('nama', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->filled('jabatan_uuid')) {
+        $pegawais->where('jabatan_uuid', $request->jabatan_uuid);
+    }
+
+    if ($request->filled('shift')) {
+        $pegawais->where('grup_uuid', $request->shift);
+    }
+
+    if ($request->filled('grup_sb')) {
+        $pegawais->where('grup_sb', $request->grup_sb);
+    }
+
+    $pegawais = $pegawais->paginate(10)->withQueryString();
+    $jabatans = Jabatan::all();
+    $grupSbs  = Grup::all();
+
+    // generate range tanggal
+    $dates = [];
+    $current = strtotime($tanggalMulai);
+    $end     = strtotime($tanggalSelesai);
+
+    while ($current <= $end) {
+        $dates[] = date('Y-m-d', $current);
+        $current = strtotime("+1 day", $current);
+    }
+
+    $pegawaisByGrupSb = $pegawais->groupBy('grup_sb');
+
+    return view('absensi.rekap', compact(
+        'pegawais',
+        'jabatans',
+        'pegawaisByGrupSb',
+        'dates',
+        'grupSbs',
+        'tanggalMulai',
+        'tanggalSelesai'
+    ));
+}
 
 
     public function simpanRekap(Request $request)

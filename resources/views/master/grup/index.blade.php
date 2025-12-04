@@ -77,7 +77,7 @@
                                             <th style="width: 10px">#</th>
                                             <th>
                                                 <a href="{{ route('grup.index', ['sort_by' => 'nama', 'sort_order' => $currentOrder] + request()->all()) }}"
-                                                    class="text-secondary fw-bold">
+                                                    class="text-light fw-bold">
                                                     Grup
                                                     @if(request('sort_by') == 'nama' && request('sort_order') == 'asc')
                                                     <i class="fas fa-sort-up"></i>
@@ -144,3 +144,15 @@
 
 
     @endsection
+
+    
+    <style>
+        .table thead th {
+ 
+    background-color: #343a40 !important;
+    color: #fff;
+    
+    text-align: center;
+    vertical-align: middle;
+}
+    </style>

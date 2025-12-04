@@ -112,11 +112,13 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-2 d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary flex-grow-1">
-                                        <i class="fas fa-search"></i> Filter
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Cari
                                     </button>
-                                    <a href="{{ route('absensi.index') }}" class="btn btn-warning flex-grow-1">
+                                </div>
+                                <div class="col-auto">
+                                    <a href="{{ route('absensi.index') }}" class="btn btn-warning">
                                         <i class="fas fa-redo"></i> Reset
                                     </a>
                                 </div>

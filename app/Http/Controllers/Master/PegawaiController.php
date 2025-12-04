@@ -22,12 +22,39 @@ class PegawaiController extends Controller
 
         // Pencarian
         if ($request->filled('search')) {
-            $query->where('nama', 'like', '%' . $request->search . '%');
-        }
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            // Kolom langsung dari tabel pegawai
+            $q->where('nama', 'like', "%$search%")
+              ->orWhere('alamat', 'like', "%$search%")
+              ->orWhere('grup_uuid', 'like', "%$search%");
+            
+            // Kolom relasi: jabatan
+            $q->orWhereHas('jabatan', function ($q2) use ($search) {
+                $q2->where('jabatan', 'like', "%$search%");
+            });
+
+            // Kolom relasi: grup
+            $q->orWhereHas('grupSb', function ($q3) use ($search) {
+                $q3->where('nama', 'like', "%$search%");
+            });
+        });
+    }
 
         // Filter Jabatan
         if ($request->filled('filter_jabatan')) {
             $query->where('jabatan_uuid', $request->filter_jabatan);
+        }
+
+        // Filter Grup
+        if ($request->filled('filter_grup_sb')) {
+            $query->where('grup_sb', $request->filter_grup_sb);
+        }
+
+        // Filter Grup Enum
+        if ($request->filled('filter_grup')) {
+            $query->where('grup_uuid', $request->filter_grup);
         }
 
         // Urutan
