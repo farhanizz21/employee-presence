@@ -21,6 +21,9 @@ class GajianController extends Controller
     {
         $periodes = AbsensiPeriode::orderBy('tanggal_mulai', 'desc')->get();
         $periodeUuid = $request->get('periode_uuid');
+        if (!$periodeUuid && $periodes->count() > 0) {
+            $periodeUuid = $periodes->first()->uuid;
+        }
         $periodeAktif = $periodeUuid
             ? AbsensiPeriode::where('uuid', $periodeUuid)->first()
             : null;

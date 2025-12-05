@@ -74,7 +74,6 @@
                                         <select name="periode_uuid" id="periode_uuid"
                                             class="form-select form-select-sm border-primary" style="max-width: 250px;"
                                             onchange="this.form.submit()">
-                                            <option value="">-- Pilih Periode --</option>
                                             @foreach($periodes as $periode)
                                             <option value="{{ $periode->uuid }}"
                                                 {{ $periodeUuid == $periode->uuid ? 'selected' : '' }}>
@@ -99,19 +98,19 @@
                                     </button>
                                 </div>
                                 <div class="col-auto">
-                                    <a href="" class="btn btn-warning">
+                                    <a href="{{ route('gajian.index') }}" class="btn btn-warning">
                                         <i class="fas fa-redo"></i> Reset
                                     </a>
                                 </div>
                             </form>
                             <div class="table-responsive">
-
-                                <table class="table table-bordered table-hover">
+                                <table class="table table-bordered table-striped table-sm table-hover">
                                     <thead class="bg-info text-center">
                                         <tr>
                                             <th style="width: 5%">#</th>
                                             <th>Pegawai</th>
                                             <th>Grup</th>
+                                            <th>Shift</th>
                                             <th>Jabatan</th>
                                             <th>Total Gaji</th>
                                             <th class="text-center" style="width: 10%;">Status</th>
@@ -123,6 +122,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $gaji['pegawai']->nama}}</td>
+                                            <td>{{ $gaji['pegawai']->grupSb->nama}}</td>
                                             <td>{{ $gaji['pegawai']->grup_uuid}}</td>
                                             <td>{{ $gaji['jabatan']->jabatan}}</td>
                                             <td><strong>Rp
@@ -388,17 +388,28 @@
                     document.getElementById('totalGajiInput').value = this.dataset.total;
 
                     // Periode
+                    const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
+                    const bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
                     const periodeMulai = new Date(this.dataset.periode_mulai + 'T00:00:00');
                     const periodeSelesai = new Date(this.dataset.periode_selesai + 'T00:00:00');
+
+                    // Format tanggal Indonesia pakai Intl.DateTimeFormat
                     const options = {
                         day: '2-digit',
                         month: 'long',
                         year: 'numeric'
                     };
-                    document.getElementById('modalPeriodeMulai').textContent = new Intl.DateTimeFormat(
-                        'id-ID', options).format(periodeMulai);
-                    document.getElementById('modalPeriodeSelesai').textContent = new Intl
-                        .DateTimeFormat('id-ID', options).format(periodeSelesai);
+                    const tanggalMulai = new Intl.DateTimeFormat('id-ID', options).format(periodeMulai);
+                    const tanggalSelesai = new Intl.DateTimeFormat('id-ID', options).format(periodeSelesai);
+
+                    // Gabungkan HARI + TANGGAL
+                    document.getElementById('modalPeriodeMulai').textContent =
+                        hari[periodeMulai.getDay()] + ", " + tanggalMulai;
+
+                    document.getElementById('modalPeriodeSelesai').textContent =
+                        hari[periodeSelesai.getDay()] + ", " + tanggalSelesai;
+
 
                     // Detail Absensi
                     let detailAbsensi = [];
@@ -434,25 +445,25 @@
             });
         });
     </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-    const detailButtons = document.querySelectorAll('.btn-detail');
-    const btnBayar = document.getElementById('btnBayar');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const detailButtons = document.querySelectorAll('.btn-detail');
+            const btnBayar = document.getElementById('btnBayar');
 
-    detailButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // isi data modal seperti biasa ...
-            document.getElementById('modalNama').textContent = this.dataset.nama;
-            // dst... (semua pengisian lain tidak perlu diubah)
+            detailButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // isi data modal seperti biasa ...
+                    document.getElementById('modalNama').textContent = this.dataset.nama;
+                    // dst... (semua pengisian lain tidak perlu diubah)
 
-            // Tampilkan / sembunyikan tombol Bayar sesuai status_gajian
-            if (this.dataset.status == '1') {
-                btnBayar.style.display = 'none';
-            } else {
-                btnBayar.style.display = 'inline-block';
-            }
+                    // Tampilkan / sembunyikan tombol Bayar sesuai status_gajian
+                    if (this.dataset.status == '1') {
+                        btnBayar.style.display = 'none';
+                    } else {
+                        btnBayar.style.display = 'inline-block';
+                    }
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
     @endpush

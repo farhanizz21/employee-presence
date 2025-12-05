@@ -23,6 +23,7 @@ class Absensi extends Model
         'grup_uuid',
         'jabatan_uuid',
         'shift',
+        'grup_sb',
         'periode_uuid',
         'status',
         'pencapaian',
@@ -41,6 +42,11 @@ class Absensi extends Model
         return $this->belongsTo(Pegawai::class, 'pegawai_uuid', 'uuid');
     }
 
+    public function grup()
+    {
+        return $this->belongsTo(Grup::class, 'grup_sb', 'uuid');
+    }
+    
     public function jabatan()
     {
         return $this->belongsTo(Jabatan::class, 'jabatan_uuid', 'uuid');
@@ -57,9 +63,9 @@ class Absensi extends Model
     }
 
     public function hasilProduksi()
-{
-    return $this->hasOne(Hasil_produksi::class, 'tanggal', 'tanggal');
-}
+    {
+        return $this->hasOne(Hasil_produksi::class, 'tanggal', 'tanggal');
+    }
 
 
 }
