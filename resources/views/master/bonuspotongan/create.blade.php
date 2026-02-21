@@ -40,7 +40,7 @@
                 </div>
                 <!--end::Header-->
                 <!--begin::Form-->
-                <form class="bonuspotongan" method="post" action="{{ route('bonuspotongan.store') }}">
+                <form id="bonusForm" class="bonuspotongan" method="post" action="{{ route('bonuspotongan.store') }}">
                     @csrf
                     <!--begin::Body-->
                     <div class="card-body">
@@ -76,14 +76,14 @@
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" name="nominal" id="nominal" class="form-control"
-                                        value="{{ old('nominal') }}" required>
+                                        value="{{ number_format($bonuspotongan->nominal, 0, ',', '.') }}" required>
                                 </div>
                                 @error('nominal')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <!-- <div class="col-md-6 mb-3">
                                 <label class="form-label">Berlaku untuk<span class="text-danger">*</span></label>
                                 <select name="jabatan[]"
                                     class="form-select select2 @error('jabatan') is-invalid @enderror" multiple
@@ -98,7 +98,7 @@
                                 @error('jabatan')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> -->
 
                         </div>
                         <div class="form-group row">
@@ -142,12 +142,19 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Format input nominal as currency
     const nominalInput = document.getElementById('nominal');
+    const form = document.getElementById('bonusForm');
+
+    if (!form || !nominalInput) {
+        console.error('FORM ATAU INPUT TIDAK DITEMUKAN');
+        return;
+    }
+
     nominalInput.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-        e.target.value = new Intl.NumberFormat('id-ID').format(value); // Format as currency
+        const raw = e.target.value.replace(/\D/g, '');
+        e.target.value = new Intl.NumberFormat('id-ID').format(raw);
     });
-    document.querySelector('form').addEventListener('submit', function() {
-        const nominalInput = document.getElementById('nominal');
+
+    form.addEventListener('submit', function(e) {
         nominalInput.value = nominalInput.value.replace(/\D/g, '');
     });
 

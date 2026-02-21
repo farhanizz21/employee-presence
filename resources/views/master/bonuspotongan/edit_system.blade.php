@@ -42,7 +42,7 @@
                 </div>
                 <!--end::Header-->
                 <!--begin::Form-->
-                <form class="bonuspotongan" method="post"
+                <form id="bonusForm" class="bonuspotongan" method="post"
                     action="{{ route('bonuspotongan.update_system',$bonuspotongan->uuid) }}">
                     @csrf
                     @method('PUT')
@@ -120,18 +120,22 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Format input nominal as currency
-    console.log('aaaa');
     const nominalInput = document.getElementById('nominal');
+    const form = document.getElementById('bonusForm');
+
+    if (!form || !nominalInput) {
+        console.error('FORM ATAU INPUT TIDAK DITEMUKAN');
+        return;
+    }
+
     nominalInput.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-        e.target.value = new Intl.NumberFormat('id-ID').format(value); // Format as currency
-    });
-    document.querySelector('form').addEventListener('submit', function() {
-        const nominalInput = document.getElementById('nominal');
-        nominalInput.value = nominalInput.value.replace(/\D/g, '');
+        const raw = e.target.value.replace(/\D/g, '');
+        e.target.value = new Intl.NumberFormat('id-ID').format(raw);
     });
 
+    form.addEventListener('submit', function(e) {
+        nominalInput.value = nominalInput.value.replace(/\D/g, '');
+    });
 });
 </script>
 @endpush

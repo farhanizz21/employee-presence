@@ -85,7 +85,7 @@
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <!-- <div class="col-md-6 mb-3">
                                 <label class="form-label">Berlaku untuk <span class="text-danger">*</span></label>
                                 <select name="jabatan[]"
                                     class="form-select select2 @error('jabatan') is-invalid @enderror" multiple
@@ -102,7 +102,7 @@
                                 @error('jabatan')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
-                            </div>
+                            </div> -->
                         </div>
                         <div class="form-group row">
                             <div class="col-md-12">
