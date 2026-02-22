@@ -18,7 +18,7 @@ class PegawaiController extends Controller
 
     public function index(Request $request)
     {
-        $query = Pegawai::with(['jabatan', 'grupSb']);
+        $query = Pegawai::with(['jabatan']);
 
         // Pencarian
         if ($request->filled('search')) {
@@ -27,17 +27,11 @@ class PegawaiController extends Controller
         $query->where(function ($q) use ($search) {
             // Kolom langsung dari tabel pegawai
             $q->where('nama', 'like', "%$search%")
-              ->orWhere('alamat', 'like', "%$search%")
-              ->orWhere('grup_uuid', 'like', "%$search%");
+              ->orWhere('alamat', 'like', "%$search%");
             
             // Kolom relasi: jabatan
             $q->orWhereHas('jabatan', function ($q2) use ($search) {
                 $q2->where('jabatan', 'like', "%$search%");
-            });
-
-            // Kolom relasi: grup
-            $q->orWhereHas('grupSb', function ($q3) use ($search) {
-                $q3->where('nama', 'like', "%$search%");
             });
         });
     }
@@ -48,11 +42,6 @@ class PegawaiController extends Controller
         }
 
         // Filter Grup
-        if ($request->filled('filter_grup_sb')) {
-            $query->where('grup_sb', $request->filter_grup_sb);
-        }
-
-        // Filter Grup Enum
         if ($request->filled('filter_grup')) {
             $query->where('grup_uuid', $request->filter_grup);
         }
@@ -82,23 +71,19 @@ class PegawaiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-    'nama' => 'required|string|max:100',
-    'grup' => 'required|string|in:Pagi,Malam',
-    'telepon' => 'required|string|max:20',
-    'jabatan' => 'required|string',
-    'grup_sb' => 'required|string',
-    'alamat' => 'nullable|string|max:255',
-    'keterangan' => 'nullable|string|max:255',
-]);
+            'nama' => 'required|string|max:100',
+            'jabatan' => 'required|uuid',
+            'telepon' => 'required|string',
+            'grup' => 'required|uuid',
+            'keterangan' => 'nullable|string|max:255',
+        ]);
 
         Pegawai::create([
             'uuid' => \Illuminate\Support\Str::uuid(), // Generate UUID otomatis
             'nama' => $validated['nama'],
             'grup_uuid' => $validated['grup'],
-            'grup_sb' => $validated['grup_sb'],
             'telepon' => $validated['telepon'],
             'jabatan_uuid' => $validated['jabatan'],
-            'alamat' => $validated['alamat'],
             'keterangan' => $validated['keterangan']
             // 'created_by' => Auth::pegawai()->uuid
         ]);
@@ -134,18 +119,35 @@ class PegawaiController extends Controller
     $validated = $request->validate([
         'nama' => 'required|string|max:100',
         'telepon' => 'required|string|max:20',
-        'grup_uuid' => 'required|string|in:Pagi,Malam', // pastikan hanya enum ini
-        'jabatan_uuid' => 'required|exists:jabatans,uuid',
-        'grup_sb' => 'required|exists:grups,uuid',
-        'alamat' => 'nullable|string|max:255',
+        'jabatan' => 'required|exists:jabatans,uuid',
+        'grup' => 'required|exists:grups,uuid',
         'keterangan' => 'nullable|string|max:255',
     ]);
 
     $pegawai = Pegawai::where('uuid', $uuid)->firstOrFail();
-    $pegawai->update($validated);
+    $pegawai->update([
+        'nama' => $validated['nama'],
+        'telepon' => $validated['telepon'],
+        'grup_uuid' => $validated['grup'],
+        'jabatan_uuid' => $validated['jabatan'],
+        'keterangan' => $validated['keterangan'] ?? null,
+    ]);
 
     return redirect()->route('pegawai.index')->with('success', 'Data berhasil diupdate!');
 }
+
+    public function updateStatus(string $uuid)
+    {
+        $pegawai = Pegawai::where('uuid', $uuid)->firstOrFail();
+
+        $pegawai->update([
+            'status' => ! $pegawai->status
+        ]);
+
+        return redirect()
+            ->route('pegawai.index')
+            ->with('success', 'Status pegawai berhasil diperbarui.');
+    }
 
     /**
      * Remove the specified resource from storage.

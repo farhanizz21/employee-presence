@@ -16,10 +16,10 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('nama', 100);
             $table->string('telepon');
-            $table->enum('grup_uuid', ['Pagi', 'Malam']);
-            $table->uuid('grup_sb');
+            $table->uuid('grup_uuid');
             $table->uuid('jabatan_uuid');
             $table->string('alamat', 255)->nullable();
+            $table->boolean('status')->default(true);
             $table->string('keterangan', 255)->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -22,26 +22,26 @@
     <!--begin::Accessibility Features-->
     <!-- Skip links will be dynamically added by accessibility.js -->
     <meta name="supported-color-schemes" content="light dark">
-    
+
     <!--end::Accessibility Features-->
 
 
-    
+
     <!--begin::Required Plugin(AdminLTE)-->
     <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
     <!--end::Required Plugin(AdminLTE)-->
-    
+
     <!-- Custom fonts for this template-->
-    
-   
-<!-- Font Awesome -->
-<link rel="stylesheet" href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
 
-<!-- Select2 -->
-<link rel="stylesheet" href="{{ asset('adminlte/plugins/select2/css/select2.min.css') }}">
 
-<!-- FullCalendar -->
-<link rel="stylesheet" href="{{ asset('adminlte/plugins/fullcalendar/main.min.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
+
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{{ asset('adminlte/plugins/select2/css/select2.min.css') }}">
+
+    <!-- FullCalendar -->
+    <link rel="stylesheet" href="{{ asset('adminlte/plugins/fullcalendar/main.min.css') }}">
 
 
 
@@ -52,6 +52,7 @@
 
 <!-- Bootstrap 4 bundle (sudah ada Popper.js di dalamnya) -->
 <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
@@ -115,57 +116,59 @@
     <!--begin::Script-->
 
     <!-- CSS -->
-<link rel="stylesheet" href="{{ asset('adminlte/dist/css/daterangepicker.css') }}">
+    @stack('styles')
+    <link rel="stylesheet" href="{{ asset('adminlte/dist/css/daterangepicker.css') }}">
 
-<!-- JS -->
-<script src="{{ asset('adminlte/dist/js/moment.min.js') }}"></script>
-<script src="{{ asset('adminlte/dist/js/daterangepicker.min.js') }}"></script>
+    <!-- JS -->
+    <script src="{{ asset('adminlte/dist/js/moment.min.js') }}"></script>
+    <script src="{{ asset('adminlte/dist/js/daterangepicker.min.js') }}"></script>
 
-    
-    
+
+
     <!--begin::Required Plugin(AdminLTE)-->
     <!-- <script src="{{ asset('adminlte/dist/js/adminlte.js') }}"></script> -->
-    
+
     <!--end::Required Plugin(AdminLTE)-->
-<!-- jQuery -->
-<!-- <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script> -->
-<!-- Bootstrap Bundle -->
-<!-- <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script> -->
-<!-- OverlayScrollbars JS -->
-<script src="{{ asset('adminlte/plugins/overlayScrollbars/js/OverlayScrollbars.min.js') }}"></script>
-<!-- AdminLTE App -->
-<script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
+    <!-- jQuery -->
+    <!-- <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script> -->
+    <!-- Bootstrap Bundle -->
+    <!-- <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script> -->
+    <!-- OverlayScrollbars JS -->
+    <script src="{{ asset('adminlte/plugins/overlayScrollbars/js/OverlayScrollbars.min.js') }}"></script>
+    <!-- AdminLTE App -->
+    <script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
 
-<!-- OverlayScrollbars & Tooltip Init -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // OverlayScrollbars init
-    const sidebarWrapper = document.querySelector(".sidebar-wrapper");
-    if (sidebarWrapper && typeof OverlayScrollbarsGlobal !== "undefined" && OverlayScrollbarsGlobal.OverlayScrollbars) {
-        OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
-            scrollbars: {
-                theme: "os-theme-light",
-                autoHide: "leave",
-                clickScroll: true,
-            },
+    <!-- OverlayScrollbars & Tooltip Init -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // OverlayScrollbars init
+        const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+        if (sidebarWrapper && typeof OverlayScrollbarsGlobal !== "undefined" && OverlayScrollbarsGlobal
+            .OverlayScrollbars) {
+            OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+                scrollbars: {
+                    theme: "os-theme-light",
+                    autoHide: "leave",
+                    clickScroll: true,
+                },
+            });
+        }
+
+        // Bootstrap tooltip init
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
         });
-    }
-
-    // Bootstrap tooltip init
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-});
-</script>
+    </script>
 
 
-<!-- OverlayScrollbars CSS -->
-<link rel="stylesheet" href="{{ asset('adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
+    <!-- OverlayScrollbars CSS -->
+    <link rel="stylesheet" href="{{ asset('adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
 
 
-<script src="{{ asset('adminlte/plugins/select2/js/select2.full.min.js') }}"></script>
-<script src="{{ asset('adminlte/plugins/fullcalendar/main.min.js') }}"></script>
+    <script src="{{ asset('adminlte/plugins/select2/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('adminlte/plugins/fullcalendar/main.min.js') }}"></script>
 
 
 

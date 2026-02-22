@@ -18,9 +18,8 @@ class Pegawai extends Model
         'telepon',
         'grup_uuid',
         'jabatan_uuid',
-        'grup_sb',
-        'alamat',
         'keterangan',
+        'status',
         'created_at',
         'updated_at',
         'deleted_at'
@@ -46,14 +45,14 @@ class Pegawai extends Model
         return $this->hasMany(Gajian::class, 'pegawai_uuid', 'uuid');
     }
 
+    public function grup()
+    {
+        return $this->belongsTo(Grup::class, 'grup_uuid', 'uuid');
+    }
+
     public function jabatan()
     {
         return $this->belongsTo(Jabatan::class, 'jabatan_uuid', 'uuid');
-    }
-
-    public function grupSb()
-    {
-        return $this->belongsTo(Grup::class, 'grup_sb', 'uuid');
     }
 
     public function pegawais()
