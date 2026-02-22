@@ -91,6 +91,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('jabatan', JabatanController::class);
     Route::resource('grup', GrupController::class);
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pegawai Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::post('pegawai/{uuid}/update-status', [PegawaiController::class, 'updateStatus'])->name('pegawai.updateStatus');
     /*
     |--------------------------------------------------------------------------
     | Jabatan Routes
