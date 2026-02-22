@@ -66,15 +66,15 @@
                             </form>
 
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
+                                <table class="table table-bordered table-striped table-hover">
                                     @php
                                     $currentSort = request('sort_by');
                                     $currentOrder = request('sort_order') == 'asc' ? 'desc' : 'asc';
                                     @endphp
                                     <thead>
                                         <tr>
-                                            <th style="width: 10px; text-align:center; vertical-align:middle;" rowspan="2">#</th>
-                                            <th rowspan="2" style="text-align:center; vertical-align:middle;">
+                                            <th style="width: 2%;">#</th>
+                                            <th>
                                                 <a href="{{ route('jabatan.index', ['sort_by' => 'jabatan', 'sort_order' => $currentOrder] + request()->all()) }}"
                                                     class="text-light fw-bold">
                                                     Jabatan
@@ -89,36 +89,71 @@
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th rowspan="2" style="text-align:center; vertical-align:middle;">Sistem Gaji</th>
-                                            <th colspan="2" style="text-align:center; vertical-align:middle;">Gaji</th>
-                                            <th rowspan="2" style="text-align:center; vertical-align:middle;">Aksi</th>
-                                        </tr>
-                                        <tr>
-                                            <th style="text-align:center; vertical-align:middle;">Gaji Pagi</th>
-                                            <th style="text-align:center; vertical-align:middle;">Gaji Malam</th>
+                                            <th style="width: 10%;">
+                                                <form method="GET" action="{{ route('jabatan.index') }}">
+                                                    <select name="filter_sistem" class="form-select form-select-sm"
+                                                        onchange="this.form.submit()">
+                                                        <option value="">Semua Sistem Gaji</option>
+                                                        <option value="1"
+                                                            {{ request('filter_sistem') == '1' ? 'selected' : '' }}>
+                                                            Harian
+                                                        </option>
+                                                        <option value="2"
+                                                            {{ request('filter_sistem') == '2' ? 'selected' : '' }}>
+                                                            Borongan
+                                                        </option>
+                                                    </select>
+                                                </form>
+                                            </th>
+                                            <th>Gaji</th>
+                                            <th style="width: 10%;">Bonus</th>
+                                            <th>Keterangan</th>
+                                            <th style="width: 5%">
+                                                Status
+                                            </th>
+                                            <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($jabatans as $jabatan)
                                         <tr class="align-middle">
                                             <td>{{ $loop->iteration }}</td>
-                                            <td class="text-truncate" style="max-width: 200px;">{{ $jabatan->jabatan }}
+                                            <td class="text-truncate">{{ $jabatan->jabatan }}
                                             </td>
-                                            <td class="text-truncate" style="max-width: 200px;">
+                                            <td class="text-truncate">
                                                 {{ $jabatan->harian_text }}
                                             </td>
-                                            <td class="text-truncate" style="max-width: 200px;">Rp
-                                                {{ number_format($jabatan->gaji_pagi, 0, ',', '.') }}
+                                            <td class="text-truncate">Rp
+                                                {{ number_format($jabatan->gaji, 0, ',', '.') }}
                                             </td>
-                                            <td class="text-truncate" style="max-width: 200px;">Rp
-                                                {{ number_format($jabatan->gaji_malam, 0, ',', '.') }}
+                                            <td class="text-truncate">
+                                                {{ $jabatan->bonusPotongan->nama ?? '-' }}
+                                            </td>
+                                            <td class="text-truncate">
+                                                {{ $jabatan->keterangan ?? '-'}}
                                             </td>
                                             <td>
+                                                @if($jabatan->is_system)
+                                                <span class="badge bg-secondary">Sistem</span>
+                                                @else
+                                                <span class="badge bg-primary">Bisa Edit</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{-- Tombol Edit --}}
+                                                @if($jabatan->is_system)
+                                                <a href="{{ route('jabatan.edit_system', $jabatan->uuid) }}"
+                                                    class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Edit">
+                                                    <i class="fas fa-coins text-white"></i>
+                                                </a>
+                                                @else
                                                 <a href="{{ route('jabatan.edit', $jabatan->uuid) }}"
                                                     class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
-                                                    title="Edit Data">
+                                                    title="Edit">
                                                     <i class="fas fa-edit text-white"></i>
                                                 </a>
+                                                @endif
+                                                @if(!$jabatan->is_system)
                                                 <form action="{{ route('jabatan.destroy', $jabatan->uuid) }}"
                                                     method="POST" style="display:inline;">
                                                     @csrf
@@ -128,11 +163,12 @@
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
+                                                @endif
                                             </td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="7" class="text-center">No Data</td>
+                                            <td colspan="8" class="text-center">No Data</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
@@ -160,12 +196,12 @@
     @endsection
 
     <style>
-        .table thead th {
- 
-    background-color: #343a40 !important;
-    color: #fff;
-    
-    text-align: center;
-    vertical-align: middle;
-}
+    .table thead th {
+
+        background-color: #343a40 !important;
+        color: #fff;
+
+        text-align: center;
+        vertical-align: middle;
+    }
     </style>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Master\Jabatan;
+use App\Models\Master\BonusPotongan;
 
 class JabatanController extends Controller
 {
@@ -14,6 +15,11 @@ class JabatanController extends Controller
     public function index(Request $request)
     {
         $query = Jabatan::query();
+
+        //filter sistem
+        if ($request->filled('filter_sistem')) {
+            $query->where('harian', $request->filter_sistem);
+        }
 
         // Pencarian
         if ($request->filled('search')) {
@@ -38,7 +44,8 @@ class JabatanController extends Controller
      */
     public function create()
     {
-        return view('master.jabatan.create');
+        $BonusPotongans = BonusPotongan::all();
+        return view('master.jabatan.create', compact('BonusPotongans'));
     }
 
     /**
@@ -47,23 +54,24 @@ class JabatanController extends Controller
     public function store(Request $request)
     {
         $request->merge([
-            'gaji_pagi'  => str_replace('.', '', $request->gaji_pagi),
-            'gaji_malam' => str_replace('.', '', $request->gaji_malam),
+            'gaji'  => str_replace('.', '', $request->gaji),
         ]);
 
         $validated = $request->validate([
             'jabatan'    => 'required|string',
             'harian'     => 'required|in:1,2',
-            'gaji_pagi'  => 'required|numeric',
-            'gaji_malam' => 'required|numeric',
+            'gaji'  => 'required|numeric',
+            'bonus'    => 'nullable|uuid',
+            'keterangan' => 'nullable|string',
         ]);
 
         Jabatan::create([
             'uuid'       => \Str::uuid(),
             'jabatan'    => $validated['jabatan'],
             'harian'     => $validated['harian'],
-            'gaji_pagi'  => $validated['gaji_pagi'],
-            'gaji_malam' => $validated['gaji_malam'],
+            'gaji'  => $validated['gaji'],
+            'bonus_uuid' => $validated['bonus'] ?? null,
+            'keterangan'  => $validated['keterangan'],
         ]);
 
         return redirect()->route('jabatan.index')->with('success', 'Data berhasil ditambahkan!');
@@ -76,7 +84,9 @@ class JabatanController extends Controller
     public function edit(string $uuid)
     {
         $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();
-        return view('master.jabatan.edit', compact('jabatan'));
+        $BonusPotongans = BonusPotongan::all();
+    
+        return view('master.jabatan.edit', compact('jabatan','BonusPotongans'));
     }
 
     /**
@@ -85,19 +95,53 @@ class JabatanController extends Controller
     public function update(Request $request, string $uuid)
     {
         $request->merge([
-            'gaji_pagi'  => str_replace('.', '', $request->gaji_pagi),
-            'gaji_malam' => str_replace('.', '', $request->gaji_malam),
+            'gaji'  => str_replace('.', '', $request->gaji),
         ]);
 
         $validated = $request->validate([
             'jabatan'    => 'required|string',
-            'gaji_pagi'  => 'required|numeric',
-            'gaji_malam' => 'required|numeric',
-            'harian'     => 'required|numeric'
+            'harian'     => 'required|in:1,2',
+            'gaji'  => 'required|numeric',
+            'bonus'    => 'nullable|uuid',
+            'keterangan' => 'nullable|string',
+        ]);
+        
+        $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();
+
+        $jabatan->update([
+            'jabatan'    => $validated['jabatan'],
+            'harian'     => $validated['harian'],
+            'gaji'       => $validated['gaji'],
+            'bonus_uuid' => $validated['bonus'] ?? null,
+            'keterangan' => $validated['keterangan'],
         ]);
 
+        return redirect()->route('jabatan.index')->with('success', 'Data berhasil diupdate!');
+    }
+
+    public function edit_system(string $uuid)
+    {
         $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();
-        $jabatan->update($validated);
+        $BonusPotongans = BonusPotongan::all();
+    
+        return view('master.jabatan.edit_system', compact('jabatan','BonusPotongans'));
+    }
+
+    public function update_system(Request $request, $uuid)
+    {
+        $request->merge([
+            'gaji'  => str_replace('.', '', $request->gaji),
+        ]);
+
+        $validated = $request->validate([
+            'gaji'  => 'required|numeric',
+        ]);
+        
+        $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();
+
+        $jabatan->update([
+            'gaji'       => $validated['gaji'],
+        ]);
 
         return redirect()->route('jabatan.index')->with('success', 'Data berhasil diupdate!');
     }

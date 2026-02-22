@@ -4,6 +4,8 @@ namespace App\Models\Master;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Master\BonusPotongan;
+
 
 class Jabatan extends Model
 {
@@ -12,9 +14,10 @@ class Jabatan extends Model
     protected $fillable = [
         'uuid',
         'jabatan',
-        'gaji_pagi',
-        'gaji_malam',
+        'gaji',
         'harian',
+        'bonus_uuid',
+        'keterangan',
         'created_at',
         'updated_at',
         'deleted_at'
@@ -38,5 +41,10 @@ class Jabatan extends Model
     public function absensi()
     {
         return $this->hasMany(Absensi::class, 'grup_uuid', 'uuid');
+    }
+
+    public function bonusPotongan()
+    {
+        return $this->belongsTo(BonusPotongan::class, 'bonus_uuid', 'uuid');
     }
 }

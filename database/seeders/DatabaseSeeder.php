@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use App\Models\Master\User;
 use App\Models\Master\BonusPotongan;
+use App\Models\Master\Jabatan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,6 +24,50 @@ class DatabaseSeeder extends Seeder
                 'role' => '1', // 1= Admin, 2=User
                 ]
             );
+        Jabatan::updateOrCreate(
+            [
+                'uuid' => Str::uuid(),
+                'gaji' => 100,
+                'harian' => 2,
+                'jabatan' => 'Nge Ces Pagi',
+                'bonus_uuid' => NULL,
+                'keterangan' => 'Perhitungan : ',
+                'is_system' => true
+            ]
+        );
+        Jabatan::updateOrCreate(
+            [
+                'uuid' => Str::uuid(),
+                'gaji' => 110,
+                'harian' => 2,
+                'jabatan' => 'Nge Ces Malam',
+                'bonus_uuid' => NULL,
+                'keterangan' => 'Perhitungan : ',
+                'is_system' => true
+            ]
+        );
+        Jabatan::updateOrCreate(
+            [
+                'uuid' => Str::uuid(),
+                'gaji' => 110,
+                'harian' => 2,
+                'jabatan' => 'Nge Pan Pagi',
+                'bonus_uuid' => NULL,
+                'keterangan' => 'Perhitungan : ',
+                'is_system' => true
+            ]
+        );
+        Jabatan::updateOrCreate(
+            [
+                'uuid' => Str::uuid(),
+                'gaji' => 110,
+                'harian' => 2,
+                'jabatan' => 'Nge Pan Malam',
+                'bonus_uuid' => NULL,
+                'keterangan' => 'Perhitungan : ',
+                'is_system' => true
+            ]
+        );
         BonusPotongan::updateOrCreate(
             [
                 'nama' => 'Bonus Kehadiran',
