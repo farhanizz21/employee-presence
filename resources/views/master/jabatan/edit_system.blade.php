@@ -5,14 +5,14 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <h3 class="mb-0">Tambah Jabatan</h3>
+                <h3 class="mb-0">Edit Jabatan</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
                     <li class="breadcrumb-item">
                         <a href="{{ route('jabatan.index')}}">Daftar Jabatan</a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Tambah</li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit</li>
                 </ol>
             </div>
         </div>
@@ -24,19 +24,23 @@
         <div class="col-12">
             <div class="card card-primary card-outline mb-4">
                 <div class="card-header">
-                    <div class="card-title fw-bold text-primary">Form Tambah Jabatan</div>
+                    <div class="card-title fw-bold text-primary">Form Edit Jabatan</div>
                 </div>
 
-                <form class="jabatan" method="post" action="{{ route('jabatan.store') }}">
+                <!--begin::Form-->
+                <form method="post" action="{{ route('jabatan.update_system', $jabatan->uuid) }}">
                     @csrf
+                    @method('PUT')
+
                     <div class="card-body">
                         <div class="form-group row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
                                     Nama Jabatan <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" name="jabatan" class="form-control" value="{{ old('jabatan') }}"
-                                    required>
+                                <input type="text" name="jabatan"
+                                    class="form-control @error('jabatan') is-invalid @enderror"
+                                    value="{{ old('jabatan', $jabatan->jabatan) }}" disabled>
                                 @error('jabatan')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -47,16 +51,18 @@
                                     Sistem Gaji <span class="text-danger">*</span>
                                 </label>
                                 <select name="harian" class="form-select @error('harian') is-invalid @enderror"
-                                    required>
-                                    <option disabled {{ old('harian') ? '' : 'selected' }}>Pilih Sistem Gajian</option>
-                                    <option value="1" {{ old('harian') == 1 ? 'selected' : '' }}>Harian</option>
-                                    <option value="2" {{ old('harian') == 2 ? 'selected' : '' }}>Borongan</option>
+                                    disabled>
+                                    <option value="1" {{ old('harian', $jabatan->harian ?? 1) == 1 ? 'selected' : '' }}>
+                                        Harian</option>
+                                    <option value="2" {{ old('harian', $jabatan->harian ?? 2) == 2 ? 'selected' : '' }}>
+                                        Borongan</option>
                                 </select>
                                 @error('harian')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
+
                         <div class="form-group row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
@@ -64,56 +70,58 @@
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" name="gaji" id="gaji" class="form-control"
-                                        value="{{ old('gaji') }}" required>
+                                    <input type="text" name="gaji" id="gaji"
+                                        class="form-control @error('gaji') is-invalid @enderror"
+                                        value="{{ old('gaji', number_format($jabatan->gaji, 0, ',', '.')) }}" required>
                                 </div>
                                 @error('gaji')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Pilihan Bonus</label>
-                                <select name="bonus" class="form-select @error('bonus') is-invalid @enderror">
-                                    <option value="" selected>Tidak ada bonus</option>
+                                <label class="form-label">Pilihan Bonus <span class="text-danger">*</span></label>
+                                <select name="bonus" class="form-select @error('bonus') is-invalid @enderror" disabled>
+                                    <option {{ !$jabatan->jabatan ? 'selected' : '' }}>Tidak ada bonus</option>
                                     @foreach ($BonusPotongans as $BonusPotongan)
                                     <option value="{{ $BonusPotongan->uuid }}"
-                                        {{ old('bonus') == $BonusPotongan->uuid ? 'selected' : '' }}>
+                                        {{ (old('jabatan', $jabatan->BonusPotongan->uuid ?? '') == $BonusPotongan->uuid) ? 'selected' : '' }}>
                                         {{ $BonusPotongan->nama }}
                                     </option>
                                     @endforeach
                                 </select>
-                                @error('bonus')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text">
-                                    Pilih bonus kondisional sesuai dengan jabatan
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Keterangan</label>
-                                <input type="text" name="keterangan" class="form-control"
-                                    value="{{ old('keterangan') }}">
-                                @error('keterangan')
+                                @error('bonua')
                                 <div class="invalid-feedback d-block">
                                     {{ $message }}
                                 </div>
                                 @enderror
-                                <div class="form-text">
-                                    Kolom isian untuk keterangan tambahan, jika ada.
-                                </div>
                             </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <label class="form-label">Keterangan</label>
+                                <textarea name="keterangan"
+                                    class="form-control @error('keterangan') is-invalid @enderror"
+                                    disabled>{{ old('keterangan', $jabatan->keterangan) }}</textarea>
+                            </div>
+                            <div class="form-text">
+                                Kolom isian untuk keterangan tambahan, jika ada.
+                            </div>
+                            @error('keterangan')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
                         <a href="{{ route('jabatan.index') }}" class="btn btn-md btn-danger">
                             <i class="fa fa-times"></i> Batal
                         </a>
                     </div>
                 </form>
+                <!--end::Form-->
             </div>
         </div>
     </div>
@@ -124,18 +132,21 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Format input gaji sebagai currency
-    const gaji = document.getElementById('gaji');
+    const gajiPagi = document.getElementById('gaji_pagi');
+    const gajiMalam = document.getElementById('gaji_malam');
 
     function formatCurrency(input) {
         let value = input.value.replace(/\D/g, '');
         if (value) input.value = new Intl.NumberFormat('id-ID').format(value);
     }
 
-    gaji.addEventListener('input', () => formatCurrency(gaji));
+    gajiPagi.addEventListener('input', () => formatCurrency(gajiPagi));
+    gajiMalam.addEventListener('input', () => formatCurrency(gajiMalam));
 
     // Sebelum submit, hapus format currency agar tersimpan sebagai angka murni
     document.querySelector('form').addEventListener('submit', function() {
-        gaji.value = gaji.value.replace(/\D/g, '');
+        gajiPagi.value = gajiPagi.value.replace(/\D/g, '');
+        gajiMalam.value = gajiMalam.value.replace(/\D/g, '');
     });
 });
 </script>

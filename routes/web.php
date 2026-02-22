@@ -93,6 +93,14 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Jabatan Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::get('jabatan/{uuid}/edit-system', [JabatanController::class, 'edit_system'])->name('jabatan.edit_system');
+    Route::put('jabatan/{uuid}/update-system', [JabatanController::class, 'update_system'])->name('jabatan.update_system');
+
+    /*
+    |--------------------------------------------------------------------------
     | Bonus Potongan Routes
     |--------------------------------------------------------------------------
     */
