@@ -65,11 +65,14 @@ table thead.bg-info th {
                 <div class="col-12 col-lg-12">
                     <!--begin::Col-->
                     <div class="card mb-4">
-                        <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
-                            <i class="fas fa-exclamation-circle me-2 text-warning"></i>
-                            <strong>Perhatian&nbsp;:&nbsp;</strong>Data yang sudah berstatus
-                            <strong>&nbsp;Sudah Gajian&nbsp;</strong> tidak dapat diubah lagi.
-                            Pastikan seluruh absensi sudah final sebelum melakukan proses pembayaran.
+                        <div class="alert alert-warning d-flex align-items-start gap-2 mb-0" role="alert">
+                            <i class="fas fa-exclamation-circle text-warning mt-1"></i>
+
+                            <div>
+                                <strong>Perhatian:</strong>
+                                Data yang sudah berstatus <strong>Sudah Gajian</strong> tidak dapat diubah lagi.
+                                Pastikan seluruh absensi sudah final sebelum melakukan proses pembayaran.
+                            </div>
                         </div>
 
                         <div class="card-header">

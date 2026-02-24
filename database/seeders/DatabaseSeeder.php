@@ -70,11 +70,11 @@ class DatabaseSeeder extends Seeder
         );
         BonusPotongan::updateOrCreate(
             [
-                'nama' => 'Bonus Kehadiran',
+                'nama' => 'Bonus Kehadiran A',
                 'kode' => 'bonus_kehadiran',
                 'uuid' => Str::uuid(),
                 'jenis' => 1,
-                'nominal' => 100000,
+                'nominal' => 10000,
                 'keterangan' => 'Bonus untuk pegawai hadir penuh',
                 'status' => 1,
                 'is_system' => true
@@ -82,27 +82,39 @@ class DatabaseSeeder extends Seeder
         );
         BonusPotongan::updateOrCreate(
             [
-                'nama' => 'Bonus Lembur',
-                'kode' => 'bonus_lembur',
+                'nama' => 'Bonus Kehadiran B',
+                'kode' => 'bonus_kehadiran_b',
                 'uuid' => Str::uuid(),
                 'jenis' => 1,
-                'nominal' => 100000,
-                'keterangan' => 'Bonus lembur',
+                'nominal' => 15000,
+                'keterangan' => 'Bonus untuk pegawai hadir penuh',
                 'status' => 1,
                 'is_system' => true
             ]
         );
         BonusPotongan::updateOrCreate(
             [
-                'nama' => 'Potongan Terlambat',
-                'kode' => 'potongan_terlambat',
+                'nama' => 'Potongan Alpha',
+                'kode' => 'potongan_alpha',
                 'uuid' => Str::uuid(),
-                'jenis' => 2,
-                'nominal' => 50000,
-                'keterangan' => '-',
+                'jenis' => 1,
+                'nominal' => 2500,
+                'keterangan' => 'Potongan Alpha',
                 'status' => 1,
                 'is_system' => true
             ]
         );
+        // BonusPotongan::updateOrCreate(
+        //     [
+        //         'nama' => 'Potongan Terlambat',
+        //         'kode' => 'potongan_terlambat',
+        //         'uuid' => Str::uuid(),
+        //         'jenis' => 2,
+        //         'nominal' => 50000,
+        //         'keterangan' => '-',
+        //         'status' => 1,
+        //         'is_system' => true
+        //     ]
+        // );
     }
 }

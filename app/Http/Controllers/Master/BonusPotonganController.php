@@ -61,10 +61,10 @@ class BonusPotonganController extends Controller
             'jenis' => 'required|integer|in:1,2',
             'nama' => 'required|string|max:100',
             'nominal' => 'required|integer',
-            'jabatan' => 'required|array|min:1',
-            'jabatan.*' => 'uuid|exists:jabatans,uuid',
+            // 'jabatan' => 'required|array|min:1',
+            // 'jabatan.*' => 'uuid|exists:jabatans,uuid',
             'keterangan' => 'nullable|string',
-            // 'status' => 'nullable|integer|in:1,2', // 1=Aktif, 2=Nonaktif
+            'is_system' => 'nullable|integer|in:1,2', // 1=Aktif, 2=Nonaktif
         ]);
         BonusPotongan::create([
             'uuid' => \Illuminate\Support\Str::uuid(), // Generate UUID otomatis
@@ -72,8 +72,8 @@ class BonusPotonganController extends Controller
             'jenis' => $validated['jenis'],
             'nominal' => $validated['nominal'],
             'keterangan' => $validated['keterangan'],
-            'status' => 1, // Default status aktif
-            'jabatan' => json_encode($validated['jabatan']), // simpan array ke json
+            'is_system' => 1, // Default status aktif
+            // 'jabatan' => json_encode($validated['jabatan']), // simpan array ke json
             // 'jabatan' => $validated['jabatan']
             // 'created_by' => Auth::pegawai()->uuid
         ]);
@@ -130,13 +130,12 @@ class BonusPotonganController extends Controller
 
     public function update_system(Request $request, $uuid)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nominal' => 'required|numeric',
         ]);
-
-        $bonuspotongan = BonusPotongan::where('uuid', $uuid)->firstOrFail();
+        $bonusPotongan = BonusPotongan::where('uuid', $uuid)->firstOrFail();
         $bonusPotongan->update($validated);
-
+        // dd($bonusPotongan);
         return redirect()->route('bonuspotongan.index')->with('success', 'Nominal berhasil diperbarui.');
     }
 
