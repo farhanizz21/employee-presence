@@ -1,9 +1,9 @@
 <style>
-    .nav-item.has-treeview > a .right {
+.nav-item.has-treeview>a .right {
     transition: transform 0.3s ease;
 }
 
-.nav-item.menu-open > a .right {
+.nav-item.menu-open>a .right {
     transform: rotate(-90deg);
 }
 </style>
@@ -50,19 +50,19 @@
                 <li class="nav-header">MASTER DATA</li>
 
                 <li
-    class="nav-item has-treeview {{ request()->is('user*','pegawai*','grup*','jabatan*','bonuspotongan*') ? 'menu-open' : '' }}">
-    
-    <a href="#"
-       class="nav-link {{ request()->is('user*','pegawai*','jabatan*','grup*','bonuspotongan*') ? 'active' : '' }}">
-       
-        <i class="nav-icon fas fa-database"></i>
-        <p>
-            Master Data 
-            <i class="right fas fa-angle-left"></i>
-        </p>
-    </a>
+                    class="nav-item has-treeview {{ request()->is('user*','pegawai*','grup*','jabatan*','bonuspotongan*','hutang*') ? 'menu-open' : '' }}">
 
-    <ul class="nav nav-treeview">
+                    <a href="#"
+                        class="nav-link {{ request()->is('user*','pegawai*','jabatan*','grup*','bonuspotongan*','hutang*') ? 'active' : '' }}">
+
+                        <i class="nav-icon fas fa-database"></i>
+                        <p>
+                            Master Data
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('user.index') }}"
                                 class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}">
@@ -100,6 +100,14 @@
                                 class="nav-link {{ request()->routeIs('bonuspotongan.*') ? 'active' : '' }}">
                                 <i class="fas fa-gift nav-icon"></i>
                                 <p>Bonus & Potongan</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('hutang.index') }}"
+                                class="nav-link {{ request()->routeIs('hutang.*') ? 'active' : '' }}">
+                                <i class="fas fa-money-bill nav-icon"></i>
+                                <p>Hutang</p>
                             </a>
                         </li>
                     </ul>

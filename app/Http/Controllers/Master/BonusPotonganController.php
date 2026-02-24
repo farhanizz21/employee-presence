@@ -56,6 +56,11 @@ class BonusPotonganController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->merge([
+            'nominal'  => str_replace('.', '', $request->nominal),
+        ]);
+        
         $validated = $request->validate([
 
             'jenis' => 'required|integer|in:1,2',
@@ -104,6 +109,10 @@ class BonusPotonganController extends Controller
      */
     public function update_non_system(Request $request, $uuid)
     {
+
+        $request->merge([
+            'nominal'  => str_replace('.', '', $request->nominal),
+        ]);
         // dd($request->all());
         $validated = $request->validate([
             'jenis' => 'required|integer|in:1,2',
@@ -130,11 +139,15 @@ class BonusPotonganController extends Controller
 
     public function update_system(Request $request, $uuid)
     {
-        $request->validate([
+        $request->merge([
+            'nominal'  => str_replace('.', '', $request->nominal),
+        ]);
+
+        $validated = $request->validate([
             'nominal' => 'required|numeric',
         ]);
 
-        $bonuspotongan = BonusPotongan::where('uuid', $uuid)->firstOrFail();
+        $bonusPotongan = BonusPotongan::where('uuid', $uuid)->firstOrFail();
         $bonusPotongan->update($validated);
 
         return redirect()->route('bonuspotongan.index')->with('success', 'Nominal berhasil diperbarui.');
