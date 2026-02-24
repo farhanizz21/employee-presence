@@ -76,7 +76,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" name="nominal" id="nominal" class="form-control"
-                                        value="{{ number_format($bonuspotongan->nominal, 0, ',', '.') }}" required>
+                                        value="{{ old('nominal') }}" required>
                                 </div>
                                 @error('nominal')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>

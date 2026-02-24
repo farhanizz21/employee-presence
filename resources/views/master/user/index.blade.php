@@ -48,6 +48,20 @@
                                 </div>
                             </div>
                         </div>
+                        {{-- 🔹 Deskripsi Penggunaan --}}
+                        <div class="card-body pt-3 pb-2">
+                            <div class="alert alert-light border small mb-0">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Informasi:</strong><br>
+                                <strong>Master User digunakan untuk mengelola akun dan hak akses pengguna pada sistem
+                                    ini.</strong>
+                                Pengguna dengan role <strong>Admin</strong> memiliki akses penuh ke seluruh menu dan
+                                fitur yang tersedia.
+                                Pengguna dengan role <strong>User</strong> hanya dapat mengakses menu
+                                <strong>Absensi</strong> dan <strong>Gajian</strong> sesuai dengan
+                                kewenangan yang diberikan.
+                            </div>
+                        </div>
                         <div class="card-body">
                             <form method="GET" action="{{ route('user.index') }}"
                                 class="row gy-2 gx-3 mb-3 align-items-center">
@@ -119,7 +133,7 @@
                                         @forelse($users as $user)
                                         <tr class="align-middle">
                                             <td>{{ $loop->iteration }}</td>
-                                           
+
                                             <td class="text-truncate">{{ $user->username }}</td>
                                             <td class="text-truncate">{{ $user->email }}</td>
                                             <td class="text-truncate">{{ $user->role_label }}</td>
@@ -172,14 +186,14 @@
 
     @endsection
 
-    
+
     <style>
-        .table thead th {
- 
-    background-color: #343a40 !important;
-    color: #fff;
-    
-    text-align: center;
-    vertical-align: middle;
-}
+    .table thead th {
+
+        background-color: #343a40 !important;
+        color: #fff;
+
+        text-align: center;
+        vertical-align: middle;
+    }
     </style>

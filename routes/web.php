@@ -10,6 +10,7 @@ use App\Http\Controllers\Master\PegawaiController;
 use App\Http\Controllers\Master\JabatanController;
 use App\Http\Controllers\Master\GrupController;
 use App\Http\Controllers\Master\BonusPotonganController;
+use App\Http\Controllers\Master\HutangController;
 
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\GajianController;
@@ -86,17 +87,18 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::resource('user', UserController::class);
-    Route::get('/pegawai/search', [PegawaiController::class, 'search'])->name('pegawai.search');
     Route::resource('pegawai', PegawaiController::class);
     Route::resource('jabatan', JabatanController::class);
     Route::resource('grup', GrupController::class);
-
-
+    Route::resource('hutang', HutangController::class);
+    
+    
     /*
     |--------------------------------------------------------------------------
     | Pegawai Routes
     |--------------------------------------------------------------------------
     */
+    Route::get('/pegawai/search', [PegawaiController::class, 'search'])->name('pegawai.search');
     Route::post('pegawai/{uuid}/update-status', [PegawaiController::class, 'updateStatus'])->name('pegawai.updateStatus');
     /*
     |--------------------------------------------------------------------------
@@ -116,5 +118,12 @@ Route::middleware('auth')->group(function () {
     Route::get('bonuspotongan/{uuid}/edit-non-system', [BonusPotonganController::class, 'edit_non_system'])->name('bonuspotongan.edit_non_system');
     Route::put('bonuspotongan/{uuid}/update-non-system', [BonusPotonganController::class, 'update_non_system'])->name('bonuspotongan.update_non_system');
     Route::resource('bonuspotongan', BonusPotonganController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hutang Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::post('hutang/{uuid}/update-status', [HutangController::class, 'updateStatus'])->name('hutang.updateStatus');
 
 });
