@@ -14,7 +14,8 @@ class Jabatan extends Model
     protected $fillable = [
         'uuid',
         'jabatan',
-        'gaji',
+        'gaji_pagi',
+        'gaji_malam',
         'harian',
         'bonus_uuid',
         'keterangan',

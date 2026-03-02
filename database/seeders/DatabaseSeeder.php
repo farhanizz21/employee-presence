@@ -27,7 +27,8 @@ class DatabaseSeeder extends Seeder
         Jabatan::updateOrCreate(
             [
                 'uuid' => Str::uuid(),
-                'gaji' => 100,
+                'gaji_pagi' => 100,
+                'gaji_malam' => 110,
                 'harian' => 2,
                 'jabatan' => 'Nge Ces Pagi',
                 'bonus_uuid' => NULL,
@@ -38,7 +39,8 @@ class DatabaseSeeder extends Seeder
         Jabatan::updateOrCreate(
             [
                 'uuid' => Str::uuid(),
-                'gaji' => 110,
+                'gaji_pagi' => 110,
+                'gaji_malam' => 110,
                 'harian' => 2,
                 'jabatan' => 'Nge Ces Malam',
                 'bonus_uuid' => NULL,
@@ -49,7 +51,8 @@ class DatabaseSeeder extends Seeder
         Jabatan::updateOrCreate(
             [
                 'uuid' => Str::uuid(),
-                'gaji' => 110,
+                'gaji_pagi' => 110,
+                'gaji_malam' => 110,
                 'harian' => 2,
                 'jabatan' => 'Nge Pan Pagi',
                 'bonus_uuid' => NULL,
@@ -60,7 +63,8 @@ class DatabaseSeeder extends Seeder
         Jabatan::updateOrCreate(
             [
                 'uuid' => Str::uuid(),
-                'gaji' => 110,
+                'gaji_pagi' => 110,
+                'gaji_malam' => 110,
                 'harian' => 2,
                 'jabatan' => 'Nge Pan Malam',
                 'bonus_uuid' => NULL,

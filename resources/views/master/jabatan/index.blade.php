@@ -73,8 +73,8 @@
                                     @endphp
                                     <thead>
                                         <tr>
-                                            <th style="width: 2%;">#</th>
-                                            <th>
+                                            <th rowspan="2" style="width: 2%;">#</th>
+                                            <th rowspan="2">
                                                 <a href="{{ route('jabatan.index', ['sort_by' => 'jabatan', 'sort_order' => $currentOrder] + request()->all()) }}"
                                                     class="text-light fw-bold">
                                                     Jabatan
@@ -89,7 +89,7 @@
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th style="width: 10%;">
+                                            <th rowspan="2" style="width: 10%;">
                                                 <form method="GET" action="{{ route('jabatan.index') }}">
                                                     <select name="filter_sistem" class="form-select form-select-sm"
                                                         onchange="this.form.submit()">
@@ -105,13 +105,17 @@
                                                     </select>
                                                 </form>
                                             </th>
-                                            <th>Gaji</th>
-                                            <th style="width: 10%;">Bonus</th>
-                                            <th>Keterangan</th>
-                                            <th style="width: 5%">
+                                            <th colspan="2" style="text-align:center; vertical-align:middle;">Gaji</th>
+                                            <th rowspan="2" style="width: 10%;">Bonus</th>
+                                            <th rowspan="2">Keterangan</th>
+                                            <th rowspan="2" style="width: 5%">
                                                 Status
                                             </th>
-                                            <th>Aksi</th>
+                                            <th rowspan="2">Aksi</th>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align:center; vertical-align:middle;">Gaji Pagi</th>
+                                            <th style="text-align:center; vertical-align:middle;">Gaji Malam</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -123,8 +127,11 @@
                                             <td class="text-truncate">
                                                 {{ $jabatan->harian_text }}
                                             </td>
-                                            <td class="text-truncate">Rp
-                                                {{ number_format($jabatan->gaji, 0, ',', '.') }}
+                                            <td class="text-truncate" style="max-width: 200px;">Rp
+                                                {{ number_format($jabatan->gaji_pagi, 0, ',', '.') }}
+                                            </td>
+                                            <td class="text-truncate" style="max-width: 200px;">Rp
+                                                {{ number_format($jabatan->gaji_malam, 0, ',', '.') }}
                                             </td>
                                             <td class="text-truncate">
                                                 {{ $jabatan->bonusPotongan->nama ?? '-' }}

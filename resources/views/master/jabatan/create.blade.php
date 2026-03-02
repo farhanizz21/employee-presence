@@ -60,17 +60,33 @@
                         <div class="form-group row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    Gaji <span class="text-danger">*</span>
+                                    Gaji Pagi <span class="text-danger">*</span>
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" name="gaji" id="gaji" class="form-control"
-                                        value="{{ old('gaji') }}" required>
+                                    <input type="text" name="gaji_pagi" id="gaji_pagi" class="form-control"
+                                        value="{{ old('gaji_pagi') }}" required>
                                 </div>
-                                @error('gaji')
+                                @error('gaji_pagi')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Gaji Malam <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" name="gaji_malam" id="gaji_malam" class="form-control"
+                                        value="{{ old('gaji_malam') }}" required>
+                                </div>
+                                @error('gaji_malam')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Pilihan Bonus</label>
                                 <select name="bonus" class="form-select @error('bonus') is-invalid @enderror">
@@ -124,18 +140,21 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Format input gaji sebagai currency
-    const gaji = document.getElementById('gaji');
+    const gajiPagi = document.getElementById('gaji_pagi');
+    const gajiMalam = document.getElementById('gaji_malam');
 
     function formatCurrency(input) {
         let value = input.value.replace(/\D/g, '');
         if (value) input.value = new Intl.NumberFormat('id-ID').format(value);
     }
 
-    gaji.addEventListener('input', () => formatCurrency(gaji));
+    gajiPagi.addEventListener('input', () => formatCurrency(gajiPagi));
+    gajiMalam.addEventListener('input', () => formatCurrency(gajiMalam));
 
     // Sebelum submit, hapus format currency agar tersimpan sebagai angka murni
     document.querySelector('form').addEventListener('submit', function() {
-        gaji.value = gaji.value.replace(/\D/g, '');
+        gajiPagi.value = gajiPagi.value.replace(/\D/g, '');
+        gajiMalam.value = gajiMalam.value.replace(/\D/g, '');
     });
 });
 </script>
