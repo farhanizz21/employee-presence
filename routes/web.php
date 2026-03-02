@@ -52,6 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/absensi/{uuid}/update-status', [AbsensiController::class, 'updateStatus'])->name('absensi.updateStatus');
     Route::get('/absensi/rekap', [AbsensiController::class, 'formRekap'])->name('absensi.rekap');
     Route::post('/absensi/rekap', [AbsensiController::class, 'simpanRekap'])->name('absensi.simpanRekap');
+    Route::get('/absensi/rekap2', [AbsensiController::class, 'formRekap'])->name('absensi.rekap2');
+    Route::post('/absensi/rekap2', [AbsensiController::class, 'simpanRekap'])->name('absensi.simpanRekap2');
     Route::get('/absensi/periode-by-bulan-tahun', [AbsensiController::class, 'getPeriodeByBulanTahun'])->name('absensi.periodeByBulanTahun');
     Route::get('/absensi/get-periode', [AbsensiController::class, 'getPeriodeByBulanTahun'])->name('absensi.getPeriode');
     Route::get('/absensi/get-data', [AbsensiController::class, 'getAbsensiData'])->name('absensi.getData');

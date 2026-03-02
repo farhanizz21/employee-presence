@@ -9,7 +9,7 @@
         <!--begin::Row-->
         <div class="row">
             <div class="col-sm-6">
-                <h3 class="mb-0">Tambah Data Absensi</h3>
+                <h3 class="mb-0">Tambah Data Absensi w</h3>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
@@ -74,98 +74,61 @@
                                 @csrf
                                 <input type="hidden" name="tanggal_mulai" value="{{ $tanggalMulai }}">
                                 <input type="hidden" name="tanggal_selesai" value="{{ $tanggalSelesai }}">
-
-                                <div class="table-responsive"
-                                    style="max-height: 75vh; overflow: auto; border-radius: 8px; border: 1px solid #dee2e6;">
-                                    <table
-                                        class="table table-bordered table-striped table-sm table-hover align-middle mb-0">
-                                        <thead class="table-dark">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead>
                                             <tr>
-                                                <th class="sticky-col first-col text-center align-middle">Nama Pegawai
-                                                </th>
-                                                <th class="sticky-col second-col text-center align-middle">Default Grup
-                                                </th>
-                                                <th
-                                                    class="sticky-col third-col text-center align-middle border-separator">
-                                                    Default Jobdesk</th>
+                                                <th style="width: 2%;">#</th>
+                                                <th>Nama Pegawai</th>
+                                                <th>Grup</th>
+                                                <th>Jabatan</th>
                                                 @foreach($dates as $tgl)
-                                                <th class="text-center align-middle" style="min-width:140px;">
-                                                    {{ \Carbon\Carbon::parse($tgl)->format('d M y') }}
-                                                </th>
+                                                <th>{{ \Carbon\Carbon::parse($tgl)->translatedFormat('d M') }}</th>
                                                 @endforeach
+                                                <th style="width: 13%">Aksi</th>
                                             </tr>
                                         </thead>
-
-
                                         <tbody>
                                             @foreach($pegawais as $pegawai)
-                                            <tr>
-                                                <td
-                                                    class="sticky-col first-col text-center align-middle fw-semibold bg-white">
-                                                    {{ $pegawai->nama }}
-                                                </td>
-                                                <td class="sticky-col second-col text-center align-middle bg-white">
-                                                    {{ $pegawai->grup->nama ?? '-' }}
-                                                </td>
-                                                <td
-                                                    class="sticky-col third-col text-center align-middle bg-white border-separator">
-                                                    {{ $pegawai->jabatan->jabatan ?? '-' }}
-                                                </td>
+                                            <tr class="align-middle">
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $pegawai->nama }}</td>
+                                                <td>{{ $pegawai->grup->nama ?? '-' }}</td>
+                                                <td>{{ $pegawai->jabatan->jabatan ?? '-' }}</td>
                                                 @foreach($dates as $tgl)
-                                                <td class="text-center align-middle">
-                                                    {{-- Select Status --}}
+                                                <td>
                                                     <select name="absensi[{{ $pegawai->uuid }}][{{ $tgl }}][status]"
                                                         class="form-select form-select-sm status-select"
                                                         style="font-size:0.75rem; padding:2px 4px;">
                                                         <option value="1">Masuk</option>
                                                         <option value="2">Alpha</option>
                                                         <option value="3">Izin</option>
-                                                        <option value="4">Lembur</option>
                                                     </select>
-
-                                                    {{-- Hidden shift & grup (default) --}}
-                                                    <input type="hidden"
-                                                        name="absensi[{{ $pegawai->uuid }}][{{ $tgl }}][shift]"
-                                                        class="shift-input" value="{{ $pegawai->grup_uuid }}">
-                                                    <input type="hidden"
-                                                        name="absensi[{{ $pegawai->uuid }}][{{ $tgl }}][jabatan_uuid]"
-                                                        class="jabatan-input" value="{{ $pegawai->jabatan->uuid }}">
-                                                    <input type="hidden"
-                                                        name="absensi[{{ $pegawai->uuid }}][{{ $tgl }}][grup_sb]"
-                                                        class="grupsb-input" value="{{ $pegawai->grup_sb ?? '-' }}">
-
-                                                    {{-- Placeholder untuk info perubahan (kosong dulu, diisi via JS jika berubah) --}}
-                                                    <div class="change-info mt-1 small text-muted"></div>
-
-                                                    {{-- Input Pencapaian (default show jika jabatan->harian == 2) --}}
                                                     <input type="number"
                                                         name="absensi[{{ $pegawai->uuid }}][{{ $tgl }}][pencapaian]"
-                                                        class="form-control form-control-sm pencapaian-input"
-                                                        style="margin-top:4px; font-size:0.75rem; padding:2px 4px; {{ $pegawai->jabatan->harian == 2 ? '' : 'display:none;' }}"
+                                                        class="form-control form-control-sm pencapaian-input mt-2"
+                                                        style="font-size:0.75rem; padding:2px 4px; {{ $pegawai->jabatan->harian == 2 ? '' : 'display:none;' }}"
                                                         placeholder="Pencapaian">
-
-                                                    {{-- Tombol modal --}}
+                                                </td>
+                                                @endforeach
+                                                <td>
                                                     <button type="button"
-                                                        class="btn btn-light btn-sm p-1  border-0 shadow-none edit-btn"
+                                                        class="btn btn-light btn-sm p-1 border-0 shadow-none edit-btn"
                                                         data-toggle="modal" data-target="#ubahModal"
                                                         data-pegawai="{{ $pegawai->uuid }}"
-                                                        data-nama="{{ $pegawai->nama }}" data-tanggal="{{ $tgl }}"
+                                                        data-nama="{{ $pegawai->nama }}" data-tanggal="{{ $dates[0] }}"
                                                         data-shift="{{ $pegawai->grup_uuid ?? '' }}"
                                                         data-grup="{{ $pegawai->grup_sb ?? '' }}"
                                                         data-jabatan="{{ $pegawai->jabatan_uuid ?? '' }}"
-                                                        data-status="{{ $absensi[$pegawai->uuid][$tgl]['status'] ?? '' }}"
                                                         title="Ubah Data">
                                                         <i class="fas fa-edit text-warning"></i>
                                                         <span class="text-secondary small">Edit</span>
                                                     </button>
-
                                                 </td>
-                                                @endforeach
                                             </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
-
                                     @if($pegawais->count())
                                     <div class="mt-3 d-flex justify-content-center">
                                         {{ $pegawais->withQueryString()->links('pagination::bootstrap-4') }}
@@ -184,7 +147,6 @@
                                 <a href="{{ route('absensi.index')}}" class="btn btn-danger shadow-sm mt-3 ms-3">
                                     <i class="fas fa-times fa-sm text-white-50"></i> Batal
                                 </a>
-
                             </form>
                         </div>
 
@@ -214,11 +176,9 @@
                                         <div class="form-group">
                                             <label>Status</label>
                                             <select id="modalStatus" class="form-control">
-                                                <option value="Alpha">Alpha</option>
-                                                <option value="Masuk">Masuk</option>
-                                                <option value="Izin">Izin</option>
-                                                <option value="Telat">Telat</option>
-                                                <option value="Lembur">Lembur</option>
+                                                <option value="1">Masuk</option>
+                                                <option value="2">Alpha</option>
+                                                <option value="3">Izin</option>
                                             </select>
                                         </div>
                                         <div class="form-group">

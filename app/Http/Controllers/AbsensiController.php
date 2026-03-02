@@ -76,7 +76,7 @@ class AbsensiController extends Controller
             $pegawais->where('grup_sb', $request->grup_sb);
         }
 
-        $pegawais = $pegawais->paginate(10)->withQueryString();
+        $pegawais = $pegawais->paginate(20)->withQueryString();
 
         $jabatans = Jabatan::all();
         $grups = Grup::all();
@@ -340,7 +340,7 @@ class AbsensiController extends Controller
         $pegawais->where('grup_sb', $request->grup_sb);
     }
 
-    $pegawais = $pegawais->paginate(10)->withQueryString();
+    $pegawais = $pegawais->paginate(20)->withQueryString();
     $jabatans = Jabatan::all();
     $grupSbs  = Grup::all();
 
@@ -356,7 +356,7 @@ class AbsensiController extends Controller
 
     $pegawaisByGrupSb = $pegawais->groupBy('grup_sb');
 
-    return view('absensi.rekap', compact(
+    return view('absensi.rekap2', compact(
         'pegawais',
         'jabatans',
         'pegawaisByGrupSb',

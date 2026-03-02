@@ -19,7 +19,7 @@ return new class extends Migration
             $table->uuid('grup_uuid'); // Optional foreign key to Grup
             $table->uuid('jabatan_uuid');
             $table->uuid('grup_sb');
-            $table->string('status', 20);
+            $table->integer('status'); // 1=masuk, 2=izin, 3=alpha, 4=lembur
             $table->integer('pencapaian')->nullable();
             $table->date('tgl_absen'); // Date of attendance
             $table->timestamps();
