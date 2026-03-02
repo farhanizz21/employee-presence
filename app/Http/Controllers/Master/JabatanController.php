@@ -54,13 +54,15 @@ class JabatanController extends Controller
     public function store(Request $request)
     {
         $request->merge([
-            'gaji'  => str_replace('.', '', $request->gaji),
+            'gaji_pagi'  => str_replace('.', '', $request->gaji_pagi),
+            'gaji_malam' => str_replace('.', '', $request->gaji_malam),
         ]);
 
         $validated = $request->validate([
             'jabatan'    => 'required|string',
             'harian'     => 'required|in:1,2',
-            'gaji'  => 'required|numeric',
+            'gaji_pagi'  => 'required|numeric',
+            'gaji_malam' => 'required|numeric',
             'bonus'    => 'nullable|uuid',
             'keterangan' => 'nullable|string',
         ]);
@@ -69,7 +71,8 @@ class JabatanController extends Controller
             'uuid'       => \Str::uuid(),
             'jabatan'    => $validated['jabatan'],
             'harian'     => $validated['harian'],
-            'gaji'  => $validated['gaji'],
+            'gaji_pagi'     => $validated['gaji_pagi'],
+            'gaji_malam'     => $validated['gaji_malam'],
             'bonus_uuid' => $validated['bonus'] ?? null,
             'keterangan'  => $validated['keterangan'],
         ]);
@@ -95,14 +98,17 @@ class JabatanController extends Controller
     public function update(Request $request, string $uuid)
     {
         $request->merge([
-            'gaji'  => str_replace('.', '', $request->gaji),
+            'gaji_pagi'  => str_replace('.', '', $request->gaji_pagi),
+            'gaji_malam' => str_replace('.', '', $request->gaji_malam),
         ]);
+
 
         $validated = $request->validate([
             'jabatan'    => 'required|string',
             'harian'     => 'required|in:1,2',
-            'gaji'  => 'required|numeric',
-            'bonus'    => 'nullable|uuid',
+            'bonus'    => 'nullable',
+            'gaji_pagi'  => 'required|numeric',
+            'gaji_malam' => 'required|numeric',
             'keterangan' => 'nullable|string',
         ]);
         
@@ -111,7 +117,8 @@ class JabatanController extends Controller
         $jabatan->update([
             'jabatan'    => $validated['jabatan'],
             'harian'     => $validated['harian'],
-            'gaji'       => $validated['gaji'],
+            'gaji_pagi'  => $validated['gaji_pagi'],
+            'gaji_malam' => $validated['gaji_malam'],
             'bonus_uuid' => $validated['bonus'] ?? null,
             'keterangan' => $validated['keterangan'],
         ]);
@@ -130,17 +137,20 @@ class JabatanController extends Controller
     public function update_system(Request $request, $uuid)
     {
         $request->merge([
-            'gaji'  => str_replace('.', '', $request->gaji),
+            'gaji_pagi'  => str_replace('.', '', $request->gaji_pagi),
+            'gaji_malam' => str_replace('.', '', $request->gaji_malam),
         ]);
 
         $validated = $request->validate([
-            'gaji'  => 'required|numeric',
+            'gaji_pagi'  => 'required|numeric',
+            'gaji_malam'  => 'required|numeric',
         ]);
         
         $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();
 
         $jabatan->update([
-            'gaji'       => $validated['gaji'],
+            'gaji_pagi'       => $validated['gaji_pagi'],
+            'gaji_malam'       => $validated['gaji_malam'],
         ]);
 
         return redirect()->route('jabatan.index')->with('success', 'Data berhasil diupdate!');

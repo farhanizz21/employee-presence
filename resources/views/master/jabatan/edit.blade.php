@@ -62,25 +62,42 @@
                                 @enderror
                             </div>
                         </div>
-
                         <div class="form-group row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">
-                                    Gaji <span class="text-danger">*</span>
+                                    Gaji Pagi <span class="text-danger">*</span>
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" name="gaji" id="gaji"
-                                        class="form-control @error('gaji') is-invalid @enderror"
-                                        value="{{ old('gaji', number_format($jabatan->gaji, 0, ',', '.')) }}" required>
+                                    <input type="text" name="gaji_pagi" id="gaji_pagi"
+                                        class="form-control @error('gaji_pagi') is-invalid @enderror"
+                                        value="{{ old('gaji_pagi', number_format($jabatan->gaji_pagi, 0, ',', '.')) }}"
+                                        required>
                                 </div>
-                                @error('gaji')
+                                @error('gaji_pagi')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Gaji Malam <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" name="gaji_malam" id="gaji_malam"
+                                        class="form-control @error('gaji_malam') is-invalid @enderror"
+                                        value="{{ old('gaji_malam', number_format($jabatan->gaji_malam, 0, ',', '.')) }}"
+                                        required>
+                                </div>
+                                @error('gaji_malam')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Pilihan Bonus <span class="text-danger">*</span></label>
-                                <select name="bonus" class="form-select @error('bonus') is-invalid @enderror" required>
+                                <select name="bonus" class="form-select @error('bonus') is-invalid @enderror">
                                     <option {{ !$jabatan->jabatan ? 'selected' : '' }}>Tidak ada bonus</option>
                                     @foreach ($BonusPotongans as $BonusPotongan)
                                     <option value="{{ $BonusPotongan->uuid }}"
