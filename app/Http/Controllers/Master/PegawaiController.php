@@ -46,6 +46,11 @@ class PegawaiController extends Controller
             $query->where('grup_uuid', $request->filter_grup);
         }
 
+        //filter shift
+        if ($request->filled('filter_shift')) {
+            $query->where('shift', $request->filter_shift);
+        }
+
         // Urutan
         if ($request->filled('sort_by') && in_array($request->sort_order, ['asc', 'desc'])) {
             $query->orderBy($request->sort_by, $request->sort_order);
@@ -75,6 +80,7 @@ class PegawaiController extends Controller
             'jabatan' => 'required|uuid',
             'telepon' => 'required|string',
             'grup' => 'required|uuid',
+            'shift' => 'required|string|in:1,2',
             'keterangan' => 'nullable|string|max:255',
         ]);
 
@@ -82,6 +88,7 @@ class PegawaiController extends Controller
             'uuid' => \Illuminate\Support\Str::uuid(), // Generate UUID otomatis
             'nama' => $validated['nama'],
             'grup_uuid' => $validated['grup'],
+            'shift' => $validated['shift'],
             'telepon' => $validated['telepon'],
             'jabatan_uuid' => $validated['jabatan'],
             'keterangan' => $validated['keterangan']
@@ -121,6 +128,7 @@ class PegawaiController extends Controller
         'telepon' => 'required|string|max:20',
         'jabatan' => 'required|exists:jabatans,uuid',
         'grup' => 'required|exists:grups,uuid',
+        'shift' => 'required|string|in:1,2',
         'keterangan' => 'nullable|string|max:255',
     ]);
 
@@ -129,6 +137,7 @@ class PegawaiController extends Controller
         'nama' => $validated['nama'],
         'telepon' => $validated['telepon'],
         'grup_uuid' => $validated['grup'],
+        'shift' => $validated['shift'],
         'jabatan_uuid' => $validated['jabatan'],
         'keterangan' => $validated['keterangan'] ?? null,
     ]);

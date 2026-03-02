@@ -17,6 +17,7 @@ class Pegawai extends Model
         'nama',
         'telepon',
         'grup_uuid',
+        'shift',
         'jabatan_uuid',
         'keterangan',
         'status',
@@ -28,6 +29,15 @@ class Pegawai extends Model
     public function getRouteKeyName()
     {
         return 'uuid';
+    }
+
+    public function getShiftLabelAttribute()
+    {
+        return match ($this->shift) {
+            1 => 'Pagi',
+            2 => 'Malam',
+            default => 'Tidak diketahui',
+        };
     }
 
     public function user()

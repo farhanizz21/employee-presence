@@ -91,6 +91,23 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">Shift <span class="text-danger">*</span></label>
+                                <select name="shift" class="form-select @error('shift') is-invalid @enderror" required>
+                                    <option disabled {{ !$pegawai->shift ? 'selected' : '' }}>Pilih Shift</option>
+                                    <option value="1" {{ old('shift', $pegawai->shift) == '1' ? 'selected' : '' }}>Pagi
+                                    </option>
+                                    <option value="2" {{ old('shift', $pegawai->shift) == '2' ? 'selected' : '' }}>Malam
+                                    </option>
+                                </select>
+                                @error('grup')
+                                <div class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Telepon <span class="text-danger">
                                         *</span></label>
                                 <input type="number" name="telepon"

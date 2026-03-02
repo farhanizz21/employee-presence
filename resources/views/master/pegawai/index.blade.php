@@ -111,6 +111,26 @@
                                                         value="{{ request('sort_order') }}">
                                                 </form>
                                             </th>
+                                            <th>
+                                                <form method="GET" action="{{ route('pegawai.index') }}">
+                                                    <select name="filter_shift" class="form-select form-select-sm"
+                                                        onchange="this.form.submit()">
+                                                        <option value="">Semua Shift</option>
+                                                        <option value="1"
+                                                            {{ request('filter_shift')=='1' ? 'selected' : '' }}>Pagi
+                                                        </option>
+                                                        <option value="2"
+                                                            {{ request('filter_shift')=='2' ? 'selected' : '' }}>
+                                                            Malam</option>
+                                                    </select>
+
+                                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                                    <input type="hidden" name="sort_by"
+                                                        value="{{ request('sort_by') }}">
+                                                    <input type="hidden" name="sort_order"
+                                                        value="{{ request('sort_order') }}">
+                                                </form>
+                                            </th>
                                             <th style="width: 15%">
                                                 <form method="GET" action="{{ route('pegawai.index') }}">
                                                     <select name="filter_grup" class="form-select form-select-sm"
@@ -147,6 +167,7 @@
                                                 {{ $pegawai->nama }}
                                             </td>
                                             <td class="text-truncate">{{ $pegawai->jabatan->jabatan }}</td>
+                                            <td class="text-truncate">{{ $pegawai->shift_label }}</td>
                                             <td class="text-truncate">{{ $pegawai->grup->nama }}</td>
                                             <td class="text-truncate">{{ $pegawai->telepon }}</td>
                                             <td class="text-truncate">{{ $pegawai->keterangan ?? '-' }}</td>

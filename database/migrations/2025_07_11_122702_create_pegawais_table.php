@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nama', 100);
             $table->string('telepon');
             $table->uuid('grup_uuid');
+            $table->integer('shift');
             $table->uuid('jabatan_uuid');
             $table->string('alamat', 255)->nullable();
             $table->boolean('status')->default(true);

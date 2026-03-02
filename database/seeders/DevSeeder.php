@@ -29,9 +29,10 @@ class DevSeeder extends Seeder
         Jabatan::updateOrCreate(
             [
                 'uuid' => Str::uuid(),
-                'gaji' => 100,
+                'gaji_pagi' => 100,
+                'gaji_malam' => 105,
                 'harian' => 2,
-                'jabatan' => 'Nge Ces Pagi',
+                'jabatan' => 'Nge Ces',
                 'bonus_uuid' => NULL,
                 'keterangan' => 'Perhitungan : ',
                 'is_system' => true
@@ -40,31 +41,10 @@ class DevSeeder extends Seeder
         Jabatan::updateOrCreate(
             [
                 'uuid' => Str::uuid(),
-                'gaji' => 110,
+                'gaji_pagi' => 110,
+                'gaji_malam' => 115,
                 'harian' => 2,
-                'jabatan' => 'Nge Ces Malam',
-                'bonus_uuid' => NULL,
-                'keterangan' => 'Perhitungan : ',
-                'is_system' => true
-            ]
-        );
-        Jabatan::updateOrCreate(
-            [
-                'uuid' => Str::uuid(),
-                'gaji' => 110,
-                'harian' => 2,
-                'jabatan' => 'Nge Pan Pagi',
-                'bonus_uuid' => NULL,
-                'keterangan' => 'Perhitungan : ',
-                'is_system' => true
-            ]
-        );
-        Jabatan::updateOrCreate(
-            [
-                'uuid' => Str::uuid(),
-                'gaji' => 110,
-                'harian' => 2,
-                'jabatan' => 'Nge Pan Malam',
+                'jabatan' => 'Nge Pan',
                 'bonus_uuid' => NULL,
                 'keterangan' => 'Perhitungan : ',
                 'is_system' => true
@@ -74,24 +54,25 @@ class DevSeeder extends Seeder
         Jabatan::updateOrCreate(
             [
                 'uuid' => Str::uuid(),
-                'gaji' => 110,
+                'gaji_pagi' => 4500,
+                'gaji_malam' => 5000,
                 'harian' => 1,
-                'jabatan' => 'Kantor Pagi',
+                'jabatan' => 'Kantor',
                 'bonus_uuid' => NULL,
                 'keterangan' => 'Perhitungan : ',
-                'is_system' => true
+                'is_system' => false
             ]
         );
-
         Jabatan::updateOrCreate(
             [
                 'uuid' => Str::uuid(),
-                'gaji' => 110,
-                'harian' => 1,
-                'jabatan' => 'Kantor Malam',
+                'gaji_pagi' => 110,
+                'gaji_malam' => 115,
+                'harian' => 2,
+                'jabatan' => 'Tukang',
                 'bonus_uuid' => NULL,
                 'keterangan' => 'Perhitungan : ',
-                'is_system' => true
+                'is_system' => false
             ]
         );
         BonusPotongan::updateOrCreate(
@@ -167,6 +148,7 @@ class DevSeeder extends Seeder
                     'uuid' => Str::uuid(),
                     'telepon' => '08123' . rand(100000, 999999),
                     'grup_uuid' => $grup->uuid,
+                    'shift' => rand(1,2),
                     'jabatan_uuid' => $jabatan->uuid,
                     'status' => true,
                     'keterangan' => '-'
