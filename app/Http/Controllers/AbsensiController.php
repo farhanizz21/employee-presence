@@ -121,7 +121,7 @@ class AbsensiController extends Controller
         // Validasi
         $validated = $request->validate([
             'pegawai_uuid'   => 'required|array',
-            'grup_sb'        => 'required|string',
+            'shift'        => 'required',
             'jabatan_uuid'   => 'required|array',
             'pegawai_uuid.*' => 'required|uuid|exists:pegawais,uuid',
             'jabatan_uuid.*' => 'nullable|uuid|exists:jabatans,uuid',
@@ -134,7 +134,7 @@ class AbsensiController extends Controller
         \Log::info('Data Absensi Disimpan', [
             'pegawai_uuid' => $validated['pegawai_uuid'],
             'jabatan_uuid' => $validated['jabatan_uuid'],
-            'grup_sb'    => $validated['grup_sb'],
+            'shift'    => $validated['shift'],
             'status'       => $validated['status'],
             'tgl_absen'    => $validated['tgl_absen'],
         ]);
@@ -157,7 +157,7 @@ class AbsensiController extends Controller
                 'jabatan_uuid' => $validated['jabatan_uuid'][$index] ?? null,
                 'grup_uuid'    => $validated['grup_uuid'],
                 'status'       => $validated['status'],
-                'grup_sb'      => $validated['grup_sb'],
+                'shift'      => $validated['shift'],
                 'tgl_absen'    => $validated['tgl_absen'],
             ]);
         }
@@ -318,7 +318,7 @@ class AbsensiController extends Controller
         }
     }
 
-    // ✅ DEFAULT DATE HANYA UNTUK TAMPILAN
+    // ✅ DEFAULT DATE HANYA UNTUK TAMPIL
     $tanggalMulai   = $tanggalMulai ?? now()->toDateString();
     $tanggalSelesai = $tanggalSelesai ?? now()->toDateString();
 
@@ -333,16 +333,28 @@ class AbsensiController extends Controller
     }
 
     if ($request->filled('shift')) {
-        $pegawais->where('grup_uuid', $request->shift);
+        $pegawais->where('shift', $request->shift);
     }
 
-    if ($request->filled('grup_sb')) {
-        $pegawais->where('grup_sb', $request->grup_sb);
+    // Filter by grup_uuid (Grup)
+    if ($request->filled('grup_uuid')) {
+        $pegawais->where('grup_uuid', $request->grup_uuid);
+    }
+
+    // Filter by jabatan_uuid (Jabatan)
+    if ($request->filled('jabatan_uuid')) {
+        $pegawais->where('jabatan_uuid', $request->jabatan_uuid);
+    }
+
+    // Filter by shift (Shift)
+    if ($request->filled('shift')) {
+        $pegawais->where('shift', $request->shift);
     }
 
     $pegawais = $pegawais->paginate(20)->withQueryString();
     $jabatans = Jabatan::all();
     $grupSbs  = Grup::all();
+    $grups    = Grup::all();
 
     // generate range tanggal
     $dates = [];
@@ -362,6 +374,7 @@ class AbsensiController extends Controller
         'pegawaisByGrupSb',
         'dates',
         'grupSbs',
+        'grups',
         'tanggalMulai',
         'tanggalSelesai'
     ));
@@ -383,6 +396,7 @@ class AbsensiController extends Controller
         // Loop input absensi pegawai
         foreach ($request->input('absensi', []) as $pegawaiUuid => $tanggalData) {
             $pegawai = \App\Models\Master\Pegawai::find($pegawaiUuid);
+            // dd($request->all());
 
             foreach ($tanggalData as $tanggal => $data) {
                 Absensi::updateOrCreate(
@@ -394,14 +408,15 @@ class AbsensiController extends Controller
                     [
                         'uuid'      => Str::uuid()->toString(),
                         'status'    => $data['status'] ?? 'Alpha',
-                        'grup_uuid'     => $data['shift'],
+                        'grup_uuid'     => $data['grup_uuid'],
                         'jabatan_uuid' => $data['jabatan_uuid'],
-                        'grup_sb' => $data['grup_sb'],
+                        'shift' => $data['shift'],
                         'pencapaian' => $data['pencapaian'] ?? null,
                         'periode_uuid' => $periode->uuid,
 
                     ]
                 );
+                // dd($request->input('absensi'));
             }
         }
 
