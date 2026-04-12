@@ -191,6 +191,11 @@
                                         </thead>
                                         <tbody>
                                             @forelse($pegawais as $pegawai)
+                                            @php
+                                            $absensi = $existingAbsensi->get($pegawai->uuid);
+                                            $status = $absensi ? $absensi->status : 1;
+                                            $pencapaian = $absensi ? $absensi->pencapaian : '';
+                                            @endphp
                                             <tr class="align-middle">
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td class="text-truncate">
@@ -204,25 +209,29 @@
                                                 </td>
                                                 <td>
                                                     <div class="btn-group btn-group-sm status-group">
-                                                        <button type="button" class="btn btn-outline-success active"
+                                                        <button type="button"
+                                                            class="btn {{ $status == 1 ? 'btn-success active' : 'btn-outline-success' }}"
                                                             data-value="1">
                                                             Masuk
                                                         </button>
-                                                        <button type="button" class="btn btn-outline-warning"
+                                                        <button type="button"
+                                                            class="btn {{ $status == 2 ? 'btn-warning active' : 'btn-outline-warning' }}"
                                                             data-value="2">
                                                             Izin
                                                         </button>
-                                                        <button type="button" class="btn btn-outline-danger"
+                                                        <button type="button"
+                                                            class="btn {{ $status == 3 ? 'btn-danger active' : 'btn-outline-danger' }}"
                                                             data-value="3">
                                                             Alpha
                                                         </button>
                                                     </div>
                                                     <input type="hidden" name="data[{{ $pegawai->uuid }}][status]"
-                                                        class="status-input" value="1">
+                                                        class="status-input" value="{{ $status }}">
                                                 </td>
                                                 <td>
                                                     <input type="number" name="data[{{ $pegawai->uuid }}][pencapaian]"
-                                                        class="form-control" placeholder="Pencapaian">
+                                                        class="form-control" placeholder="Pencapaian"
+                                                        value="{{ $pencapaian }}">
                                                 </td>
                                                 <td>
                                                     <!-- <button type="button" class="btn btn-sm btn-warning edit-btn"
@@ -237,6 +246,77 @@
                                                     </button>
                                                 </td>
                                             </tr>
+
+                                            {{-- 🔥 AUTO RENDER LONG SHIFT JIKA SUDAH ADA DATA --}}
+                                            @php
+                                            $longShift = $existingAbsensi->get($pegawai->uuid . '_long');
+                                            @endphp
+
+                                            @if($longShift)
+                                            @php
+                                            $lsStatus = $longShift->status;
+                                            $lsPencapaian = $longShift->pencapaian;
+                                            $lsShift = $longShift->shift;
+                                            $lsShiftLabel = $lsShift == 1 ? 'Pagi' : 'Malam';
+                                            @endphp
+                                            <tr class="align-middle longshift-row"
+                                                data-pegawai-uuid="{{ $pegawai->uuid }}">
+                                                <td>#</td>
+                                                <td class="text-truncate">
+                                                    <span class="badge bg-success ms-1">Long Shift</span>
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>{{ $lsShiftLabel }}</td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm status-group">
+                                                        <button type="button"
+                                                            class="btn {{ $lsStatus == 1 ? 'btn-success active' : 'btn-outline-success' }}"
+                                                            data-value="1">Masuk</button>
+                                                        <button type="button"
+                                                            class="btn {{ $lsStatus == 2 ? 'btn-warning active' : 'btn-outline-warning' }}"
+                                                            data-value="2">Izin</button>
+                                                        <button type="button"
+                                                            class="btn {{ $lsStatus == 3 ? 'btn-danger active' : 'btn-outline-danger' }}"
+                                                            data-value="3">Alpha</button>
+                                                    </div>
+
+                                                    <input type="hidden"
+                                                        name="data[{{ $pegawai->uuid }}_long][is_lembur]" value="1">
+                                                    <input type="hidden" name="data[{{ $pegawai->uuid }}_long][shift]"
+                                                        value="{{ $lsShift }}">
+                                                    <input type="hidden" class="status-input"
+                                                        name="data[{{ $pegawai->uuid }}_long][status]"
+                                                        value="{{ $lsStatus }}">
+                                                </td>
+                                                <td>
+                                                    <input type="number"
+                                                        name="data[{{ $pegawai->uuid }}_long][pencapaian]"
+                                                        class="form-control" placeholder="Pencapaian"
+                                                        value="{{ $lsPencapaian }}">
+                                                </td>
+                                                <td>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-danger remove-longshift-btn">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+
+                                            <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                // Sembunyikan tombol longshift pada baris asli
+                                                const originalRow = document.querySelector(
+                                                    '[data-pegawai="{{ $pegawai->uuid }}"]').closest('tr');
+                                                const originalLongshiftBtn = originalRow.querySelector(
+                                                    '.longshift-btn');
+                                                if (originalLongshiftBtn) {
+                                                    originalLongshiftBtn.style.display = 'none';
+                                                }
+                                            });
+                                            </script>
+                                            @endif
+
                                             @empty
                                             <tr>
                                                 <td colspan="8" class="text-center">No Data

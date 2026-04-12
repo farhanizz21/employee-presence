@@ -56,12 +56,25 @@ class AbsensiUpdateController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
+        $tanggalAbsen = $request->input('tanggal_absen', date('Y-m-d'));
         $perPage = $request->input('per_page', 10);
         $pegawais = $query->paginate($perPage)->appends($request->all());
 
+        // Get existing absensi data for selected date
+        $existingAbsensi = Absensi::where('tgl_absen', $tanggalAbsen)
+            ->get()
+            ->keyBy(function ($item) {
+                $key = $item->pegawai_uuid;
+                if ($item->is_lembur) {
+                    $key .= '_long';
+                }
+                return $key;
+            });
+
         $jabatans = Jabatan::all();
         $grups = Grup::all();
-        return view('absensiUpdate.create', compact('pegawais', 'jabatans', 'grups'));
+        // dd($existingAbsensi);
+        return view('absensiUpdate.create', compact('pegawais', 'jabatans', 'grups', 'existingAbsensi', 'tanggalAbsen'));
     }
 
     public function store(Request $request)
