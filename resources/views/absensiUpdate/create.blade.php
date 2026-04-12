@@ -55,46 +55,46 @@
                         <div class="card-body">
                             <form method="GET" action="{{ route('absensiUpdate.create') }}"
                                 class="row mb-3 align-items-end g-2">
-                                <div class="row g-2 mb-2">
+                                <div class="p-3 mb-3 rounded bg-light border">
 
-                                    <div class="col-md-3">
-                                        <label class="form-label fw-bold">
-                                            <i class="fas fa-calendar-alt me-1"> </i> Tanggal Absensi </label>
-                                        <div class="input-group">
-                                            <button type="button" class="btn btn-outline-secondary"
-                                                onclick="changeDate(-1)">
-                                                <i class="fas fa-chevron-left"></i>
-                                            </button>
-                                            <input type="date" name="tanggal_absen" id="tanggal_absen"
-                                                class="form-control"
-                                                value="{{ request('tanggal_absen') ?? date('Y-m-d') }}"
-                                                onchange="this.form.submit()">
-                                            <button type="button" class="btn btn-outline-secondary"
-                                                onclick="changeDate(1)">
-                                                <i class="fas fa-chevron-right"></i>
-                                            </button>
+                                    <div class="d-flex justify-content-between align-items-center">
+
+                                        <div>
+                                            <small class="text-muted d-block">Tanggal Absensi</small>
+
+                                            <div class="d-flex align-items-center gap-2">
+                                                <button class="btn btn-outline-secondary btn-sm"
+                                                    onclick="changeDate(-1)">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </button>
+
+                                                <input type="date" name="tanggal_absen" id="tanggal_absen"
+                                                    class="form-control form-control-sm"
+                                                    value="{{ request('tanggal_absen') ?? date('Y-m-d') }}"
+                                                    onchange="this.form.submit()">
+
+                                                <button class="btn btn-outline-secondary btn-sm"
+                                                    onclick="changeDate(1)">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <!-- PER PAGE -->
-                                    <div class="col-md-1">
-                                        <label class="form-label">Per Page</label>
-                                        <select name="per_page" class="form-select">
-                                            <option value="10" {{ request('per_page')=='10' ? 'selected' : '' }}>10
-                                            </option>
-                                            <option value="25" {{ request('per_page')=='25' ? 'selected' : '' }}>25
-                                            </option>
-                                            <option value="50" {{ request('per_page')=='50' ? 'selected' : '' }}>50
-                                            </option>
-                                            <option value="100" {{ request('per_page')=='100' ? 'selected' : '' }}>
-                                                100
-                                            </option>
-                                        </select>
+                                        <div>
+                                            <small class="text-muted d-block">Per Page</small>
+                                            <select name="per_page" class="form-select form-select-sm"
+                                                onchange="this.form.submit()">
+                                                <option value="10">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                            </select>
+                                        </div>
+
                                     </div>
                                 </div>
 
                                 <!-- 🔹 BARIS 2 -->
-                                <div class="row g-2">
+                                <div class="row g-2 align-items-end">
 
                                     <!-- SEARCH -->
                                     <div class="col-md-3">
@@ -538,6 +538,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const originalRow = this.closest('tr');
             addLongShiftRow(pegawaiData, originalRow);
+        });
+    });
+
+    // 🔥 SETUP EVENT LISTENER UNTUK TOMBOL REMOVE LONGSHIFT YANG SUDAH ADA DARI SERVER
+    document.querySelectorAll(".remove-longshift-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const longshiftRow = this.closest('tr.longshift-row');
+            const pegawaiUuid = longshiftRow.dataset.pegawaiUuid;
+
+            // Hapus baris longshift
+            longshiftRow.remove();
+
+            // Tampilkan kembali tombol longshift pada baris asli
+            const originalLongshiftBtn = document.querySelector(
+                `.longshift-btn[data-pegawai="${pegawaiUuid}"]`);
+            if (originalLongshiftBtn) {
+                originalLongshiftBtn.style.display = 'inline-block';
+            }
+
+            updateRowNumbers();
         });
     });
 
