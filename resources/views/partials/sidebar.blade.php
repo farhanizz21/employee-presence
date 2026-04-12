@@ -36,6 +36,13 @@
                         <p>Absensi</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('absensiUpdate.index') }}"
+                        class="nav-link {{ request()->routeIs('absensiUUpdate.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-clipboard-check"></i>
+                        <p>Absensi Update</p>
+                    </a>
+                </li>
 
                 {{-- Gajian --}}
                 <li class="nav-item">
