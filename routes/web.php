@@ -13,6 +13,7 @@ use App\Http\Controllers\Master\BonusPotonganController;
 use App\Http\Controllers\Master\HutangController;
 
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AbsensiUpdateController;
 use App\Http\Controllers\GajianController;
 use App\Http\Controllers\PayrollController;
 
@@ -57,6 +58,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/absensi/periode-by-bulan-tahun', [AbsensiController::class, 'getPeriodeByBulanTahun'])->name('absensi.periodeByBulanTahun');
     Route::get('/absensi/get-periode', [AbsensiController::class, 'getPeriodeByBulanTahun'])->name('absensi.getPeriode');
     Route::get('/absensi/get-data', [AbsensiController::class, 'getAbsensiData'])->name('absensi.getData');
+
+    /*
+    |--------------------------------------------------------------------------
+    | AbsensiUpdate Routes
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/absensiUpdate', [AbsensiUpdateController::class, 'index'])->name('absensiUpdate.index');
+    Route::get('/absensiUpdate/create', [AbsensiUpdateController::class, 'create'])->name('absensiUpdate.create');
+    Route::post('/absensiUpdate', [AbsensiUpdateController::class, 'store'])->name('absensiUpdate.store');
 
     /*
     |--------------------------------------------------------------------------
