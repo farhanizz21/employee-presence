@@ -14,21 +14,19 @@ return new class extends Migration
         Schema::create('gajians', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->uuid('pegawai_uuid');
-            $table->uuid('jabatan_uuid');
-            $table->integer('gaji_pokok');
-            $table->integer('bonus_kehadiran');
-            $table->integer('bonus_lembur');
-            $table->integer('total_potongan');
-            $table->integer('total_gaji');
-            $table->integer('jumlah_hadir');  
-            $table->integer('jumlah_lembur');
-            $table->integer('jumlah_telat');
-            $table->integer('jumlah_alpha');
-            $table->text('keterangan')->nullable();
             $table->uuid('periode_uuid');
-            $table->date('periode_mulai')->nullable();
-            $table->date('periode_selesai')->nullable();
+            $table->uuid('pegawai_uuid');
+
+            $table->integer('hadir')->default(0);
+            $table->integer('izin')->default(0);
+            $table->integer('alpha')->default(0);
+
+            $table->decimal('gaji_pokok', 12, 2)->default(0);
+            $table->decimal('bonus', 12, 2)->default(0);
+            $table->decimal('potongan', 12, 2)->default(0);
+
+            $table->decimal('gaji_bersih', 12, 2)->default(0);
+
             $table->timestamps();
             $table->softDeletes();
         });
