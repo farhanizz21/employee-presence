@@ -22,19 +22,19 @@ class PegawaiController extends Controller
 
         // Pencarian
         if ($request->filled('search')) {
-        $search = $request->search;
+            $search = $request->search;
 
-        $query->where(function ($q) use ($search) {
-            // Kolom langsung dari tabel pegawai
-            $q->where('nama', 'like', "%$search%")
-              ->orWhere('alamat', 'like', "%$search%");
-            
-            // Kolom relasi: jabatan
-            $q->orWhereHas('jabatan', function ($q2) use ($search) {
-                $q2->where('jabatan', 'like', "%$search%");
+            $query->where(function ($q) use ($search) {
+                // Kolom langsung dari tabel pegawai
+                $q->where('nama', 'like', "%$search%")
+                ->orWhere('alamat', 'like', "%$search%");
+                
+                // Kolom relasi: jabatan
+                $q->orWhereHas('jabatan', function ($q2) use ($search) {
+                    $q2->where('jabatan', 'like', "%$search%");
+                });
             });
-        });
-    }
+        }
 
         // Filter Jabatan
         if ($request->filled('filter_jabatan')) {

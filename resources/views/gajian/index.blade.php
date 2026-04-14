@@ -88,7 +88,6 @@
                                     <a href="{{ route('gajian.show', $periode->uuid) }}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-eye"></i> Review
                                     </a>
-
                                     <button class="btn btn-success btn-sm">
                                         <i class="fas fa-lock"></i> Final
                                     </button>
@@ -96,9 +95,10 @@
 
                                     {{-- FINAL --}}
                                     @if($periode->status == 'final')
-                                    <button class="btn btn-secondary btn-sm">
+                                    <a href="{{ route('gajian.show', $periode->uuid) }}"
+                                        class="btn btn-secondary btn-sm">
                                         <i class="fas fa-file-invoice"></i> Detail
-                                    </button>
+                                    </a>
                                     @endif
 
                                 </td>

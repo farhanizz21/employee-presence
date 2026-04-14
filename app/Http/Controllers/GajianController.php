@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
 use App\Models\Gajian;
 use App\Models\Master\Pegawai;
 use App\Models\Master\Jabatan;
+use App\Models\Master\Grup;
+
 use App\Models\Master\BonusPotongan;
 use App\Models\Absensi;
 use App\Models\GajianPeriode;
@@ -106,9 +108,7 @@ class GajianController extends Controller
 
                 $potongan += $hutang;
                 $gajiBersih = $gajiPokok - $potongan;
-
-                // dd($pegawai->nama, $tarif, $hadir, $izin, $alpha, $gajiPokok, $potongan, $gajiBersih);
-// dd($absensis->pluck('status'));
+                
                 Gajian::create([
                     'uuid' => Str::uuid(),
                     'periode_uuid' => $periode->uuid,
@@ -144,15 +144,62 @@ class GajianController extends Controller
         }
     }
 
-    public function show($uuid)
+    public function show($uuid, Request $request)
     {
         $periode = GajianPeriode::where('uuid', $uuid)->firstOrFail();
 
-        $gajians = Gajian::with('pegawai')
-            ->where('periode_uuid', $uuid)
-            ->get();
+        // 🔥 pakai query builder, jangan langsung get()
+        $query = Gajian::with(['pegawai.jabatan'])
+            ->where('periode_uuid', $uuid);
 
-        return view('gajian.show', compact('periode', 'gajians'));
+        // 🔹 Filter grup
+        if ($request->filled('filter_grup')) {
+            $query->whereHas('pegawai', function ($q) use ($request) {
+                $q->where('grup_uuid', $request->filter_grup);
+            });
+        }
+
+        // 🔹 Filter jabatan
+        if ($request->filled('filter_jabatan')) {
+            $query->whereHas('pegawai', function ($q) use ($request) {
+                $q->where('jabatan_uuid', $request->filter_jabatan);
+            });
+        }
+
+        $gajians = $query->get();
+
+        $jabatans = Jabatan::all();
+        $grups = Grup::all();
+
+        return view('gajian.show', compact('periode', 'gajians', 'jabatans', 'grups'));
+    }
+
+    public function updateBonusPotongan(Request $request)
+    {
+        $request->validate([
+            'uuid' => 'required|exists:gajians,uuid',
+            'bonus' => 'nullable|numeric',
+            'potongan' => 'nullable|numeric',
+        ]);
+
+        $gaji = Gajian::where('uuid', $request->uuid)->firstOrFail();
+
+        // ❗ proteksi: tidak boleh edit kalau final
+        $periode = GajianPeriode::where('uuid', $gaji->periode_uuid)->first();
+
+        if ($periode->status == 'final') {
+            return response()->json(['message' => 'Data sudah final'], 403);
+        }
+
+        $gaji->bonus = $request->bonus ?? 0;
+        $gaji->potongan = $request->potongan ?? 0;
+
+        // 🔥 hitung ulang
+        $gaji->gaji_bersih = $gaji->gaji_pokok + $gaji->bonus - $gaji->potongan;
+
+        $gaji->save();
+
+        return response()->json(['message' => 'Berhasil update']);
     }
 
     public function final($uuid)
@@ -169,5 +216,40 @@ class GajianController extends Controller
 
         return redirect()->route('gajian.index')
             ->with('success', 'Gajian berhasil difinalisasi & dikunci');
+    }
+
+    public function detail($periodeUuid, $pegawaiUuid)
+    {
+        $periode = GajianPeriode::where('uuid', $periodeUuid)->firstOrFail();
+
+        $gaji = Gajian::with('pegawai')
+            ->where('periode_uuid', $periodeUuid)
+            ->where('pegawai_uuid', $pegawaiUuid)
+            ->firstOrFail();
+
+        return view('gajian.detail', compact('periode', 'gaji'));
+    }
+
+    public function pdf($periodeUuid, $pegawaiUuid)
+    {
+        $periode = GajianPeriode::where('uuid', $periodeUuid)->firstOrFail();
+
+        $gaji = Gajian::with('pegawai')
+            ->where('periode_uuid', $periodeUuid)
+            ->where('pegawai_uuid', $pegawaiUuid)
+            ->firstOrFail();
+
+        // 🔹 format periode
+        $mulai = Carbon::parse($periode->tanggal_mulai)->format('dMy');
+        $selesai = Carbon::parse($periode->tanggal_selesai)->format('dMy');
+
+        // 🔹 bersihkan nama pegawai (hindari spasi)
+        $nama = str_replace(' ', '-', $gaji->pegawai->nama);
+
+        $fileName = "slip-{$nama}-{$mulai}-{$selesai}.pdf";
+
+        $pdf = Pdf::loadView('gajian.pdf', compact('periode', 'gaji'));
+
+        return $pdf->stream($fileName);
     }
 }

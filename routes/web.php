@@ -82,6 +82,13 @@ Route::middleware('auth')->group(function () {
             ->name('show');
         Route::post('/{uuid}/final', [GajianController::class, 'final'])
             ->name('final');
+        Route::get('/{periode}/{pegawai}', [GajianController::class, 'detail'])
+            ->name('detail');
+
+        Route::get('/{periode}/{pegawai}/pdf', [GajianController::class, 'pdf'])
+            ->name('pdf');
+        Route::post('/update-bonus-potongan', [GajianController::class, 'updateBonusPotongan'])
+            ->name('updateBonusPotongan');
     });
 
     /*
