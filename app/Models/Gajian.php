@@ -14,19 +14,18 @@ class Gajian extends Model
 
     protected $fillable = [
         'uuid',
-        'pegawai_uuid',
-        'jabatan_uuid',
-        'gaji_pokok',
-        'bonus_kehadiran',
-        'bonus_lembur',
-        'total_potongan',
-        'total_gaji',
-        'jumlah_hadir',
-        'jumlah_lembur',
-        'jumlah_telat',
         'periode_uuid',
-        'jumlah_alpha',
-        'keterangan',
+        'pegawai_uuid',
+        
+        'hadir',
+        'izin',
+        'alpha',
+
+        'gaji_pokok',
+        'bonus',
+        'potongan',
+        
+        'gaji_bersih',
     ];
 
     public function pegawai()

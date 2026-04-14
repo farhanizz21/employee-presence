@@ -15,15 +15,20 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->uuid('pegawai_uuid');
-            $table->uuid('periode_uuid');
-            $table->uuid('grup_uuid'); // Optional foreign key to Grup
-            $table->uuid('jabatan_uuid');
-            $table->integer('shift');
-            $table->integer('status'); // 1=masuk, 2=izin, 3=alpha
-            $table->integer('pencapaian')->nullable();
-            $table->date('tgl_absen'); // Date of attendance
+            $table->date('tgl_absen');
+            $table->tinyInteger('shift');
+            $table->tinyInteger('status');
+            $table->integer('pencapaian')->default(0);
+            $table->boolean('is_lembur')->default(false);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['pegawai_uuid', 'tgl_absen', 'shift']);
+            
+            $table->foreign('pegawai_uuid')
+                ->references('uuid')
+                ->on('pegawais')
+                ->cascadeOnDelete();
         });
     }
 

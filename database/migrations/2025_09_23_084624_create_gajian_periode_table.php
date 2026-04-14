@@ -8,18 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('absensi_periode', function (Blueprint $table) {
-            $table->id('periode_id'); // Primary key auto increment
+        Schema::create('gajian_periodes', function (Blueprint $table) {
+            $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('nama_periode', 100);
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
+            $table->enum('status', ['draft', 'calculated', 'final'])->default('draft');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('absensi_periode');
+        Schema::dropIfExists('gajian_periodes');
     }
 };

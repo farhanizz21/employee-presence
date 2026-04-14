@@ -25,7 +25,7 @@ use App\Http\Controllers\PayrollController;
 
 Route::get('/', function () {
     return auth()->check()
-        ? redirect()->route('absensi.index')
+        ? redirect()->route('user.index')
         : redirect()->route('login');
 });
 
@@ -73,16 +73,16 @@ Route::middleware('auth')->group(function () {
     | Gajian Routes
     |--------------------------------------------------------------------------
     */
-    Route::get('/gajian/cetak/{uuid}', [GajianController::class, 'cetakSlip'])->name('gajian.cetak');
-    Route::resource('gajian', GajianController::class);
-    Route::get('/gajian/preview/{periode_uuid}', [GajianController::class,'preview'])->name('gajian.preview');
-    Route::post('/gajian/save-draft/{periode_uuid}', [GajianController::class,'saveDraft'])->name('gajian.saveDraft');
-    Route::post('/gajian/finalize/{periode_uuid}', [GajianController::class,'finalize'])->name('gajian.finalize');
-    Route::get('/gajian/slip/{uuid}', [GajianController::class,'slip'])->name('gajian.slip');
-    Route::get('/gajian/generate', [GajianController::class, 'generatePayroll'])->name('gajian.generate');
-    Route::get('gajian/get-periodes', [GajianController::class, 'getPeriodes'])->name('gajian.getPeriodes');
-    Route::get('gajian/get-data', [GajianController::class, 'getGajianData'])->name('gajian.getGajianData');
-    Route::post('/gajian/store', [GajianController::class, 'store'])->name('gajian.store');
+    Route::prefix('gajian')->name('gajian.')->group(function () {
+        Route::get('/', [GajianController::class, 'index'])->name('index');
+        Route::get('/create', [GajianController::class, 'create'])->name('create');
+        Route::post('/store', [GajianController::class, 'store'])->name('store');
+        Route::get('/{uuid}/proses', [GajianController::class, 'proses'])->name('proses');
+        Route::get('/{uuid}', [GajianController::class, 'show'])
+            ->name('show');
+        Route::post('/{uuid}/final', [GajianController::class, 'final'])
+            ->name('final');
+    });
 
     /*
     |--------------------------------------------------------------------------
