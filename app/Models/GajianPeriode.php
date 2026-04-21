@@ -18,4 +18,10 @@ class GajianPeriode extends Model
         'tanggal_selesai',
         'status',
     ];
+
+
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
 }

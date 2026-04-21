@@ -27,8 +27,9 @@
     </style>
 </head>
 
-<body>
+@foreach($gajians as $gaji)
 
+<body>
     <div class="title">
         <strong>SLIP GAJI</strong><br>
         {{ $gaji->pegawai->nama }}
@@ -77,5 +78,6 @@
     </table>
 
 </body>
+@endforeach
 
 </html>

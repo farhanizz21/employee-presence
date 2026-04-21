@@ -44,15 +44,25 @@
 
                 <div>
                     @if($periode->status == 'calculated')
-                    <form action="{{ route('gajian.final', $periode->uuid) }}" method="POST">
-                        @csrf
-                        <button class="btn btn-success"
-                            onclick="return confirm('Finalisasi gajian? Data akan dikunci.')">
-                            <i class="fas fa-lock"></i> Finalisasi
-                        </button>
-                    </form>
+                    <div class="mb-3 d-flex gap-2">
+                        <form action="{{ route('gajian.recalculate', $periode->uuid) }}" method="POST">
+                            @csrf
+                            <button type="button" class="btn btn-warning btn-recalculate">
+                                <i class="fas fa-sync"></i> Proses Ulang
+                            </button>
+                        </form>
+                        <form action="{{ route('gajian.final', $periode->uuid) }}" method="POST">
+                            @csrf
+                            <button type="button" class="btn btn-success btn-finalisasi">
+                                <i class="fas fa-lock"></i> Finalisasi
+                            </button>
+                        </form>
+                    </div>
                     @else
                     <span class="badge bg-success">FINAL</span>
+                    <button class="btn btn-danger btn-sm" id="btnExportSelected">
+                        <i class="fas fa-file-pdf"></i> Export Terpilih
+                    </button>
                     @endif
                 </div>
             </div>
@@ -66,6 +76,9 @@
                     <table class="table table-bordered table-hover align-middle">
                         <thead class="table-dark text-center">
                             <tr>
+                                <th class="text-center" style="width:40px;">
+                                    <input type="checkbox" id="checkAll">
+                                </th>
                                 <th>#</th>
                                 <th>Nama</th>
                                 <th style="width: 15%">
@@ -115,6 +128,9 @@
 
                             @forelse($gajians as $i => $gaji)
                             <tr>
+                                <td class="text-center">
+                                    <input type="checkbox" class="check-item" value="{{ $gaji->pegawai_uuid }}">
+                                </td>
                                 <td class="text-center">{{ $i+1 }}</td>
 
                                 <td>{{ $gaji->pegawai->nama ?? '-' }}</td>
@@ -141,20 +157,22 @@
                                     Rp {{ number_format($gaji->gaji_bersih,0,',','.') }}
                                 </td>
                                 @if($periode->status == 'calculated')
-                                <!-- <td class="text-center">
+                                <td class="text-center">
                                     <button class="btn btn-warning btn-sm btn-edit-gaji" data-uuid="{{ $gaji->uuid }}"
                                         data-nama="{{ $gaji->pegawai->nama }}" data-bonus="{{ $gaji->bonus }}"
-                                        data-potongan="{{ $gaji->potongan }}" data-bs-toggle="modal"
-                                        data-bs-target="#modalEditGaji">
+                                        data-potongan="{{ $gaji->potongan }}" data-toggle="modal"
+                                        data-target="#modalEditGaji">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                </td> -->
+                                </td>
                                 @endif
                                 @if($periode->status == 'final')
                                 <td class="text-center">
                                     {{-- 🟢 STATUS: FINAL --}}
-                                    <a href="{{ route('gajian.pdf', [$periode->uuid, $gaji->pegawai_uuid]) }}"
-                                        target="_blank" class="btn btn-danger btn-sm">
+                                    <a href="{{ route('gajian.pdf', [
+                                                $periode->uuid,
+                                                'pegawai_uuid' => $gaji->pegawai_uuid
+                                            ]) }}" target="_blank" class="btn btn-danger btn-sm">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </a>
                                 </td>
@@ -198,7 +216,7 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Bonus & Potongan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
@@ -228,18 +246,101 @@
         </div>
     </div>
 </div>
+@endsection
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.css') }}">
+@endpush
+
+
+@push('scripts')
+<script src="{{ asset('adminlte/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 
 <script>
 $(document).ready(function() {
-    $(document).on('click', '.btn-edit-gaji', function() {
+
+    // select all
+    $('#checkAll').on('change', function() {
+        $('.check-item').prop('checked', $(this).prop('checked'));
+    });
+
+    $('#btnExportSelected').on('click', function() {
+
+        let selected = [];
+
+        $('.check-item:checked').each(function() {
+            selected.push($(this).val());
+        });
+
+        if (selected.length === 0) {
+            alert('Pilih minimal 1 pegawai');
+            return;
+        }
+
+        let url = "{{ route('gajian.pdf', $periode->uuid) }}";
+
+        // kirim sebagai array
+        url += '?pegawai_uuid[]=' + selected.join('&pegawai_uuid[]=');
+
+        window.open(url, '_blank');
+    });
+
+    $('.btn-recalculate').on('click', function(e) {
+        e.preventDefault();
+
+        let form = $(this).closest('form'); // ambil form parent
+
+        Swal.fire({
+            title: 'Proses ulang gaji?',
+            text: 'Data gaji akan diperbarui berdasarkan absensi terbaru.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, proses ulang',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                // 🔒 disable biar tidak double klik
+                $('.btn-recalculate').prop('disabled', true);
+
+                form.submit();
+            }
+        });
+    });
+
+    $('.btn-finalisasi').on('click', function(e) {
+        e.preventDefault();
+
+        let form = $(this).closest('form'); // ambil form parent
+
+        Swal.fire({
+            title: 'Finalisasi gajian?',
+            text: 'Data gaji akan dikunci.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, finalisasi',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                // 🔒 disable biar tidak double klik
+                $('.btn-recalculate').prop('disabled', true);
+
+                form.submit();
+            }
+        });
+    });
+
+    $('.btn-edit-gaji').on('click', function() {
+        console.log('Edit Gaji clicked');
         $('#gaji_uuid').val($(this).data('uuid'));
         $('#nama_pegawai').text($(this).data('nama'));
         $('#bonus').val($(this).data('bonus'));
         $('#potongan').val($(this).data('potongan'));
     });
 
-
     $('#formEditGaji').on('submit', function(e) {
+        console.log('aaaa');
         e.preventDefault();
 
         $.ajax({
@@ -252,7 +353,6 @@ $(document).ready(function() {
                 potongan: $('#potongan').val()
             },
             success: function(res) {
-
                 $('#modalEditGaji').modal('hide');
 
                 // update UI tanpa reload (optional)
@@ -262,5 +362,4 @@ $(document).ready(function() {
     });
 });
 </script>
-
-@endsection
+@endpush

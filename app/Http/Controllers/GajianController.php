@@ -49,98 +49,104 @@ class GajianController extends Controller
             ->with('success', 'Periode berhasil dibuat (Draft)');
     }
 
-    public function proses($uuid)
+    private function generateGaji($periode)
     {
-        DB::beginTransaction();
+        $pegawais = Pegawai::with('jabatan')->get();
 
-        try {
-            $periode = GajianPeriode::where('uuid', $uuid)->firstOrFail();
+        foreach ($pegawais as $pegawai) {
 
-            // ❗ Cegah double proses
-            if ($periode->status !== 'draft') {
-                return redirect()->back()->with('error', 'Periode sudah diproses!');
-            }
+            // 🔹 Ambil absensi sesuai periode
+            $absensis = Absensi::where('pegawai_uuid', $pegawai->uuid)
+                ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
+                ->get();
 
-            $pegawais = Pegawai::with('jabatan')->get();
+            $hadir = $absensis->where('status', '1')->count();
+            $izin  = $absensis->where('status', '2')->count();
+            $alpha = $absensis->where('status', '3')->count();
 
-            foreach ($pegawais as $pegawai) {
+            $gajiPokok = 0;
 
-                // 🔹 Ambil absensi sesuai periode
-                $absensis = Absensi::where('pegawai_uuid', $pegawai->uuid)
-                    ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
-                    ->get();
+            foreach ($absensis as $absen) {
 
-                $hadir = $absensis->where('status', '1')->count();
-                $izin  = $absensis->where('status', '2')->count();
-                $alpha = $absensis->where('status', '3')->count();
-
-                $gajiPokok = 0;
-
-                foreach ($absensis as $absen) {
-
-                    // hanya hitung yang hadir
-                    if ($absen->status != '1') {
-                        continue;
-                    }
-
-                    // tentukan tarif berdasarkan shift
-                    if ($absen->shift == '1') {
-                        $tarif = $pegawai->jabatan->gaji_pagi ?? 0;
-                    } elseif ($absen->shift == '2') {
-                        $tarif = $pegawai->jabatan->gaji_malam ?? 0;
-                    } else {
-                        $tarif = 0;
-                    }
-
-                    $gajiPokok += $tarif;
+                // hanya hitung yang hadir
+                if ($absen->status != '1') {
+                    continue;
                 }
 
-                // HITUNGAN POTONGAN ALPHA
-                $potongan = 0;
+                // tentukan tarif berdasarkan shift
+                if ($absen->shift == '1') {
+                    $tarif = $pegawai->jabatan->gaji_pagi ?? 0;
+                } elseif ($absen->shift == '2') {
+                    $tarif = $pegawai->jabatan->gaji_malam ?? 0;
+                } else {
+                    $tarif = 0;
+                }
 
-                //HITUNGAN BONUS KEHADIRAN
-                $bonus = 0;
+                $gajiPokok += $tarif;
+            }
 
-                $hutang = DB::table('hutangs')
+            // HITUNGAN POTONGAN ALPHA
+            $potongan = 0;
+
+            //HITUNGAN BONUS KEHADIRAN
+            $bonus = 0;
+
+            $hutang = DB::table('hutangs')
                     ->where('pegawai_uuid', $pegawai->uuid)
                     ->where('is_active', 1)
                     ->sum('nominal');
 
-                $potongan += $hutang;
-                $gajiBersih = $gajiPokok - $potongan;
-                
-                Gajian::create([
-                    'uuid' => Str::uuid(),
+            $potongan += $hutang;
+            $gajiBersih = $gajiPokok - $potongan;
+
+            $existing = Gajian::where('periode_uuid', $periode->uuid)
+                ->where('pegawai_uuid', $pegawai->uuid)
+                ->first();
+
+            Gajian::updateOrCreate(
+                [
                     'periode_uuid' => $periode->uuid,
                     'pegawai_uuid' => $pegawai->uuid,
+                ],
+                [
+                    'uuid' => $existing->uuid ?? Str::uuid(),
 
                     'hadir' => $hadir,
                     'izin' => $izin,
                     'alpha' => $alpha,
 
                     'gaji_pokok' => $gajiPokok,
-                    'bonus' => $bonus,
-                    'potongan' => $potongan,
+                    'bonus' => $existing->bonus ?? 0,
+                    'potongan' => $existing->potongan ?? $potongan,
                     
-                    'gaji_bersih' => $gajiBersih,
-                ]);
+                    'gaji_bersih' => $gajiPokok + ($existing->bonus ?? 0) - ($existing->potongan ?? $potongan),
+                ]
+            );
+        }
+    }
 
-            }
+    public function proses($uuid)
+    {
+        $periode = GajianPeriode::where('uuid', $uuid)->firstOrFail();
 
-            // 🔥 Ubah status periode
-            $periode->update([
-                'status' => 'calculated'
-            ]);
+        if ($periode->status !== 'draft') {
+            return back()->with('error', 'Sudah diproses');
+        }
+
+        DB::beginTransaction();
+        try {
+
+            $this->generateGaji($periode);
+
+            $periode->update(['status' => 'calculated']);
 
             DB::commit();
 
-            return redirect()->route('gajian.index')
-                ->with('success', 'Gajian berhasil diproses');
+            return back()->with('success', 'Gaji berhasil diproses');
 
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', 'Gagal proses');
         }
     }
 
@@ -202,6 +208,30 @@ class GajianController extends Controller
         return response()->json(['message' => 'Berhasil update']);
     }
 
+    public function recalculate($uuid)
+    {
+        $periode = GajianPeriode::where('uuid', $uuid)->firstOrFail();
+
+        if ($periode->status !== 'calculated') {
+            return back()->with('error', 'Tidak bisa recalculate');
+        }
+
+        DB::beginTransaction();
+        try {
+
+            // ❗ TIDAK PERLU DELETE
+            $this->generateGaji($periode);
+
+            DB::commit();
+
+            return back()->with('success', 'Berhasil proses ulang');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal recalculate');
+        }
+    }
+    
     public function final($uuid)
     {
         $periode = GajianPeriode::where('uuid', $uuid)->firstOrFail();
@@ -229,26 +259,37 @@ class GajianController extends Controller
 
         return view('gajian.detail', compact('periode', 'gaji'));
     }
-
-    public function pdf($periodeUuid, $pegawaiUuid)
+    
+    public function pdf(Request $request, $periodeUuid)
     {
         $periode = GajianPeriode::where('uuid', $periodeUuid)->firstOrFail();
 
-        $gaji = Gajian::with('pegawai')
-            ->where('periode_uuid', $periodeUuid)
-            ->where('pegawai_uuid', $pegawaiUuid)
-            ->firstOrFail();
+        $query = Gajian::with('pegawai')
+            ->where('periode_uuid', $periodeUuid);
 
-        // 🔹 format periode
+        if ($request->pegawai_uuid) {
+            $pegawaiIds = $request->pegawai_uuid;
+            if (!is_array($pegawaiIds)) {
+                $pegawaiIds = [$pegawaiIds];
+            }
+            $query->whereIn('pegawai_uuid', $pegawaiIds);
+        }
+
+        $gajians = $query->get();
+        
+        if ($gajians->isEmpty()) {
+            return back()->with('error', 'Data gaji tidak ditemukan');
+        }
+
         $mulai = Carbon::parse($periode->tanggal_mulai)->format('dMy');
         $selesai = Carbon::parse($periode->tanggal_selesai)->format('dMy');
 
-        // 🔹 bersihkan nama pegawai (hindari spasi)
-        $nama = str_replace(' ', '-', $gaji->pegawai->nama);
+        $fileName = "gajian-{$mulai}-{$selesai}.pdf";
 
-        $fileName = "slip-{$nama}-{$mulai}-{$selesai}.pdf";
-
-        $pdf = Pdf::loadView('gajian.pdf', compact('periode', 'gaji'));
+        $pdf = Pdf::loadView('gajian.pdf', [
+            'periode' => $periode,
+            'gajians' => $gajians
+        ]);
 
         return $pdf->stream($fileName);
     }
