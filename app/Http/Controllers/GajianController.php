@@ -84,10 +84,12 @@ class GajianController extends Controller
                     $tarif = 0;
                 }
 
+                //penghitungan gaji pokok berdasarkan jabatan & shift
+
                 $gajiPokok += $tarif;
             }
 
-            //POTONGAN
+            //---------------- POTONGAN --------------------
             //PER PEGAWAI SESUAI JABATAN
             $potonganData = $allPotongan->filter(function ($item) use ($pegawai) {
                 return in_array($pegawai->jabatan_uuid, $item->jabatan ?? []);
@@ -99,7 +101,7 @@ class GajianController extends Controller
                 $potongan = $alpha * $potonganData->sum('nominal');
             }
 
-            //BONUS 
+            //----------------- BONUS ---------------------
             //PER PEGAWAI SESUAI JABATAN
             $bonusData = $allBonus->filter(function ($item) use ($pegawai) {
                 return in_array($pegawai->jabatan_uuid, $item->jabatan ?? []);
@@ -117,10 +119,6 @@ class GajianController extends Controller
 
             $potongan += $hutang;
             $gajiBersih = $gajiPokok - $potongan;
-
-            // $existing = Gajian::where('periode_uuid', $periode->uuid)
-            //     ->where('pegawai_uuid', $pegawai->uuid)
-            //     ->first();
 
             Gajian::updateOrCreate(
                 [

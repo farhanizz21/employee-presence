@@ -16,10 +16,10 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('nama', 100);
             $table->string('kode')->nullable()->unique();
-            $table->unsignedTinyInteger('jenis'); // 1=Bonus, 2=Potongan
+            $table->unsignedTinyInteger('jenis')->comment('1=Bonus, 2=Potongan'); // 1=Bonus, 2=Potongan
             $table->integer('nominal'); // Jumlah nominal
             $table->text('keterangan')->nullable(); // Deskripsi atau keterangan
-            $table->unsignedTinyInteger('status')->default(1); // 1=Aktif, 2=Nonaktif
+            $table->unsignedTinyInteger('status')->default(1)->comment('1=Aktif, 2=Nonaktif'); // 1=Aktif, 2=Nonaktif
             $table->json('jabatan')->nullable(); // UUID Jabatan
             $table->boolean('is_system')->default(false); // True untuk data bawaan sistem
             $table->timestamps();

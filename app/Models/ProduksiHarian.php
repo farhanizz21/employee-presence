@@ -29,4 +29,9 @@ class ProduksiHarian extends Model
         return 'uuid';
     }
 
+    public function absensis()
+    {
+        return $this->hasMany(Absensi::class, 'produksi_uuid', 'uuid');
+    }
+
 }

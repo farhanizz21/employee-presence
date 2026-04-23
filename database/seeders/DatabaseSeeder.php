@@ -14,111 +14,100 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-                ['email' => 'admin@example.com'],
-                [
-                'uuid' => Str::uuid(), // Generate UUID otomatis
-                'username' => 'admin',
-                'email' => 'admin@example.com',
-                'password' => bcrypt('admin'),
-                'pegawai_uuid' => null, // Admin tidak terkait dengan pegawai
-                'role' => '1', // 1= Admin, 2=User
-                ]
-            );
+            ['email' => 'admin@example.com',
+            'username' => 'admin',
+             'role' => '1', // 1= Admin, 2=User
+            ],
+            [
+            'uuid' => Str::uuid(), // Generate UUID otomatis
+            'email' => 'admin@example.com',
+            'password' => bcrypt('admin'),
+            'pegawai_uuid' => null, // Admin tidak terkait dengan pegawai
+            ]
+        );
         Jabatan::updateOrCreate(
+            [
+                'jabatan' => 'NgeCes',
+                'is_system' => true
+            ],
             [
                 'uuid' => Str::uuid(),
                 'gaji_pagi' => 100,
-                'gaji_malam' => 110,
+                'gaji_malam' => 105,
                 'harian' => 2,
-                'jabatan' => 'Nge Ces Pagi',
                 'bonus_uuid' => NULL,
                 'keterangan' => 'Perhitungan : ',
-                'is_system' => true
             ]
         );
         Jabatan::updateOrCreate(
             [
+                'jabatan' => 'NgePan',
+                'is_system' => true
+            ],
+            [
                 'uuid' => Str::uuid(),
                 'gaji_pagi' => 110,
-                'gaji_malam' => 110,
+                'gaji_malam' => 115,
                 'harian' => 2,
-                'jabatan' => 'Nge Ces Malam',
                 'bonus_uuid' => NULL,
                 'keterangan' => 'Perhitungan : ',
-                'is_system' => true
             ]
         );
         Jabatan::updateOrCreate(
             [
-                'uuid' => Str::uuid(),
-                'gaji_pagi' => 110,
-                'gaji_malam' => 110,
-                'harian' => 2,
-                'jabatan' => 'Nge Pan Pagi',
-                'bonus_uuid' => NULL,
-                'keterangan' => 'Perhitungan : ',
+                'jabatan' => 'Tukang',
                 'is_system' => true
-            ]
-        );
-        Jabatan::updateOrCreate(
+            ],
             [
                 'uuid' => Str::uuid(),
                 'gaji_pagi' => 110,
-                'gaji_malam' => 110,
+                'gaji_malam' => 115,
                 'harian' => 2,
-                'jabatan' => 'Nge Pan Malam',
                 'bonus_uuid' => NULL,
                 'keterangan' => 'Perhitungan : ',
-                'is_system' => true
             ]
         );
         BonusPotongan::updateOrCreate(
             [
+                'kode' => 'bonus_kehadiran_a',
+                'is_system' => true
+            ],
+            [
                 'nama' => 'Bonus Kehadiran A',
-                'kode' => 'bonus_kehadiran',
                 'uuid' => Str::uuid(),
                 'jenis' => 1,
                 'nominal' => 10000,
                 'keterangan' => 'Bonus untuk pegawai hadir penuh',
-                'status' => 1,
-                'is_system' => true
+                'status' => 1
             ]
         );
         BonusPotongan::updateOrCreate(
             [
-                'nama' => 'Bonus Kehadiran B',
                 'kode' => 'bonus_kehadiran_b',
+                'is_system' => true
+            ],
+            [
+                'nama' => 'Bonus Kehadiran B',
                 'uuid' => Str::uuid(),
                 'jenis' => 1,
                 'nominal' => 15000,
                 'keterangan' => 'Bonus untuk pegawai hadir penuh',
-                'status' => 1,
-                'is_system' => true
+                'status' => 1
             ]
         );
         BonusPotongan::updateOrCreate(
             [
-                'nama' => 'Potongan Alpha',
                 'kode' => 'potongan_alpha',
+                'is_system' => true
+            ],
+            [
+                'nama' => 'Potongan Alpha',
                 'uuid' => Str::uuid(),
                 'jenis' => 2,
                 'nominal' => 2500,
                 'keterangan' => 'Potongan Alpha',
                 'status' => 1,
-                'is_system' => true
             ]
         );
-        // BonusPotongan::updateOrCreate(
-        //     [
-        //         'nama' => 'Potongan Terlambat',
-        //         'kode' => 'potongan_terlambat',
-        //         'uuid' => Str::uuid(),
-        //         'jenis' => 2,
-        //         'nominal' => 50000,
-        //         'keterangan' => '-',
-        //         'status' => 1,
-        //         'is_system' => true
-        //     ]
-        // );
     }
 }
