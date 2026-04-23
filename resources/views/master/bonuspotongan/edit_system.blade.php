@@ -1,5 +1,18 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+.select2-container--default .select2-selection--multiple {
+    min-height: 38px;
+    padding: 4px;
+}
+
+.select2-container--default .select2-selection__rendered {
+    color: #000 !important;
+}
+</style>
+@endpush
+
 @section('content')
 
 <div class="app-content-header">
@@ -79,8 +92,22 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Berlaku untuk <span class="text-danger">*</span></label>
-                                <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror"
-                                    value="Seluruh pegawai" disabled>
+
+                                <select name="jabatan[]" id="selectJabatan"
+                                    class="form-control select2 @error('jabatan') is-invalid @enderror" multiple>
+
+                                    @foreach ($jabatans as $jabatan)
+                                    <option value="{{ $jabatan->uuid }}"
+                                        {{ collect(old('jabatan'))->contains($jabatan->uuid) ? 'selected' : '' }}>
+                                        {{ $jabatan->jabatan }}
+                                    </option>
+                                    @endforeach
+
+                                </select>
+
+                                @error('jabatan')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                         <div class="form-group row">
@@ -136,6 +163,14 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         nominalInput.value = nominalInput.value.replace(/\D/g, '');
     });
+
+    $('#selectJabatan').select2({
+        placeholder: "Pilih jabatan (boleh lebih dari satu)",
+        allowClear: true,
+        width: '100%',
+        // theme: 'default'
+    });
+
 });
 </script>
 @endpush

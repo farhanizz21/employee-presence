@@ -108,6 +108,9 @@
                                                 Nominal
                                             </th>
                                             <th>
+                                                Jabatan
+                                            </th>
+                                            <th>
                                                 Keterangan
                                             </th>
                                             <th style="width: 5%">
@@ -128,6 +131,17 @@
                                             </td>
                                             <td class="text-truncate" style="max-width: 200px;">
                                                 Rp {{ number_format($bonuspotongan->nominal, 0, ',', '.') }}
+                                            </td>
+                                            <td style="max-width: 200px;">
+                                                @if(!empty($bonuspotongan->jabatan_names))
+                                                <ul class="mb-0 ps-3">
+                                                    @foreach($bonuspotongan->jabatan_names as $nama)
+                                                    <li class="small">{{ $nama }}</li>
+                                                    @endforeach
+                                                </ul>
+                                                @else
+                                                -
+                                                @endif
                                             </td>
                                             <td class="text-truncate" style="max-width: 200px;">
                                                 {{ $bonuspotongan->keterangan }}
@@ -203,14 +217,14 @@
 
     @endsection
 
-    
+
     <style>
-        .table thead th {
- 
-    background-color: #343a40 !important;
-    color: #fff;
-    
-    text-align: center;
-    vertical-align: middle;
-}
+    .table thead th {
+
+        background-color: #343a40 !important;
+        color: #fff;
+
+        text-align: center;
+        vertical-align: middle;
+    }
     </style>
