@@ -22,6 +22,10 @@ class BonusPotongan extends Model
         'deleted_at'
     ];
 
+    protected $casts = [
+        'jabatan' => 'array',
+    ];
+
     public function getRouteKeyName()
     {
         return 'uuid';
@@ -35,7 +39,6 @@ class BonusPotongan extends Model
             default => 'Tidak diketahui',
         };
     }
-
     
     public function getStatusClassAttribute()
     {
@@ -49,5 +52,14 @@ class BonusPotongan extends Model
             2 => 'Potongan',
             default => 'Tidak diketahui',
         };
+    }
+
+    public function getJabatanNamesAttribute()
+    {
+        if (!$this->jabatan) return [];
+
+        return \App\Models\Master\Jabatan::whereIn('uuid', $this->jabatan)
+            ->pluck('jabatan')
+            ->toArray();
     }
 }

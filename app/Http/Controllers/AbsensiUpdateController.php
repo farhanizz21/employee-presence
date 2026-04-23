@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
-use App\Models\Absensi;
+
 use App\Models\Master\Pegawai;
 use App\Models\Master\Jabatan;
 use App\Models\Master\Grup;
-use Illuminate\Support\Str;
+use App\Models\Absensi;
+use App\Models\ProduksiHarian;
 
 class AbsensiUpdateController extends Controller
 {
@@ -70,30 +72,53 @@ class AbsensiUpdateController extends Controller
                 }
                 return $key;
             });
+        
+        $existingProduksi = ProduksiHarian::where('tanggal', $tanggalAbsen)->get()->keyBy('shift');
 
         $jabatans = Jabatan::all();
         $grups = Grup::all();
         // dd($existingAbsensi);
-        return view('absensiUpdate.create', compact('pegawais', 'jabatans', 'grups', 'existingAbsensi', 'tanggalAbsen'));
+        return view('absensiUpdate.create', compact('pegawais', 'jabatans', 'grups', 'existingAbsensi', 'existingProduksi', 'tanggalAbsen'));
     }
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $validated = $request->validate([
             'tanggal_absen' => 'required|date',
+            'mesin_status' => 'required|array',
+            'mesin_status.*' => 'required|in:0,1',
+
             'data' => 'required|array',
             'data.*.status' => 'required|in:1,2,3',
             'data.*.pencapaian' => 'nullable|numeric|min:0',
             'data.*.shift' => 'required|in:1,2',
             'data.*.is_lembur' => 'nullable|boolean',
+            
+            'data.*.jabatan_uuid' => 'nullable|uuid',
+            'data.*.grup_uuid' => 'nullable|uuid',
         ]);
 
         $tanggal = $validated['tanggal_absen'];
+        $mesin_status = $validated['mesin_status'];
+
+        $totalProduksiPerShift = [];
+
+        // dd($validated);
 
         foreach ($validated['data'] as $uuid => $item) {
 
             $uuid = str_replace('_long', '', $uuid);
             $pegawai = Pegawai::where('uuid', $uuid)->firstOrFail();
+
+            $shift = $item['shift'];
+            $pencapaian = $item['pencapaian'] ?? 0;
+
+            // 🔥 akumulasi produksi per shift
+            if (!isset($totalProduksiPerShift[$shift])) {
+                $totalProduksiPerShift[$shift] = 0;
+            }
+            $totalProduksiPerShift[$shift] += $pencapaian;
 
             Absensi::updateOrCreate(
                 [
@@ -106,6 +131,25 @@ class AbsensiUpdateController extends Controller
                     'status' => $item['status'],
                     'pencapaian' => $item['pencapaian'] ?? 0,
                     'is_lembur' => $item['is_lembur'] ?? 0,
+
+                    'jabatan_uuid' => $item['jabatan_uuid'] ?? $pegawai->jabatan_uuid,
+                    'grup_uuid' => $item['grup_uuid'] ?? $pegawai->grup_uuid,
+                ]
+            );
+        }
+        
+        foreach ($totalProduksiPerShift as $shift => $totalProduksi) {
+            $mesinStatus = $request->mesin_status[$shift] ?? 0;
+            
+            ProduksiHarian::updateOrCreate(
+                [
+                    'tanggal' => $tanggal,
+                    'shift' => $shift,
+                ],
+                [
+                    'uuid' => \Illuminate\Support\Str::uuid(),
+                    'mesin_status' => $mesinStatus,
+                    'total_produksi' => $totalProduksi,
                 ]
             );
         }

@@ -20,8 +20,9 @@ class Absensi extends Model
     protected $fillable = [
         'uuid',
         'pegawai_uuid',
-        // 'grup_uuid',
-        // 'jabatan_uuid',
+        'produksi_uuid',
+        'grup_uuid',
+        'jabatan_uuid',
         'shift',
         // 'grup_sb',
         // 'periode_uuid',
@@ -39,13 +40,22 @@ class Absensi extends Model
         return 'uuid';
     }
 
+    public function getMesinStatusLabelAttribute()
+    {
+        return match ($this->mesin_status) {
+            0 => 'Normal',
+            1 => 'Rusak',
+            default => 'Unknown'
+        };
+    }
+
     public function pegawai() {
         return $this->belongsTo(Pegawai::class, 'pegawai_uuid', 'uuid');
     }
 
     public function grup()
     {
-        return $this->belongsTo(Grup::class, 'grup_sb', 'uuid');
+        return $this->belongsTo(Grup::class, 'grup_uuid', 'uuid');
     }
     
     public function jabatan()

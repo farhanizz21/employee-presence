@@ -56,9 +56,7 @@
                             <form method="GET" action="{{ route('absensiUpdate.create') }}"
                                 class="row mb-3 align-items-end g-2">
                                 <div class="p-3 mb-3 rounded bg-light border">
-
                                     <div class="d-flex justify-content-between align-items-center">
-
                                         <div>
                                             <small class="text-muted d-block">Tanggal Absensi</small>
 
@@ -68,10 +66,10 @@
                                                     <i class="fas fa-chevron-left"></i>
                                                 </button>
 
-                                                <input type="date" name="tanggal_absen" id="tanggal_absen"
+                                                <input type="text" id="tanggal_absen" name="tanggal_absen"
                                                     class="form-control form-control-sm"
-                                                    value="{{ request('tanggal_absen') ?? date('Y-m-d') }}"
-                                                    onchange="this.form.submit()">
+                                                    value="{{ request('tanggal_absen') ?? date('Y-m-d') }}" readonly
+                                                    style="cursor:pointer;">
 
                                                 <button class="btn btn-outline-secondary btn-sm"
                                                     onclick="changeDate(1)">
@@ -79,7 +77,6 @@
                                                 </button>
                                             </div>
                                         </div>
-
                                         <div>
                                             <small class="text-muted d-block">Per Page</small>
                                             <select name="per_page" class="form-select form-select-sm"
@@ -89,7 +86,50 @@
                                                 <option value="50">50</option>
                                             </select>
                                         </div>
-
+                                    </div>
+                                </div>
+                                <div class="card mb-3 rounded bg-light border">
+                                    <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+                                        {{-- 🔵 TOTAL PENCAPAIAN --}}
+                                        <div class="d-flex gap-4">
+                                            <div>
+                                                <small class="text-muted d-block">Shift Pagi</small>
+                                                <h5 class="mb-0 fw-bold text-dark" id="totalShift1">0</h5>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block">Shift Malam</small>
+                                                <h5 class="mb-0 fw-bold text-dark" id="totalShift2">0</h5>
+                                            </div>
+                                        </div>
+                                        {{-- 🔴 KONDISI MESIN --}}
+                                        @php
+                                        $mesinShift1 = $existingProduksi->get(1) ?
+                                        $existingProduksi->get(1)->mesin_status : 0;
+                                        $mesinShift2 = $existingProduksi->get(2) ?
+                                        $existingProduksi->get(2)->mesin_status : 0;
+                                        @endphp
+                                        <div class="d-flex gap-4 mb-3">
+                                            <div>
+                                                <label class="form-label small">Mesin Shift Pagi</label>
+                                                <select name="mesin_status[1]" class="form-select btn-mesin text-white"
+                                                    data-shift="1">
+                                                    <option value="0" {{ $mesinShift1 == 0 ? 'selected' : '' }}>Normal
+                                                    </option>
+                                                    <option value="1" {{ $mesinShift1 == 1 ? 'selected' : '' }}>Rusak
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="form-label small">Mesin Shift Malam</label>
+                                                <select name="mesin_status[2]" class="form-select btn-mesin text-white"
+                                                    data-shift="2">
+                                                    <option value="0" {{ $mesinShift2 == 0 ? 'selected' : '' }}>Normal
+                                                    </option>
+                                                    <option value="1" {{ $mesinShift2 == 1 ? 'selected' : '' }}>Rusak
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -162,6 +202,8 @@
 
                                 <input type="hidden" name="tanggal_absen"
                                     value="{{ request('tanggal_absen') ?? date('Y-m-d') }}">
+                                <input type="hidden" name="mesin_status[1]" id="mesinShift1">
+                                <input type="hidden" name="mesin_status[2]" id="mesinShift2">
 
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-striped table-hover">
@@ -185,7 +227,7 @@
                                                     Shift
                                                 </th>
                                                 <th>Status</th>
-                                                <th>Pencapaian</th>
+                                                <th>Pencapaian (Kg)</th>
                                                 <th style="width: 13%">Aksi</th>
                                             </tr>
                                         </thead>
@@ -196,7 +238,8 @@
                                             $status = $absensi ? $absensi->status : 1;
                                             $pencapaian = $absensi ? $absensi->pencapaian : '';
                                             @endphp
-                                            <tr class="align-middle">
+                                            <tr class="align-middle" data-shift="{{ $pegawai->shift }}">
+                                                {{-- data-shift untuk JS, hidden input untuk backend --}}
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td class="text-truncate">
                                                     {{ $pegawai->nama }}
@@ -241,8 +284,11 @@
                                                     <button type="button" class="btn btn-sm btn-primary longshift-btn"
                                                         title="Tambah Long Shift" data-pegawai="{{ $pegawai->uuid }}"
                                                         data-nama="{{ $pegawai->nama }}"
-                                                        data-shift="{{ $pegawai->shift }}">
-                                                        <i class="fas fa-clock"></i>
+                                                        data-shift="{{ $pegawai->shift }}"
+                                                        data-jabatan="{{ $pegawai->jabatan->uuid }}"
+                                                        data-grup="{{ $pegawai->grup->uuid }}"
+                                                        data-jabatans='@json($jabatans)' data-grups='@json($grups)'>
+                                                        <i class="fas fa-clock"></i> Long Shift
                                                     </button>
                                                 </td>
                                             </tr>
@@ -257,16 +303,39 @@
                                             $lsStatus = $longShift->status;
                                             $lsPencapaian = $longShift->pencapaian;
                                             $lsShift = $longShift->shift;
+                                            $lsJabatan = $longShift->jabatan->jabatan;
+                                            $lsGrup = $longShift->grup->nama;
                                             $lsShiftLabel = $lsShift == 1 ? 'Pagi' : 'Malam';
                                             @endphp
                                             <tr class="align-middle longshift-row"
-                                                data-pegawai-uuid="{{ $pegawai->uuid }}">
+                                                data-pegawai-uuid="{{ $pegawai->uuid }}" data-shift="{{ $lsShift }}">
                                                 <td>#</td>
                                                 <td class="text-truncate">
                                                     <span class="badge bg-success ms-1">Long Shift</span>
                                                 </td>
-                                                <td></td>
-                                                <td></td>
+                                                <td>
+                                                    <select class="form-select"
+                                                        name="data[{{ $pegawai->uuid }}_long][jabatan_uuid]">
+                                                        @foreach($jabatans as $jabatan)
+                                                        <option value="{{ $jabatan->uuid }}"
+                                                            {{ $jabatan->uuid == $longShift->jabatan_uuid ? 'selected' : '' }}>
+                                                            {{ $jabatan->jabatan }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-select"
+                                                        name="data[{{ $pegawai->uuid }}_long][grup_uuid]">
+                                                        @foreach($grups as $grup)
+                                                        <option value="{{ $grup->uuid }}"
+                                                            {{ $grup->uuid == $longShift->grup_uuid ? 'selected' : '' }}>
+                                                            {{ $grup->nama }}
+                                                        </option>
+                                                        @endforeach
+
+                                                    </select>
+                                                </td>
                                                 <td>{{ $lsShiftLabel }}</td>
                                                 <td>
                                                     <div class="btn-group btn-group-sm status-group">
@@ -353,8 +422,109 @@
 
 @endsection
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+@endpush
+
 @push('scripts')
 <script>
+$(document).on('change', '.btn-mesin', function() {
+
+    if ($(this).val() == 1) {
+        $(this).addClass('bg-danger');
+    } else {
+        $(this).removeClass('bg-danger');
+    }
+
+    if ($(this).val() == 0) {
+        $(this).addClass('bg-success');
+    } else {
+        $(this).removeClass('bg-success');
+    }
+
+    let shift = $(this).data('shift');
+    let value = $(this).val(); // 🔥 FIX UTAMA
+
+    $(`#mesinShift${shift}`).val(value);
+
+});
+
+$(document).ready(function() {
+
+    $('.btn-mesin').each(function() {
+        let shift = $(this).data('shift');
+        let value = $(this).val();
+
+        if ($(this).val() == 1) {
+            $(this).addClass('bg-danger');
+        } else {
+            $(this).removeClass('bg-danger');
+        }
+
+        if ($(this).val() == 0) {
+            $(this).addClass('bg-success');
+        } else {
+            $(this).removeClass('bg-success');
+        }
+
+        $(`#mesinShift${shift}`).val(value);
+    });
+
+});
+
+function hitungTotal() {
+
+    let totalShift1 = 0;
+    let totalShift2 = 0;
+
+    $('input[name*="[pencapaian]"]').each(function() {
+
+        let val = parseFloat($(this).val()) || 0;
+
+        // 🔥 ambil shift dari input hidden di row yang sama
+        let row = $(this).closest('tr');
+        // let shift = row.find('input[name*="[shift]"]').val();
+        let shift = row.data('shift');
+
+        if (shift == 1) {
+            totalShift1 += val;
+        } else if (shift == 2) {
+            totalShift2 += val;
+        }
+    });
+
+    $('#totalShift1').text(totalShift1);
+    $('#totalShift2').text(totalShift2);
+}
+
+// 🔥 penting: delegated event
+$(document).on('change', 'input[name*="[pencapaian]"]', function() {
+    hitungTotal();
+});
+
+// initial load
+$(document).ready(function() {
+    $('#mesinShift1').val($('[name="mesin_status[1]"]').val());
+    $('#mesinShift2').val($('[name="mesin_status[2]"]').val());
+
+    $('.longshift-row .status-group').each(function() {
+        setupStatusGroup(this);
+    });
+
+    hitungTotal();
+});
+
+flatpickr("#tanggal_absen", {
+    dateFormat: "Y-m-d",
+    defaultDate: "{{ request('tanggal_absen') ?? date(now()) }}",
+
+    onChange: function(selectedDates, dateStr) {
+        // submit setelah pilih tanggal
+        document.getElementById('tanggal_absen').form.submit();
+    }
+});
+
 function changeDate(days) {
 
     let input = document.getElementById('tanggal_absen');
@@ -379,19 +549,38 @@ function addLongShiftRow(pegawaiData, originalRow) {
     newRow.className = 'align-middle longshift-row';
     newRow.setAttribute('data-pegawai-uuid', pegawaiData.uuid);
 
-    // Tentukan shift baru (kebalikan dari shift saat ini)
     const currentShift = pegawaiData.shift;
     // const newShift = currentShift === 'Pagi' ? 'Malam' : 'Pagi';
     const newShift = currentShift == 1 ? 2 : 1;
     const shiftLabel = newShift == 1 ? 'Pagi' : 'Malam';
+    newRow.setAttribute('data-shift', newShift);
 
     newRow.innerHTML = `
         <td>#</td>
         <td class="text-truncate">
             <span class="badge bg-success ms-1">Long Shift</span>
         </td>
-        <td></td>
-        <td></td>
+        <td>
+            <select class="form-control form-control-sm"
+                name="data[${pegawaiData.uuid}_long][jabatan_uuid]">
+                ${pegawaiData.jabatans.map(j =>
+                    `<option value="${j.uuid}" ${j.uuid == pegawaiData.jabatan ? 'selected' : ''}>
+                        ${j.jabatan}
+                    </option>`
+                ).join('')}
+            </select>
+        </td>
+
+        <td>
+            <select class="form-control form-control-sm"
+                name="data[${pegawaiData.uuid}_long][grup_uuid]">
+                ${pegawaiData.grups.map(g =>
+                    `<option value="${g.uuid}" ${g.uuid == pegawaiData.grup ? 'selected' : ''}>
+                        ${g.nama}
+                    </option>`
+                ).join('')}
+            </select>
+        </td>
          <td>${shiftLabel}</td>
 
         <td>
@@ -457,7 +646,7 @@ function addLongShiftRow(pegawaiData, originalRow) {
     if (originalLongshiftBtn) {
         originalLongshiftBtn.style.display = 'none';
     }
-
+    hitungTotal();
     // console.log('Baris longshift berhasil ditambahkan untuk:', pegawaiData.nama);
 }
 
@@ -534,8 +723,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 uuid: this.dataset.pegawai,
                 nama: this.dataset.nama,
                 shift: this.dataset.shift,
-            };
 
+                jabatan: this.dataset.jabatan,
+                grup: this.dataset.grup,
+
+                jabatans: JSON.parse(this.dataset.jabatans),
+                grups: JSON.parse(this.dataset.grups),
+            };
             const originalRow = this.closest('tr');
             addLongShiftRow(pegawaiData, originalRow);
         });

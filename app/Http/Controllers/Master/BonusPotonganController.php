@@ -139,12 +139,15 @@ class BonusPotonganController extends Controller
 
     public function update_system(Request $request, $uuid)
     {
+        // dd($request->all());
         $request->merge([
             'nominal'  => str_replace('.', '', $request->nominal),
         ]);
 
         $validated = $request->validate([
             'nominal' => 'required|numeric',
+            'jabatan' => 'required|array|min:1',
+            'jabatan.*' => 'uuid|exists:jabatans,uuid',
         ]);
 
         $bonusPotongan = BonusPotongan::where('uuid', $uuid)->firstOrFail();

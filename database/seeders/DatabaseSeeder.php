@@ -101,7 +101,7 @@ class DatabaseSeeder extends Seeder
                 'nama' => 'Potongan Alpha',
                 'kode' => 'potongan_alpha',
                 'uuid' => Str::uuid(),
-                'jenis' => 1,
+                'jenis' => 2,
                 'nominal' => 2500,
                 'keterangan' => 'Potongan Alpha',
                 'status' => 1,

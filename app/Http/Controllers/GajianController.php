@@ -52,6 +52,8 @@ class GajianController extends Controller
     private function generateGaji($periode)
     {
         $pegawais = Pegawai::with('jabatan')->get();
+        $allBonus = BonusPotongan::where('jenis', 1)->get();
+        $allPotongan = BonusPotongan::where('jenis', 2)->get();
 
         foreach ($pegawais as $pegawai) {
 
@@ -85,11 +87,28 @@ class GajianController extends Controller
                 $gajiPokok += $tarif;
             }
 
-            // HITUNGAN POTONGAN ALPHA
+            //POTONGAN
+            //PER PEGAWAI SESUAI JABATAN
+            $potonganData = $allPotongan->filter(function ($item) use ($pegawai) {
+                return in_array($pegawai->jabatan_uuid, $item->jabatan ?? []);
+            });
+            
+            //ATURAN : Alpha = Potongan -2.5rb all jabatan
             $potongan = 0;
+            if ($alpha > 0) {
+                $potongan = $alpha * $potonganData->sum('nominal');
+            }
 
-            //HITUNGAN BONUS KEHADIRAN
-            $bonus = 0;
+            //BONUS 
+            //PER PEGAWAI SESUAI JABATAN
+            $bonusData = $allBonus->filter(function ($item) use ($pegawai) {
+                return in_array($pegawai->jabatan_uuid, $item->jabatan ?? []);
+            });
+             
+            //ATURAN : jika ada alpha & izin, maka tidak dapat bonus kehadiran
+            $bonus = ($izin == 0 && $alpha == 0 && $hadir > 0)
+                ? $bonusData->sum('nominal')
+                : 0;
 
             $hutang = DB::table('hutangs')
                     ->where('pegawai_uuid', $pegawai->uuid)
@@ -99,9 +118,9 @@ class GajianController extends Controller
             $potongan += $hutang;
             $gajiBersih = $gajiPokok - $potongan;
 
-            $existing = Gajian::where('periode_uuid', $periode->uuid)
-                ->where('pegawai_uuid', $pegawai->uuid)
-                ->first();
+            // $existing = Gajian::where('periode_uuid', $periode->uuid)
+            //     ->where('pegawai_uuid', $pegawai->uuid)
+            //     ->first();
 
             Gajian::updateOrCreate(
                 [
@@ -116,10 +135,10 @@ class GajianController extends Controller
                     'alpha' => $alpha,
 
                     'gaji_pokok' => $gajiPokok,
-                    'bonus' => $existing->bonus ?? 0,
-                    'potongan' => $existing->potongan ?? $potongan,
+                    'bonus' => $bonus,
+                    'potongan' => $potongan,
                     
-                    'gaji_bersih' => $gajiPokok + ($existing->bonus ?? 0) - ($existing->potongan ?? $potongan),
+                    'gaji_bersih' => $gajiPokok + ($existing->bonus ?? $bonus) - ($existing->potongan ?? $potongan),
                 ]
             );
         }
@@ -146,7 +165,7 @@ class GajianController extends Controller
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal proses');
+            return back()->with('error', $e->getMessage());
         }
     }
 
