@@ -102,54 +102,54 @@ class AbsensiUpdateController extends Controller
         $tanggal = $validated['tanggal_absen'];
         $mesin_status = $validated['mesin_status'];
 
+        
         $totalProduksiPerShift = [];
+        //hitung total produksi per shift untuk update/insert ke ProduksiHarian
+        foreach ($validated['data'] as $uuid => $item) {
+            $shift = $item['shift'];
+            $pencapaian = $item['pencapaian'] ?? 0;
+            $totalProduksiPerShift[$shift] = ($totalProduksiPerShift[$shift] ?? 0) + $pencapaian;
+            }
+            
+            // dd($validated);
+        $produksiPerShift = [];
+        foreach ($totalProduksiPerShift as $shift => $totalProduksi) {
+            $mesinStatus = $validated['mesin_status'][$shift] ?? 0;
+            $produksi = ProduksiHarian::firstOrNew([
+                'tanggal' => $tanggal,
+                'shift' => $shift,
+            ]);
+            if (!$produksi->exists) {
+                $produksi->uuid = Str::uuid();
+            }
+            $produksi->mesin_status = $mesinStatus;
+            $produksi->total_produksi = $totalProduksi;
 
-        // dd($validated);
+            $produksi->save();
+
+            $produksiPerShift[$shift] = $produksi->uuid;
+        }
 
         foreach ($validated['data'] as $uuid => $item) {
-
             $uuid = str_replace('_long', '', $uuid);
             $pegawai = Pegawai::where('uuid', $uuid)->firstOrFail();
 
             $shift = $item['shift'];
-            $pencapaian = $item['pencapaian'] ?? 0;
-
-            // 🔥 akumulasi produksi per shift
-            if (!isset($totalProduksiPerShift[$shift])) {
-                $totalProduksiPerShift[$shift] = 0;
-            }
-            $totalProduksiPerShift[$shift] += $pencapaian;
 
             Absensi::updateOrCreate(
                 [
                     'pegawai_uuid' => $uuid,
                     'tgl_absen' => $tanggal,
-                    'shift' => $item['shift'], // 🔥 WAJIB
-                ],
-                [
-                    'uuid' => \Illuminate\Support\Str::uuid(),
-                    'status' => $item['status'],
-                    'pencapaian' => $item['pencapaian'] ?? 0,
-                    'is_lembur' => $item['is_lembur'] ?? 0,
-
-                    'jabatan_uuid' => $item['jabatan_uuid'] ?? $pegawai->jabatan_uuid,
-                    'grup_uuid' => $item['grup_uuid'] ?? $pegawai->grup_uuid,
-                ]
-            );
-        }
-        
-        foreach ($totalProduksiPerShift as $shift => $totalProduksi) {
-            $mesinStatus = $request->mesin_status[$shift] ?? 0;
-            
-            ProduksiHarian::updateOrCreate(
-                [
-                    'tanggal' => $tanggal,
                     'shift' => $shift,
                 ],
                 [
-                    'uuid' => \Illuminate\Support\Str::uuid(),
-                    'mesin_status' => $mesinStatus,
-                    'total_produksi' => $totalProduksi,
+                    'uuid' => Str::uuid(),
+                    'produksi_uuid' => $produksiPerShift[$shift] ?? null,
+                    'status' => $item['status'],
+                    'pencapaian' => $item['pencapaian'] ?? 0,
+                    'is_lembur' => $item['is_lembur'] ?? 0,
+                    'jabatan_uuid' => $item['jabatan_uuid'] ?? $pegawai->jabatan_uuid,
+                    'grup_uuid' => $item['grup_uuid'] ?? $pegawai->grup_uuid,
                 ]
             );
         }

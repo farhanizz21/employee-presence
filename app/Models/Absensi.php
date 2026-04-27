@@ -78,5 +78,10 @@ class Absensi extends Model
         return $this->hasOne(Hasil_produksi::class, 'tanggal', 'tanggal');
     }
 
+    public function produksi()
+    {
+        return $this->belongsTo(ProduksiHarian::class, 'produksi_uuid', 'uuid');
+    }
+
 
 }
