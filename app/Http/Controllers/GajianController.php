@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Master\Hutang;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,8 @@ class GajianController extends Controller
 {
      public function index()
     {
-        $periodes = GajianPeriode::orderBy('created_at', 'desc')->get();
+        $periodes = GajianPeriode::orderBy('created_at', 'desc')->
+    get();
 
         return view('gajian.index', compact('periodes'));
     }
@@ -55,10 +57,27 @@ class GajianController extends Controller
         $pegawais = Pegawai::with('jabatan')->get();
         $allBonus = BonusPotongan::where('jenis', 1)->get();
         $allPotongan = BonusPotongan::where('jenis', 2)->get();
-        
-            foreach ($pegawais as $pegawai) {
 
-            // 🔥 FIX 1: LOAD JABATAN
+        // 🔥 1. HITUNG GLOBAL TUKANG PER SHIFT
+        $allAbsensis = Absensi::with('jabatan')
+            ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
+            ->where('status', '1')
+            ->get();
+
+        $tukangPerShift = [];
+
+        foreach ($allAbsensis as $item) {
+            if ($item->jabatan && strtolower($item->jabatan->jabatan) == 'tukang') {
+                $shift = $item->shift;
+                $tukangPerShift[$shift] = ($tukangPerShift[$shift] ?? 0) + 1;
+            }
+        }
+
+        // 🔍 DEBUG GLOBAL (WAJIB LIHAT INI DULU)
+        // dd('GLOBAL TUKANG PER SHIFT', $tukangPerShift);
+
+        foreach ($pegawais as $pegawai) {
+
             $absensis = Absensi::where('pegawai_uuid', $pegawai->uuid)
                 ->with(['produksi', 'jabatan'])
                 ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
@@ -70,92 +89,51 @@ class GajianController extends Controller
 
             $gajiPokok = 0;
 
-            // 🔥 FIX 2: HITUNG TUKANG PER SHIFT
-            $tukangPerShift = [];
-
-            $absensiPegawai = Absensi::where('pegawai_uuid', $pegawai->uuid)
-                ->with('jabatan')
-                ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
-                ->where('status', '1')
-                ->get();
-
-            foreach ($absensiPegawai as $item) {
-
-                if ($item->jabatan && strtolower($item->jabatan->jabatan) == 'tukang') {
-
-                    $shift = $item->shift;
-
-                    $tukangPerShift[$shift] = ($tukangPerShift[$shift] ?? 0) + 1;
-                }
-            }
-
-            // 🔍 DEBUG WAJIB (LIHAT STRUKTUR DATA)
-            dump('TUKANG MAP', $pegawai->nama, $tukangPerShift);
-
             foreach ($absensis as $absen) {
-
-                // 🔍 DEBUG CEK JABATAN ABSEN
-                dump([
-                    'pegawai' => $pegawai->nama,
-                    'jabatan_absen' => $absen->jabatan->jabatan ?? 'NULL',
-                    'shift' => $absen->shift,
-                    'status' => $absen->status
-                ]);
-
-                if ($absen->jabatan && strtolower($absen->jabatan->jabatan) == 'tukang') {
-
-                    dd('TUKANG DETECTED', $pegawai->nama, $absen->shift);
-
-                    $shift = $absen->shift;
-
-                    $jumlahTukang = $tukangPerShift[$shift] ?? 1;
-
-                    $totalProduksi = $absen->produksi->total_produksi ?? 0;
-
-                    $tarifDasar = ($shift == 1)
-                        ? $absen->jabatan->gaji_pagi
-                        : $absen->jabatan->gaji_malam;
-
-                    $tarif = ($totalProduksi / max(1, $jumlahTukang)) * $tarifDasar;
-
-                    // 🔍 DEBUG PERHITUNGAN
-                    dump([
-                        'shift' => $shift,
-                        'totalProduksi' => $totalProduksi,
-                        'jumlahTukang' => $jumlahTukang,
-                        'tarifDasar' => $tarifDasar,
-                        'tarifFinal' => $tarif
-                    ]);
-                }
-
-                $ProduksiHarian = ProduksiHarian::where('uuid',$absen->produksi_uuid)->firstOrFail();
 
                 // hanya hitung yang hadir
                 if ($absen->status != '1') {
                     continue;
                 }
 
-                // tentukan tarif berdasarkan shift
-                if ($absen->shift == '1') {
+                $shift = $absen->shift;
+
+                // default tarif
+                if ($shift == '1') {
                     $tarif = $pegawai->jabatan->gaji_pagi ?? 0;
-                } elseif ($absen->shift == '2') {
+                } elseif ($shift == '2') {
                     $tarif = $pegawai->jabatan->gaji_malam ?? 0;
                 } else {
                     $tarif = 0;
                 }
-                
-                //penghitungan gaji pokok borongan is_system berdasarkan jabatan & shift
-                if($absen->jabatan->is_system == true) {
-                    if($absen->jabatan->jabatan == 'NgeCes') {
-                        $tarif = ($absen->shift == '1') ? 100 : 105;
-                    } elseif($absen->jabatan->jabatan == 'NgePan') {
+
+                // LOGIKA JABATAN SISTEM
+                if ($absen->jabatan && $absen->jabatan->is_system) {
+
+                    if ($absen->jabatan->jabatan == 'NgeCes') {
+
+                    } elseif ($absen->jabatan->jabatan == 'NgePan') {
+
+                        // tetap
+
+                    } elseif ($absen->jabatan->jabatan == 'Tukang') {
+
+                        $jumlahTukang = $tukangPerShift[$shift] ?? 1;
                         
-                    } elseif($absen->jabatan->jabatan == 'Tukang') {
-                        $tarif = $ProduksiHarian->total_produksi * ($absen->shift == '1' ? $pegawai->jabatan->gaji_pagi : $pegawai->jabatan->gaji_malam) / ($tukangPerShift[$absen->shift] ?? 1);
-                        // dd($tarif, 
-                        // $ProduksiHarian->total_produksi, 
-                        // $absen->shift == '1' ? $pegawai->jabatan->gaji_pagi : $pegawai->jabatan->gaji_malam, 
-                        // $tukangPerShift[$absen->shift] ?? 1);
+                        $mesinStatus = $absen->produksi->mesin_status ?? 0;
+                        $totalProduksi = $absen->produksi->total_produksi ?? 0;
+
+                        $tarifDasar = ($shift == '1')
+                            ? $pegawai->jabatan->gaji_pagi
+                            : $pegawai->jabatan->gaji_malam;
+                        
+                            if ($mesinStatus == 0) {
+                            // ✅ mesin normal → pakai produksi
+                            $tarif = ($totalProduksi * $tarifDasar) / max(1, $jumlahTukang);
+                        } else {
+                            // ❗ mesin rusak → fallback gaji pokok
+                            $tarif = $pegawai->jabatan->gaji_pokok ?? 0;
+                        }
                     }
                 }
 
@@ -163,35 +141,30 @@ class GajianController extends Controller
             }
 
             //---------------- POTONGAN --------------------
-            //PER PEGAWAI SESUAI JABATAN
             $potonganData = $allPotongan->filter(function ($item) use ($pegawai) {
                 return in_array($pegawai->jabatan_uuid, $item->jabatan ?? []);
             });
-            
-            //ATURAN : Alpha = Potongan -2.5rb all jabatan
+
             $potongan = 0;
             if ($alpha > 0) {
                 $potongan = $alpha * $potonganData->sum('nominal');
             }
 
             //----------------- BONUS ---------------------
-            //PER PEGAWAI SESUAI JABATAN
             $bonusData = $allBonus->filter(function ($item) use ($pegawai) {
                 return in_array($pegawai->jabatan_uuid, $item->jabatan ?? []);
             });
-             
-            //ATURAN : jika ada alpha & izin, maka tidak dapat bonus kehadiran
+
             $bonus = ($izin == 0 && $alpha == 0 && $hadir > 0)
                 ? $bonusData->sum('nominal')
                 : 0;
 
-            $hutang = DB::table('hutangs')
-                    ->where('pegawai_uuid', $pegawai->uuid)
-                    ->where('is_active', 1)
-                    ->sum('nominal');
+            //----------------- Hutang ambil ---------------------
+            $hutang = Hutang::where('pegawai_uuid', $pegawai->uuid)
+                ->where('is_active', 1)
+                ->sum('nominal');
 
             $potongan += $hutang;
-            $gajiBersih = $gajiPokok - $potongan;
 
             Gajian::updateOrCreate(
                 [
@@ -199,17 +172,14 @@ class GajianController extends Controller
                     'pegawai_uuid' => $pegawai->uuid,
                 ],
                 [
-                    'uuid' => $existing->uuid ?? Str::uuid(),
-
+                    'uuid' => Str::uuid(),
                     'hadir' => $hadir,
                     'izin' => $izin,
                     'alpha' => $alpha,
-
                     'gaji_pokok' => $gajiPokok,
                     'bonus' => $bonus,
                     'potongan' => $potongan,
-                    
-                    'gaji_bersih' => $gajiPokok + ($existing->bonus ?? $bonus) - ($existing->potongan ?? $potongan),
+                    'gaji_bersih' => $gajiPokok + $bonus - $potongan,
                 ]
             );
         }
