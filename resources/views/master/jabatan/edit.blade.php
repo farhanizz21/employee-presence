@@ -96,6 +96,23 @@
                         </div>
                         <div class="form-group row">
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    Gaji Pokok <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" name="gaji_pokok" id="gaji_pokok"
+                                        class="form-control @error('gaji_pokok') is-invalid @enderror"
+                                        value="{{ old('gaji_pokok', number_format($jabatan->gaji_pokok, 0, ',', '.')) }}"
+                                        required>
+                                </div>
+                                @error('gaji_pokok')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Pilihan Bonus <span class="text-danger">*</span></label>
                                 <select name="bonus" class="form-select @error('bonus') is-invalid @enderror">
                                     <option {{ !$jabatan->jabatan ? 'selected' : '' }}>Tidak ada bonus</option>

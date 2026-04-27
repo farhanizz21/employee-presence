@@ -18,7 +18,6 @@
         </div>
     </div>
 </div>
-
 <div class="app-content">
     <div class="container-fluid">
         <div class="col-12">
@@ -26,110 +25,7 @@
                 <div class="card-header">
                     <div class="card-title fw-bold text-primary">Form Tambah Jabatan</div>
                 </div>
-
-                <form class="jabatan" method="post" action="{{ route('jabatan.store') }}">
-                    @csrf
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Nama Jabatan <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" name="jabatan" class="form-control" value="{{ old('jabatan') }}"
-                                    required>
-                                @error('jabatan')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Sistem Gaji <span class="text-danger">*</span>
-                                </label>
-                                <select name="harian" class="form-select @error('harian') is-invalid @enderror"
-                                    required>
-                                    <option disabled {{ old('harian') ? '' : 'selected' }}>Pilih Sistem Gajian</option>
-                                    <option value="1" {{ old('harian') == 1 ? 'selected' : '' }}>Harian</option>
-                                    <option value="2" {{ old('harian') == 2 ? 'selected' : '' }}>Borongan</option>
-                                </select>
-                                @error('harian')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Gaji Pagi <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" name="gaji_pagi" id="gaji_pagi" class="form-control"
-                                        value="{{ old('gaji_pagi') }}" required>
-                                </div>
-                                @error('gaji_pagi')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Gaji Malam <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="text" name="gaji_malam" id="gaji_malam" class="form-control"
-                                        value="{{ old('gaji_malam') }}" required>
-                                </div>
-                                @error('gaji_malam')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Pilihan Bonus</label>
-                                <select name="bonus" class="form-select @error('bonus') is-invalid @enderror">
-                                    <option value="" selected>Tidak ada bonus</option>
-                                    @foreach ($BonusPotongans as $BonusPotongan)
-                                    <option value="{{ $BonusPotongan->uuid }}"
-                                        {{ old('bonus') == $BonusPotongan->uuid ? 'selected' : '' }}>
-                                        {{ $BonusPotongan->nama }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                                @error('bonus')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                                <div class="form-text">
-                                    Pilih bonus kondisional sesuai dengan jabatan
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Keterangan</label>
-                                <input type="text" name="keterangan" class="form-control"
-                                    value="{{ old('keterangan') }}">
-                                @error('keterangan')
-                                <div class="invalid-feedback d-block">
-                                    {{ $message }}
-                                </div>
-                                @enderror
-                                <div class="form-text">
-                                    Kolom isian untuk keterangan tambahan, jika ada.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a href="{{ route('jabatan.index') }}" class="btn btn-md btn-danger">
-                            <i class="fa fa-times"></i> Batal
-                        </a>
-                    </div>
-                </form>
+                <form class="jabatan" method="post" action="{{ route('jabatan.store') }}"> @csrf <div class="card-body"> <div class="form-group row"> <div class="col-md-6 mb-3"> <label class="form-label"> Nama Jabatan <span class="text-danger">*</span> </label> <input type="text" name="jabatan" class="form-control" value="{{ old('jabatan') }}" required> @error('jabatan') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror </div> <div class="col-md-6 mb-3"> <label class="form-label"> Sistem Gaji <span class="text-danger">*</span> </label> <select name="harian" class="form-select @error('harian') is-invalid @enderror" required> <option disabled {{ old('harian') ? '' : 'selected' }}>Pilih Sistem Gajian</option> <option value="1" {{ old('harian') == 1 ? 'selected' : '' }}>Harian</option> <option value="2" {{ old('harian') == 2 ? 'selected' : '' }}>Borongan</option> </select> @error('harian') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror </div> </div> <div class="form-group row"> <div class="col-md-6 mb-3"> <label class="form-label"> Gaji Pagi <span class="text-danger">*</span> </label> <div class="input-group"> <span class="input-group-text">Rp</span> <input type="text" name="gaji_pagi" id="gaji_pagi" class="form-control" value="{{ old('gaji_pagi') }}" required> </div> @error('gaji_pagi') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror </div> <div class="col-md-6 mb-3"> <label class="form-label"> Gaji Malam <span class="text-danger">*</span> </label> <div class="input-group"> <span class="input-group-text">Rp</span> <input type="text" name="gaji_malam" id="gaji_malam" class="form-control" value="{{ old('gaji_malam') }}" required> </div> @error('gaji_malam') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror </div> </div> <div class="form-group row"> <div class="col-md-6 mb-3"> <label class="form-label"> Gaji pokok <span class="text-danger">*</span> </label> <div class="input-group"> <span class="input-group-text">Rp</span> <input type="text" name="gaji_pokok" id="gaji_pokok" class="form-control" value="{{ old('gaji_pokok') }}" required> </div> @error('gaji_pokok') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror </div> </div> <div class="form-group row"> <div class="col-md-6 mb-3"> <label class="form-label">Pilihan Bonus</label> <select name="bonus" class="form-select @error('bonus') is-invalid @enderror"> <option value="" selected>Tidak ada bonus</option> @foreach ($BonusPotongans as $BonusPotongan) <option value="{{ $BonusPotongan->uuid }}" {{ old('bonus') == $BonusPotongan->uuid ? 'selected' : '' }}> {{ $BonusPotongan->nama }} </option> @endforeach </select> @error('bonus') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror <div class="form-text"> Pilih bonus kondisional sesuai dengan jabatan </div> </div> </div> <div class="form-group row"> <div class="col-md-6 mb-3"> <label class="form-label">Keterangan</label> <input type="text" name="keterangan" class="form-control" value="{{ old('keterangan') }}"> @error('keterangan') <div class="invalid-feedback d-block"> {{ $message }} </div> @enderror <div class="form-text"> Kolom isian untuk keterangan tambahan, jika ada. </div> </div> </div> </div> <div class="card-footer"> <button type="submit" class="btn btn-primary">Simpan</button> <a href="{{ route('jabatan.index') }}" class="btn btn-md btn-danger"> <i class="fa fa-times"></i> Batal </a> </div> </form>
             </div>
         </div>
     </div>
@@ -138,24 +34,27 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Format input gaji sebagai currency
-    const gajiPagi = document.getElementById('gaji_pagi');
-    const gajiMalam = document.getElementById('gaji_malam');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Format input gaji sebagai currency
+        const gajiPagi = document.getElementById('gaji_pagi');
+        const gajiMalam = document.getElementById('gaji_malam');
+        const gajiPokok = document.getElementById('gaji_pokok');
 
-    function formatCurrency(input) {
-        let value = input.value.replace(/\D/g, '');
-        if (value) input.value = new Intl.NumberFormat('id-ID').format(value);
-    }
+        function formatCurrency(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value) input.value = new Intl.NumberFormat('id-ID').format(value);
+        }
 
-    gajiPagi.addEventListener('input', () => formatCurrency(gajiPagi));
-    gajiMalam.addEventListener('input', () => formatCurrency(gajiMalam));
+        gajiPagi.addEventListener('input', () => formatCurrency(gajiPagi));
+        gajiMalam.addEventListener('input', () => formatCurrency(gajiMalam));
+        gajiPokok.addEventListener('input', () => formatCurrency(gajiPokok));
 
-    // Sebelum submit, hapus format currency agar tersimpan sebagai angka murni
-    document.querySelector('form').addEventListener('submit', function() {
-        gajiPagi.value = gajiPagi.value.replace(/\D/g, '');
-        gajiMalam.value = gajiMalam.value.replace(/\D/g, '');
+        // Sebelum submit, hapus format currency agar tersimpan sebagai angka murni
+        document.querySelector('form').addEventListener('submit', function() {
+            gajiPagi.value = gajiPagi.value.replace(/\D/g, '');
+            gajiMalam.value = gajiMalam.value.replace(/\D/g, '');
+            gajiPokok.value = gajiPokok.value.replace(/\D/g, '');
+        });
     });
-});
 </script>
 @endpush

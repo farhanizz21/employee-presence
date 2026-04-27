@@ -17,7 +17,8 @@ class JabatanController extends Controller
         $query = Jabatan::query();
 
         //filter sistem
-        if ($request->filled('filter_sistem')) {
+        if ($request->
+    filled('filter_sistem')) {
             $query->where('harian', $request->filter_sistem);
         }
 
@@ -53,16 +54,19 @@ class JabatanController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->merge([
             'gaji_pagi'  => str_replace('.', '', $request->gaji_pagi),
             'gaji_malam' => str_replace('.', '', $request->gaji_malam),
+            'gaji_pokok' => str_replace('.', '', $request->gaji_pokok),
         ]);
 
         $validated = $request->validate([
             'jabatan'    => 'required|string',
             'harian'     => 'required|in:1,2',
-            'gaji_pagi'  => 'required|numeric',
-            'gaji_malam' => 'required|numeric',
+            'gaji_pagi'  => 'nullable|numeric',
+            'gaji_malam' => 'nullable|numeric',
+            'gaji_pokok' => 'nullable|numeric',
             'bonus'    => 'nullable|uuid',
             'keterangan' => 'nullable|string',
         ]);
@@ -73,6 +77,7 @@ class JabatanController extends Controller
             'harian'     => $validated['harian'],
             'gaji_pagi'     => $validated['gaji_pagi'],
             'gaji_malam'     => $validated['gaji_malam'],
+            'gaji_pokok'     => $validated['gaji_pokok'],
             'bonus_uuid' => $validated['bonus'] ?? null,
             'keterangan'  => $validated['keterangan'],
         ]);
@@ -100,6 +105,7 @@ class JabatanController extends Controller
         $request->merge([
             'gaji_pagi'  => str_replace('.', '', $request->gaji_pagi),
             'gaji_malam' => str_replace('.', '', $request->gaji_malam),
+            'gaji_pokok' => str_replace('.', '', $request->gaji_pokok),
         ]);
 
 
@@ -107,8 +113,9 @@ class JabatanController extends Controller
             'jabatan'    => 'required|string',
             'harian'     => 'required|in:1,2',
             'bonus'    => 'nullable',
-            'gaji_pagi'  => 'required|numeric',
-            'gaji_malam' => 'required|numeric',
+            'gaji_pagi'  => 'nullable|numeric',
+            'gaji_malam' => 'nullable|numeric',
+            'gaji_pokok' => 'nullable|numeric',
             'keterangan' => 'nullable|string',
         ]);
         
@@ -119,6 +126,7 @@ class JabatanController extends Controller
             'harian'     => $validated['harian'],
             'gaji_pagi'  => $validated['gaji_pagi'],
             'gaji_malam' => $validated['gaji_malam'],
+            'gaji_pokok' => $validated['gaji_pokok'],
             'bonus_uuid' => $validated['bonus'] ?? null,
             'keterangan' => $validated['keterangan'],
         ]);
@@ -139,11 +147,13 @@ class JabatanController extends Controller
         $request->merge([
             'gaji_pagi'  => str_replace('.', '', $request->gaji_pagi),
             'gaji_malam' => str_replace('.', '', $request->gaji_malam),
+            'gaji_pokok' => str_replace('.', '', $request->gaji_pokok),
         ]);
 
         $validated = $request->validate([
-            'gaji_pagi'  => 'required|numeric',
-            'gaji_malam'  => 'required|numeric',
+            'gaji_pagi'  => 'nullable|numeric',
+            'gaji_malam'  => 'nullable|numeric',
+            'gaji_pokok'  => 'nullable|numeric',
         ]);
         
         $jabatan = Jabatan::where('uuid', $uuid)->firstOrFail();
@@ -151,6 +161,7 @@ class JabatanController extends Controller
         $jabatan->update([
             'gaji_pagi'       => $validated['gaji_pagi'],
             'gaji_malam'       => $validated['gaji_malam'],
+            'gaji_pokok'       => $validated['gaji_pokok'],
         ]);
 
         return redirect()->route('jabatan.index')->with('success', 'Data berhasil diupdate!');

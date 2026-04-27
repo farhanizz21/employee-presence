@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('jabatans', function (Blueprint $table) {
             $table->
-    integer('gaji_pokok')->default(0)->after('gaji_malam');
+            integer('gaji_pokok')->after('gaji_malam')->nullable();
         });
     }
 

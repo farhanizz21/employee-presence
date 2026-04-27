@@ -16,6 +16,7 @@ class Jabatan extends Model
         'jabatan',
         'gaji_pagi',
         'gaji_malam',
+        'gaji_pokok',
         'harian',
         'bonus_uuid',
         'keterangan',
@@ -32,7 +33,8 @@ class Jabatan extends Model
 
     public function getHarianTextAttribute()
     {
-        return match ($this->harian) {
+        return match ($this->
+    harian) {
             1 => 'Harian',
             2 => 'Borongan',
             default => 'Tidak Diketahui'
