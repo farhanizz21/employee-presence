@@ -55,10 +55,7 @@ class GajianController extends Controller
     private function generateGaji($periode)
     {
         $pegawais = Pegawai::with('jabatan')->get();
-        $allBonus = BonusPotongan::where('jenis', 1)->get();
-        $allPotongan = BonusPotongan::where('jenis', 2)->get();
 
-        // 🔥 1. HITUNG GLOBAL Ngepon PER SHIFT
         $allAbsensis = Absensi::with('jabatan')
             ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
             ->where('status', '1')
@@ -72,9 +69,6 @@ class GajianController extends Controller
                 $ngeponPerShift[$shift] = ($ngeponPerShift[$shift] ?? 0) + 1;
             }
         }
-
-        // 🔍 DEBUG GLOBAL (WAJIB LIHAT INI DULU)
-        // dd('GLOBAL Ngepon PER SHIFT', $ngeponPerShift);
 
         foreach ($pegawais as $pegawai) {
 
@@ -145,23 +139,16 @@ class GajianController extends Controller
             }
 
             //---------------- POTONGAN --------------------
-            $potonganData = $allPotongan->filter(function ($item) use ($pegawai) {
-                return in_array($pegawai->jabatan_uuid, $item->jabatan ?? []);
-            });
-
             $potongan = 0;
             if ($alpha > 0) {
-                $potongan = $alpha * $potonganData->sum('nominal');
+                $potongan = BonusPotongan::where('jenis', 2)->first()->nominal ?? 0;
+                // dd($potongan);
             }
 
             //----------------- BONUS ---------------------
-            $bonusData = $allBonus->filter(function ($item) use ($pegawai) {
-                return in_array($pegawai->jabatan_uuid, $item->jabatan ?? []);
-            });
-
-            $bonus = ($izin == 0 && $alpha == 0 && $hadir > 0)
-                ? $bonusData->sum('nominal')
-                : 0;
+            if($izin == 0 && $alpha == 0 && $hadir > 0){
+                $bonus = $pegawai->jabatan->bonusPotongan->nominal ?? 0;
+            }
 
             //----------------- Hutang ambil ---------------------
             $hutang = Hutang::where('pegawai_uuid', $pegawai->uuid)
