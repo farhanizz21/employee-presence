@@ -108,7 +108,11 @@
                                             <td class="text-truncate" style="max-width: 200px;">Rp
                                                 {{ number_format($jabatan->gaji_pokok, 0, ',', '.') ?? '-' }} </td>
                                             <td class="text-truncate"> {{ $jabatan->bonusPotongan->nama ?? '-' }} </td>
-                                            <td class="text-truncate"> {{ $jabatan->keterangan ?? '-'}} </td>
+                                           <td class="text-truncate"
+                                                style="max-width: 250px;"
+                                                title="{{ $jabatan->keterangan }}">
+                                                {{ $jabatan->keterangan ?? '-' }}
+                                            </td>
                                             <td> @if($jabatan->is_system) <span class="badge bg-secondary">Sistem</span>
                                             @else <span class="badge bg-primary">Bisa Edit</span> @endif </td>
                                             <td> {{-- Tombol Edit --}} @if($jabatan->is_system) <a

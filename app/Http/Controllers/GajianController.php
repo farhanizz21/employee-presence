@@ -58,23 +58,23 @@ class GajianController extends Controller
         $allBonus = BonusPotongan::where('jenis', 1)->get();
         $allPotongan = BonusPotongan::where('jenis', 2)->get();
 
-        // 🔥 1. HITUNG GLOBAL TUKANG PER SHIFT
+        // 🔥 1. HITUNG GLOBAL Ngepon PER SHIFT
         $allAbsensis = Absensi::with('jabatan')
             ->whereBetween('tgl_absen', [$periode->tanggal_mulai, $periode->tanggal_selesai])
             ->where('status', '1')
             ->get();
 
-        $tukangPerShift = [];
+        $ngeponPerShift = [];
 
         foreach ($allAbsensis as $item) {
-            if ($item->jabatan && strtolower($item->jabatan->jabatan) == 'tukang') {
+            if ($item->jabatan && $item->jabatan->jabatan == 'Ngepon') {
                 $shift = $item->shift;
-                $tukangPerShift[$shift] = ($tukangPerShift[$shift] ?? 0) + 1;
+                $ngeponPerShift[$shift] = ($ngeponPerShift[$shift] ?? 0) + 1;
             }
         }
 
         // 🔍 DEBUG GLOBAL (WAJIB LIHAT INI DULU)
-        // dd('GLOBAL TUKANG PER SHIFT', $tukangPerShift);
+        // dd('GLOBAL Ngepon PER SHIFT', $ngeponPerShift);
 
         foreach ($pegawais as $pegawai) {
 
@@ -98,7 +98,7 @@ class GajianController extends Controller
 
                 $shift = $absen->shift;
 
-                // default tarif
+                // default tarif harian
                 if ($shift == '1') {
                     $tarif = $pegawai->jabatan->gaji_pagi ?? 0;
                 } elseif ($shift == '2') {
@@ -110,30 +110,34 @@ class GajianController extends Controller
                 // LOGIKA JABATAN SISTEM
                 if ($absen->jabatan && $absen->jabatan->is_system) {
 
-                    if ($absen->jabatan->jabatan == 'NgeCes') {
+                    if ($absen->jabatan->jabatan == 'Jeladren') {
 
-                    } elseif ($absen->jabatan->jabatan == 'NgePan') {
+                        $mesinStatus = $absen->produksi->mesin_status ?? 0;
+                        $hasilPegawai = $absen->pencapaian ?? 0;
+                        $tarifPerKg = ($shift == '1')
+                            ? $absen->jabatan->gaji_pagi
+                            : $absen->jabatan->gaji_malam;
 
-                        // tetap
+                        $gajiMinimal = $absen->jabatan->gaji_pokok ?? 0;
 
-                    } elseif ($absen->jabatan->jabatan == 'Tukang') {
+                        $hasilHitung = $hasilPegawai * $tarifPerKg;
+                        $tarif = max($hasilHitung, $gajiMinimal);
 
-                        $jumlahTukang = $tukangPerShift[$shift] ?? 1;
+                    } elseif ($absen->jabatan->jabatan == 'Ngepon') {
+
+                        $jumlahNgepon = $ngeponPerShift[$shift] ?? 1;
                         
                         $mesinStatus = $absen->produksi->mesin_status ?? 0;
                         $totalProduksi = $absen->produksi->total_produksi ?? 0;
+                        $gajiMinimal = $absen->jabatan->gaji_pokok ?? 0;
 
                         $tarifDasar = ($shift == '1')
                             ? $pegawai->jabatan->gaji_pagi
                             : $pegawai->jabatan->gaji_malam;
                         
-                            if ($mesinStatus == 0) {
-                            // ✅ mesin normal → pakai produksi
-                            $tarif = ($totalProduksi * $tarifDasar) / max(1, $jumlahTukang);
-                        } else {
-                            // ❗ mesin rusak → fallback gaji pokok
-                            $tarif = $pegawai->jabatan->gaji_pokok ?? 0;
-                        }
+                        $hasilHitung = ($totalProduksi * $tarifDasar) / max(1, $jumlahNgepon);
+
+                        $tarif = max($hasilHitung, $gajiMinimal);
                     }
                 }
 
