@@ -140,6 +140,7 @@ class GajianController extends Controller
 
             //---------------- POTONGAN --------------------
             $potongan = 0;
+            $bonus = 0;
             if ($alpha > 0) {
                 $potongan = BonusPotongan::where('jenis', 2)->first()->nominal ?? 0;
                 // dd($potongan);

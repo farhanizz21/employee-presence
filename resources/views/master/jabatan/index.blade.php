@@ -113,8 +113,8 @@
                                                 title="{{ $jabatan->keterangan }}">
                                                 {{ $jabatan->keterangan ?? '-' }}
                                             </td>
-                                            <td> @if($jabatan->is_system) <span class="badge bg-secondary">Sistem</span>
-                                            @else <span class="badge bg-primary">Bisa Edit</span> @endif </td>
+                                            <td> @if($jabatan->is_system) <span class="badge bg-secondary">Default</span>
+                                            @else <span class="badge bg-primary">Editable</span> @endif </td>
                                             <td> {{-- Tombol Edit --}} @if($jabatan->is_system) <a
                                                 href="{{ route('jabatan.edit_system', $jabatan->uuid) }}"
                                                 class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Edit">

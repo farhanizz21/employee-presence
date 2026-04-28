@@ -31,20 +31,6 @@ class BonusPotongan extends Model
         return 'uuid';
     }
 
-    public function getStatusLabelAttribute()
-    {
-        return match ($this->status) {
-            1 => 'Aktif',
-            2 => 'Nonaktif',
-            default => 'Tidak diketahui',
-        };
-    }
-    
-    public function getStatusClassAttribute()
-    {
-        return $this->status == 1 ? 'success' : 'danger';
-    }
-
     public function getJenisLabelAttribute()
     {
         return match ($this->jenis) {

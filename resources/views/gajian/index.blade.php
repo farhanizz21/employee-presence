@@ -37,6 +37,47 @@
                     <i class="fas fa-plus"></i> Tambah Periode
                 </a>
             </div>
+            <div class="card-body pt-3 pb-2">
+                <!-- PANDUAN (tidak terlalu dominan) -->
+                <div class="mb-3">
+
+                    <button class="btn btn-warning btn-sm font-weight-bold" type="button" data-toggle="collapse"
+                        data-target="#panduanBox" aria-expanded="false">
+
+                        <i class="fas fa-info-circle mr-1"></i> Panduan
+                    </button>
+
+                    <div id="panduanBox" class="collapse mt-2">
+
+                        <div class="border rounded p-3 bg-light small">
+
+                            <!-- ALUR -->
+                            <div class="mb-2">
+                                <strong>Alur Proses</strong><br>
+                            </div>
+
+                            <!-- DETAIL -->
+                            <ul class="pl-3 mb-2">
+                                <li>Status Draft: data belum di proses hitung → Klik Proses</li>
+                                <li>Status Calculated : Klik review untuk tinjau gaji (di status ini masih bisa dilakukan penyesuaian. Cara ada di poin selanjutnya). Jika sudah sesuai, Klik Finalisasi</li>
+                                <li>Status Final: kunci data & Cetak PDF</li>
+                            </ul>
+
+                            <!-- PENYESUAIAN -->
+                            <div class="mb-2">
+                                <strong>Penyesuaian (Perubahan Absensi, Bonus & Potongan)</strong>
+                                <ul class="pl-3 mb-0">
+                                    <li>Klik tombol 'Review'</li>
+                                    <li>Untuk perubahan absen bisa klik 'Edit Absen' di pojok kiri bawah</li>
+                                    <li>Untuk perubahan bonus dan potongan manual, klik icon 'Edit' di kolom aksi per pegawai</li>
+                                    <li>Jika ada perubahan harus klik Recalculate agar dapat dihitung kembali</li>
+                                    <li>Penyesuaian ini berlaku hanya sebelum status Final</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="card-body">
 
@@ -89,7 +130,7 @@
                                         <i class="fas fa-eye"></i> Review
                                     </a>
                                     <button class="btn btn-success btn-sm">
-                                        <i class="fas fa-lock"></i> Final
+                                        <i class="fas fa-lock"></i> Finalisasi
                                     </button>
                                     @endif
 

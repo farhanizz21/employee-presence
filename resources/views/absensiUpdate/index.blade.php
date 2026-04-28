@@ -90,18 +90,66 @@
                                     </a>
                                 </div>
                             </form>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10px">#</th>
+                                            <th>Nama</th>
+                                            <th>Jabatan</th>
+                                            <th>Shift</th>
+                                            <th>Status</th>
+                                            <th>Pencapaian</th>
+                                            <th>Tanggal</th>
+                                        </tr>
+                                    </thead>
 
+                                    <tbody>
+                                        @forelse ($absensis as $item)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $item->pegawai->nama }}</td>
+                                            <td>{{ $item->jabatan->jabatan ?? '-' }}</td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    {{ $item->shift == 1 ? 'Pagi' : 'Malam' }}
+                                                </span>
+                                            </td>
 
-                        </div>
-                        <div class="card-footer clearfix">
-                            <!-- pagination -->
-                            <div class="float-end">
+                                            <td>
+                                                @if($item->status == 1)
+                                                <span class="badge bg-success">Masuk</span>
+                                                @elseif($item->status == 2)
+                                                <span class="badge bg-warning">Izin</span>
+                                                @else
+                                                <span class="badge bg-danger">Alpha</span>
+                                                @endif
+                                            </td>
+
+                                            <td>{{ $item->pencapaian ?? 0 }}</td>
+                                            <td>{{ $item->tgl_absen }}</td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted">
+                                                Tidak ada data
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-                    </div> <!-- /.card -->
 
-                </div> <!-- /.col -->
-                <!--end::Col-->
+                            <div class="card-footer clearfix">
+                                <!-- pagination -->
+                                <div class="float-end">
+                                </div>
+                            </div>
+                        </div> <!-- /.card -->
+
+                    </div> <!-- /.col -->
+                    <!--end::Col-->
+                </div>
             </div>
             <!--end::Row-->
             <!--begin::Row-->

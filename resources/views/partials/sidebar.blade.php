@@ -40,7 +40,7 @@
                     <a href="{{ route('absensiUpdate.index') }}"
                         class="nav-link {{ request()->routeIs('absensiUUpdate.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-clipboard-check"></i>
-                        <p>Absensi Update</p>
+                        <p>Absensi</p>
                     </a>
                 </li>
 

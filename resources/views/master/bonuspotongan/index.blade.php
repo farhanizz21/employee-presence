@@ -48,6 +48,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="card-body pt-3 pb-2">
+                            <div class="alert alert-light border small mb-0">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Informasi:</strong><br>
+                                Master Bonus & Potongan dengan status <strong>"Default"</strong> merupakan data bawaan sistem. <br>
+
+                                - Digunakan otomatis saat proses Generate Gaji<br>
+                                - Berlaku sesuai syarat yang ditentukan<br>
+                                - Tidak dapat dihapus<br>
+                                - Nilai nominal masih dapat diubah<br>
+
+                                Penggunaan bonus dapat diatur pada <strong>menu Jabatan</strong> dengan memilih skema bonus yang tersedia.
+                            </div>
+                        </div>
                         <div class="card-body">
                             <form method="GET" action="{{ route('bonuspotongan.index') }}"
                                 class="row gy-2 gx-3 mb-3 align-items-center">
@@ -108,9 +122,6 @@
                                                 Nominal
                                             </th>
                                             <th>
-                                                Jabatan
-                                            </th>
-                                            <th>
                                                 Keterangan
                                             </th>
                                             <th style="width: 5%">
@@ -132,7 +143,7 @@
                                             <td class="text-truncate" style="max-width: 200px;">
                                                 Rp {{ number_format($bonuspotongan->nominal, 0, ',', '.') }}
                                             </td>
-                                            <td style="max-width: 200px;">
+                                            <!-- <td style="max-width: 200px;">
                                                 @if(!empty($bonuspotongan->jabatan_names))
                                                 <ul class="mb-0 ps-3">
                                                     @foreach($bonuspotongan->jabatan_names as $nama)
@@ -142,16 +153,16 @@
                                                 @else
                                                 -
                                                 @endif
-                                            </td>
+                                            </td> -->
                                             <td class="text-truncate" style="max-width: 200px;">
                                                 {{ $bonuspotongan->keterangan }}
                                             </td>
                                             <td>
                                                 @if($bonuspotongan->is_system)
-                                                <span class="badge bg-secondary">Sistem</span>
+                                                <span class="badge bg-secondary">Default</span>
                                                 @else
-                                                <span class="badge bg-{{ $bonuspotongan->status_class }}">
-                                                    {{ $bonuspotongan->status_label }}
+                                                <span class="badge bg-primary">
+                                                    Editable
                                                 </span>
                                                 @endif
                                             </td>

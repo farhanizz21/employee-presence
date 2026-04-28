@@ -19,7 +19,20 @@ class AbsensiUpdateController extends Controller
 
     public function index(Request $request)
     {
-        return view('absensiUpdate.index');
+        $tanggal = request('tanggal') ?? now()->toDateString();
+
+        $absensis = Absensi::with(['pegawai','jabatan'])
+            ->whereDate('tgl_absen', $tanggal)
+            ->get();
+
+        $hadir = $absensis->where('status', 1)->count();
+        $izin  = $absensis->where('status', 2)->count();
+        $alpha = $absensis->where('status', 3)->count();
+
+        return view('absensiUpdate.index', compact(
+            'absensis','hadir','izin','alpha'
+        ));
+        // return view('absensiUpdate.index');
     }
 
     public function create(Request $request)

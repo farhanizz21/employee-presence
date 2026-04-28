@@ -25,7 +25,7 @@ use App\Http\Controllers\PayrollController;
 
 Route::get('/', function () {
     return auth()->check()
-        ? redirect()->route('user.index')
+        ? redirect()->route('absensiUpdate.index')
         : redirect()->route('login');
 });
 
