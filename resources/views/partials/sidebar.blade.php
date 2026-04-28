@@ -29,13 +29,13 @@
                 aria-label="Main navigation" data-accordion="false" id="navigation">
 
                 {{-- Absensi --}}
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a href="{{ route('absensi.index') }}"
                         class="nav-link {{ request()->routeIs('absensi.index') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-clipboard-check"></i>
                         <p>Absensi</p>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a href="{{ route('absensiUpdate.index') }}"
                         class="nav-link {{ request()->routeIs('absensiUUpdate.*') ? 'active' : '' }}">
